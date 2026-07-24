@@ -52,7 +52,15 @@ function renderCurrent() {
 }
 function bounds() {
   const xs = currentLayout.map(p => p.x), ys = currentLayout.map(p => p.y);
-  return { minX: Math.min(...xs), maxX: Math.max(...xs), minY: Math.min(...ys), maxY: Math.max(...ys) };
+  let minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  // scale 视图左侧要容纳尺度标签（如“中观”“宇观”），需额外留白
+  if (state.view === 'scale') {
+    minX -= 220;
+    minY -= 80;
+    maxX += 80;
+    maxY += 80;
+  }
+  return { minX, maxX, minY, maxY };
 }
 function fit() { fitView(bounds(), stage.clientWidth, stage.clientHeight); }
 
