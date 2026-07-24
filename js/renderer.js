@@ -89,7 +89,7 @@ function drawScaleBands(layer) {
   // 尺度维度：按 mesoscopic / cosmic / microscopic / unified / feedback 分行显示
   const all = NODES.map(n => POS[n.id]).filter(Boolean);
   if (!all.length) return;
-  const globalMinX = Math.min(...all.map(p => p.x)) - 80;
+  const globalMinX = Math.min(...all.map(p => p.x)) - 160;
   const globalMaxX = Math.max(...all.map(p => p.x)) + 80;
 
   for (const scale of SCALE_ORDER) {

@@ -57,15 +57,11 @@ function computeScaleLayout(nodes) {
 
     const availW = W - PAD_X * 2;
     const count = list.length;
-    // 节点间距至少 240px，避免拥挤
-    const neededW = (count - 1) * 240;
-    const step = count > 1 ? Math.max(availW / (count - 1), 240) : 0;
-    const totalW = (count - 1) * step;
-    const startX = (W - totalW) / 2; // 整体居中
+    const step = count > 1 ? availW / (count - 1) : 0;
 
     for (let i = 0; i < count; i++) {
       const n = list[i];
-      const x = count === 1 ? W / 2 : startX + i * step;
+      const x = count === 1 ? W / 2 : PAD_X + i * step;
       pos.push({ id: n.id, x, y: yBase });
     }
   }

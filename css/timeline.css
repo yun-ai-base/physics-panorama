@@ -33,6 +33,7 @@
 /* 连线含义小标签 */
 .edge__label{font-family:var(--font-sans); font-size:10px; font-weight:700; fill:var(--ink-2); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.92); stroke-width:4px; stroke-linejoin:round; opacity:.92; transition:opacity .3s;}
 .edge__label.is-dim{opacity:.08 !important;}
+.edge__label-bg{fill:rgba(247,243,234,.88); pointer-events:none;}
 
 /* 节点 —— 实心浅色填充 + 纪元色描边加粗 */
 .node{cursor:pointer; transition:opacity .3s, transform .2s;}
