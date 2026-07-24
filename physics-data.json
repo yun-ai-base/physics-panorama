@@ -1,0 +1,290 @@
+{
+  "timeline": [
+    {
+      "id": "newton-mechanics",
+      "timeline": {
+        "x": 100,
+        "y": 500
+      }
+    },
+    {
+      "id": "lagrangian-mechanics",
+      "timeline": {
+        "x": 170,
+        "y": 300
+      }
+    },
+    {
+      "id": "thermodynamics",
+      "timeline": {
+        "x": 240,
+        "y": 700
+      }
+    },
+    {
+      "id": "maxwell-em",
+      "timeline": {
+        "x": 310,
+        "y": 500
+      }
+    },
+    {
+      "id": "stat-mechanics",
+      "timeline": {
+        "x": 380,
+        "y": 300
+      }
+    },
+    {
+      "id": "blackbody-radiation",
+      "timeline": {
+        "x": 450,
+        "y": 700
+      }
+    },
+    {
+      "id": "michelson-morley",
+      "timeline": {
+        "x": 520,
+        "y": 300
+      }
+    },
+    {
+      "id": "two-clouds",
+      "timeline": {
+        "x": 590,
+        "y": 700
+      }
+    },
+    {
+      "id": "special-relativity",
+      "timeline": {
+        "x": 790,
+        "y": 500
+      }
+    },
+    {
+      "id": "general-relativity",
+      "timeline": {
+        "x": 890,
+        "y": 500
+      }
+    },
+    {
+      "id": "lcdm",
+      "timeline": {
+        "x": 990,
+        "y": 300
+      }
+    },
+    {
+      "id": "planck-quantum",
+      "timeline": {
+        "x": 1190,
+        "y": 300
+      }
+    },
+    {
+      "id": "photoelectric",
+      "timeline": {
+        "x": 1255,
+        "y": 700
+      }
+    },
+    {
+      "id": "bohr-model",
+      "timeline": {
+        "x": 1320,
+        "y": 300
+      }
+    },
+    {
+      "id": "quantum-mechanics",
+      "timeline": {
+        "x": 1385,
+        "y": 500
+      }
+    },
+    {
+      "id": "solvay-conference",
+      "timeline": {
+        "x": 1450,
+        "y": 700
+      }
+    },
+    {
+      "id": "uncertainty-principle",
+      "timeline": {
+        "x": 1515,
+        "y": 300
+      }
+    },
+    {
+      "id": "dirac-equation",
+      "timeline": {
+        "x": 1580,
+        "y": 700
+      }
+    },
+    {
+      "id": "qed",
+      "timeline": {
+        "x": 1645,
+        "y": 500
+      }
+    },
+    {
+      "id": "yang-mills",
+      "timeline": {
+        "x": 1845,
+        "y": 300
+      }
+    },
+    {
+      "id": "electroweak",
+      "timeline": {
+        "x": 1920,
+        "y": 500
+      }
+    },
+    {
+      "id": "qcd",
+      "timeline": {
+        "x": 1995,
+        "y": 500
+      }
+    },
+    {
+      "id": "standard-model",
+      "timeline": {
+        "x": 2070,
+        "y": 500
+      }
+    },
+    {
+      "id": "higgs",
+      "timeline": {
+        "x": 2145,
+        "y": 700
+      }
+    },
+    {
+      "id": "string-theory",
+      "timeline": {
+        "x": 2345,
+        "y": 500
+      }
+    },
+    {
+      "id": "loop-quantum-gravity",
+      "timeline": {
+        "x": 2415,
+        "y": 300
+      }
+    },
+    {
+      "id": "dark-matter-energy",
+      "timeline": {
+        "x": 2485,
+        "y": 700
+      }
+    },
+    {
+      "id": "quantum-computing",
+      "timeline": {
+        "x": 2555,
+        "y": 500
+      }
+    },
+    {
+      "id": "ligo",
+      "timeline": {
+        "x": 2625,
+        "y": 300
+      }
+    },
+    {
+      "id": "quantum-gravity-test",
+      "timeline": {
+        "x": 2695,
+        "y": 700
+      }
+    },
+    {
+      "id": "grand-unification",
+      "timeline": {
+        "x": 2765,
+        "y": 500
+      }
+    }
+  ],
+  "conflicts": [
+    {
+      "from": "general-relativity",
+      "to": "quantum-mechanics",
+      "description": "广义相对论将引力描述为光滑时空的几何弯曲，量子力学要求所有相互作用通过量子化媒介传递——两者在普朗克尺度给出相互矛盾的数学预言。黑洞信息悖论是这一冲突的具体体现：霍金辐射暗示信息可能被摧毁，直接违反量子力学的幺正性。"
+    },
+    {
+      "from": "standard-model",
+      "to": "general-relativity",
+      "description": "标准模型精确描述了电磁力、弱力和强力，却无法包含引力——引力在量子场论框架中不可重整化。"
+    },
+    {
+      "from": "lcdm",
+      "to": "standard-model",
+      "description": "LambdaCDM宇宙学模型要求宇宙由约5%普通物质、27%暗物质和68%暗能量组成，标准模型粒子只能解释那5%。"
+    },
+    {
+      "from": "standard-model",
+      "to": "lcdm",
+      "description": "标准模型中的CP破缺太小，不足以解释宇宙中物质远多于反物质的事实——观测偏差约10个数量级以上。"
+    },
+    {
+      "from": "quantum-mechanics",
+      "to": "newton-mechanics",
+      "description": "牛顿力学建立在决定论之上，量子力学引入波函数概率坍缩和不确定性原理，颠覆了经典决定论。"
+    },
+    {
+      "from": "special-relativity",
+      "to": "newton-mechanics",
+      "description": "狭义相对论以光速不变和相对性原理推翻了牛顿的绝对时空观。经典力学在接近光速时完全失效。"
+    },
+    {
+      "from": "maxwell-em",
+      "to": "newton-mechanics",
+      "description": "麦克斯韦方程组预言真空光速为常数，牛顿绝对时空观下光速应随参考系变化——迈克尔逊-莫雷实验的零结果暴露了这一矛盾。"
+    },
+    {
+      "from": "quantum-mechanics",
+      "to": "maxwell-em",
+      "description": "经典电磁学将光视为连续波，但瑞利-金斯定律预言短波能量发散（紫外灾难），与实验矛盾。普朗克量子化和爱因斯坦光量子理论证明光具有粒子性。"
+    },
+    {
+      "from": "thermodynamics",
+      "to": "stat-mechanics",
+      "description": "热力学第二定律确立了宏观不可逆的时间箭头，而统计力学（热力学的微观基础）其底层动力学方程却时间反演对称——洛施密特悖论正是指出：从微观可逆定律如何涌现出宏观不可逆，这一张力至今仍是统计物理的基础议题，而非热力学与统计力学彼此矛盾。"
+    },
+    {
+      "from": "electroweak",
+      "to": "grand-unification",
+      "description": "电弱统一后要更进一步将强力纳入统一框架，但耦合常数在高能下未完全交汇，质子衰变未观测到——大统一仍是梦想。"
+    },
+    {
+      "from": "string-theory",
+      "to": "loop-quantum-gravity",
+      "description": "弦理论假设10维时空中的一维弦，圈量子引力主张4维时空的离散自旋网络——两者假设截然不同，均缺乏可实验检验的独特预言。"
+    },
+    {
+      "from": "qed",
+      "to": "lcdm",
+      "description": "量子场论计算的真空能密度与观测的暗能量密度相差约120个数量级（宇宙常数问题），是理论物理学史上最大的数值偏差。"
+    }
+  ],
+  "summaries": {
+    "classical": "从牛顿1687年发表《自然哲学的数学原理》到19世纪末麦克斯韦完成电磁场统一，经典物理学建立起力学、热力学、电磁学和统计力学四大支柱。它以决定论和绝对时空观为基石，以微积分为工具，描绘了一个可精确预测的机械宇宙图景。然而，19世纪末迈克尔逊-莫雷实验的零结果与黑体辐射的紫外灾难已悄然播下革命的种子。",
+    "relativity": "爱因斯坦在1905年以狭义相对论颠覆了绝对时空观，揭示出光速不变、时间膨胀和质能等价（E=mc^2）的革命性结论。1915年他进一步创立广义相对论，将引力诠释为时空弯曲的几何效应。以此为基础的LambdaCDM宇宙学标准模型成功解释了宇宙微波背景辐射和元素丰度，但它依赖的暗物质和暗能量本质仍超出已知物理的适用范围。",
+    "quantum": "1900年普朗克以能量量子化假说破解黑体辐射之困，随后爱因斯坦的光量子说、玻尔的原子模型、德布罗意的物质波、海森堡的矩阵力学和薛定谔的波动力学共同编织出量子力学的完整体系。1927年索尔维会议上爱因斯坦与玻尔关于上帝是否掷骰子的世纪辩论将量子诠释之争推向哲学顶峰。",
+    "standard-model": "杨振宁和米尔斯在1954年提出非阿贝尔规范场论。随后电弱统一理论和量子色动力学相继建立，在1970年代汇聚为粒子物理标准模型。希格斯机制在2012年被LHC实验以125GeV的希格斯玻色子发现而辉煌验证。然而它无法包含引力、没有暗物质候选粒子、未能解释中微子质量起源。",
+    "frontier": "当代物理学面向五个并行的前沿：弦理论以10维时空中的一维弦致力于万物统一，圈量子引力主张时空本身是离散网络；暗物质直接探测和暗能量巡天正试图揭开宇宙95%暗面之谜；LIGO和Virgo的引力波探测开启了多信使天文学；量子计算与量子信息将叠加和纠缠从佯谬转化为实用技术。"
+  }
+}

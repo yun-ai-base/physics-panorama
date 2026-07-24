@@ -1,0 +1,14 @@
+// 全局统一状态：所有交互仅修改 state，再由 render 刷新
+export const state = {
+  scale: 1,
+  tx: 0,
+  ty: 0,
+  selected: null,          // 选中节点 id
+  highlight: new Set(),    // 路径高亮节点集合
+  expandAll: false,        // 是否展开全链路
+  filterEra: null,         // 纪元筛选（null = 全部）
+  onlyCore: true,          // 仅显示主干
+  view: 'timeline',        // 当前视图
+  tour: null,              // 漫游模式
+  sidebarOpen: false,
+};
