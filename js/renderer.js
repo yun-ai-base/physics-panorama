@@ -15,6 +15,7 @@ const byId = new Map();
 let nodeEls = new Map();
 let edgeEls = [];
 let prefaceEls = [];
+let currentView = 'timeline';
 
 export function initRenderer(nodes, edges, summaries) {
   NODES = nodes; EDGES = edges; SUMMARIES = summaries || {};
@@ -23,7 +24,17 @@ export function initRenderer(nodes, edges, summaries) {
 
 function clear(layer) { while (layer.firstChild) layer.removeChild(layer.firstChild); }
 
+// 估算文字渲染宽度（CJK 按字号宽，其余约 0.6 倍），用于标签底板尺寸
+function labelW(text, size) {
+  let w = 0;
+  for (const ch of String(text)) {
+    w += /[一-鿿]/.test(ch) ? size : size * 0.6;
+  }
+  return w;
+}
+
 export function renderGraph(view, layoutList) {
+  currentView = view;
   POS = Object.fromEntries(layoutList.map(p => [p.id, p]));
   const L = {
     era: document.getElementById('layer-era'),
@@ -111,19 +122,44 @@ function drawScaleBands(layer) {
   }
 }
 
+function scaleEdgePath(a, b) {
+  // 尺度维度视图用正交折线：同行水平，跨行先垂后平再垂，像地铁图
+  const dy = Math.abs(b.y - a.y);
+  if (dy < 2) {
+    return `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+  }
+  const my = (a.y + b.y) / 2;
+  return `M ${a.x} ${a.y} L ${a.x} ${my} L ${b.x} ${my} L ${b.x} ${b.y}`;
+}
+
+function scaleLabelMid(a, b) {
+  const dy = Math.abs(b.y - a.y);
+  if (dy < 2) return { x: (a.x + b.x) / 2, y: a.y - 8 };
+  const my = (a.y + b.y) / 2;
+  return { x: (a.x + b.x) / 2, y: my - 8 };
+}
+
 function drawEdges(layer) {
+  const isScale = currentView === 'scale';
   for (const e of EDGES) {
     const a = POS[e.from], b = POS[e.to];
     if (!a || !b) continue;
-    const d = edgePath(a, b);
+    const d = isScale ? scaleEdgePath(a, b) : edgePath(a, b);
     const path = el('path', {
       d, class: `edge ${EDGE_CLASS[e.type]}`,
     }, layer);
-    const m = bezierMidpoint(a, b);
+    const m = isScale ? scaleLabelMid(a, b) : bezierMidpoint(a, b);
+    const text = EDGE_LABELS[e.type] || e.type;
+    const lw = labelW(text, 10) + 10;
+    el('rect', {
+      class: 'edge__label-bg',
+      x: m.x - lw / 2, y: m.y - 10,
+      width: lw, height: 13, rx: 3,
+    }, layer);
     const label = el('text', {
-      x: m.x, y: m.y - 5,
+      x: m.x, y: m.y,
       class: 'edge__label',
-      text: EDGE_LABELS[e.type] || e.type,
+      text,
     }, layer);
     edgeEls.push({ from: e.from, to: e.to, el: path, label });
   }
@@ -143,9 +179,16 @@ function drawNodes(layer) {
       transform: `translate(${p.x},${p.y})`,
     }, layer);
     el('circle', { class: 'node__circle', r, cx: 0, cy: 0 }, g);
-    el('text', { class: 'node__label', x: 0, y: r + 32, text: n.name }, g);
+    // 标签防遮挡底板：后绘制，盖住任何经过它的节点圆体（根治文字被圆体吃掉，对全部视图/节点统一生效）
+    const nameY = r + 32;
+    const nw = labelW(n.name, 14);
+    el('rect', { class: 'node__label-bg', x: -nw / 2 - 6, y: nameY - 12, width: nw + 12, height: 18, rx: 5 }, g);
+    el('text', { class: 'node__label', x: 0, y: nameY, text: n.name }, g);
     if (typeof n.year === 'number') {
-      el('text', { class: 'node__year', x: 0, y: r + 50, text: String(n.year) }, g);
+      const yearY = r + 50;
+      const yw = labelW(n.year, 11);
+      el('rect', { class: 'node__year-bg', x: -yw / 2 - 5, y: yearY - 10, width: yw + 10, height: 15, rx: 5 }, g);
+      el('text', { class: 'node__year', x: 0, y: yearY, text: String(n.year) }, g);
     }
     nodeEls.set(n.id, g);
   }

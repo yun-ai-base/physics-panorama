@@ -29,14 +29,14 @@ export function computeLayout(nodes, view) {
 }
 
 /* ── 尺度维度视图 ──
- * 按 scale 分行，行内按年份排布并均匀散开，
- * 同一 scale 内的节点用年份映射到 x，但保证最小间距。
+ * 按 scale 分行，行内均匀分布（年份只决定排序，不决定 x 位置），
+ * 同行节点在同一 y 线上，避免 era 偏移带来的杂乱。
  */
 function computeScaleLayout(nodes) {
   const scales = ['mesoscopic', 'cosmic', 'microscopic', 'unified', 'feedback'];
-  const ROW_H = 300; // 行高加大，避免多节点拥挤
-  const START_Y = 120;
-  const PAD_X = 180; // 左右留白
+  const ROW_H = 320;
+  const START_Y = 140;
+  const PAD_X = 220; // 左右留白加大，避免左侧 scale 标签被截断
 
   const groups = {};
   for (const s of scales) groups[s] = [];
@@ -52,32 +52,21 @@ function computeScaleLayout(nodes) {
 
     const yBase = START_Y + si * ROW_H;
 
-    // 按年份排序
+    // 按年份排序，让同 scale 内的理论演进从左到右
     list.sort((a, b) => (a.year ?? 1900) - (b.year ?? 1900));
 
-    // 计算可用宽度，均匀分布
     const availW = W - PAD_X * 2;
-    const step = list.length > 1 ? availW / (list.length - 1) : 0;
+    const count = list.length;
+    // 节点间距至少 240px，避免拥挤
+    const neededW = (count - 1) * 240;
+    const step = count > 1 ? Math.max(availW / (count - 1), 240) : 0;
+    const totalW = (count - 1) * step;
+    const startX = (W - totalW) / 2; // 整体居中
 
-    for (let i = 0; i < list.length; i++) {
+    for (let i = 0; i < count; i++) {
       const n = list[i];
-      // 年份作为主 x，但在均匀网格上对齐
-      let x;
-      if (list.length === 1) {
-        x = W / 2;
-      } else if (n.year != null) {
-        // 混合：60% 年份位置 + 40% 均匀位置，避免纯年份过度聚集
-        const yrRatio = (n.year - YEAR_MIN) / (YEAR_MAX - YEAR_MIN);
-        const uniformRatio = i / (list.length - 1);
-        x = PAD_X + (yrRatio * 0.55 + uniformRatio * 0.45) * availW;
-      } else {
-        x = PAD_X + i * step;
-      }
-
-      // 同一 scale 内按 era 微调 y 偏移（拉开同 x 的节点）
-      const eraOff = (ERA_RANK[n.era] ?? 0) * 28;
-
-      pos.push({ id: n.id, x, y: yBase + eraOff });
+      const x = count === 1 ? W / 2 : startX + i * step;
+      pos.push({ id: n.id, x, y: yBase });
     }
   }
   return pos;
