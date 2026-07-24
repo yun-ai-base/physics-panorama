@@ -67,6 +67,15 @@
 /* 事件节点：更小更虚 */
 .node[data-type="event"] .node__circle{stroke-dasharray:3 2;}
 
+/* 尺度维度背景带 */
+.scale-band{transition:opacity .3s;}
+.scale-band__label{
+  font-family:var(--font-serif); font-size:20px; font-weight:900;
+  letter-spacing:3px; paint-order:stroke; stroke:#fff; stroke-width:5px;
+  stroke-linejoin:round; opacity:.90;
+}
+.scale-band__line{pointer-events:none;}
+
 /* 纪元序言卡 */
 /* preface 序言卡片已禁用 —— 视觉噪音 */
 .preface{display:none !important;}

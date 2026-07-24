@@ -44,6 +44,14 @@ export const DIMENSIONS = [
 // 浅色视图布局用的排名
 export const ERA_RANK = { classical:0, relativity:1, quantum:2, 'standard-model':3, frontier:4 };
 export const SCALE_RANK = { mesoscopic:0, cosmic:1, microscopic:2, unified:3, feedback:4 };
+export const SCALE_ORDER = ['mesoscopic','cosmic','microscopic','unified','feedback'];
 export const SCALE_LABEL = {
   mesoscopic:'中观', cosmic:'宇观', microscopic:'微观', unified:'统一', feedback:'反哺',
+};
+export const SCALE_COLORS = {
+  mesoscopic:  { raw:'#A07840', name:'中观' },   // 经典棕
+  cosmic:      { raw:'#41518F', name:'宇观' },   // 宇宙蓝
+  microscopic: { raw:'#6B489E', name:'微观' },   // 量子紫
+  unified:     { raw:'#28684E', name:'统一' },   // 统一绿
+  feedback:    { raw:'#6B4E8C', name:'反哺' },   // 前沿紫
 };

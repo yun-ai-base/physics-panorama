@@ -34,7 +34,7 @@ export function computeLayout(nodes, view) {
  */
 function computeScaleLayout(nodes) {
   const scales = ['mesoscopic', 'cosmic', 'microscopic', 'unified', 'feedback'];
-  const ROW_H = 260; // 行高加大
+  const ROW_H = 300; // 行高加大，避免多节点拥挤
   const START_Y = 120;
   const PAD_X = 180; // 左右留白
 

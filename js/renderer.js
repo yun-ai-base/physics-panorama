@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { el, esc, edgePath, bezierMidpoint } from './utils.js';
-import { ERAS, ERA_ORDER, EDGE_CLASS } from './config.js';
+import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS } from './config.js';
 
 const EDGE_LABELS = {
   inherit: '继承',
@@ -34,7 +34,11 @@ export function renderGraph(view, layoutList) {
   clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface);
   nodeEls = new Map(); edgeEls = []; prefaceEls = [];
 
-  drawEraBands(L.era);
+  if (view === 'scale') {
+    drawScaleBands(L.era);
+  } else {
+    drawEraBands(L.era);
+  }
   drawEdges(L.edges);
   drawNodes(L.nodes);
   if (view === 'timeline') /* drawPrefaces(L.preface); 已移除 —— 序言卡片为视觉噪音 */;
@@ -67,6 +71,43 @@ function drawEraBands(layer) {
       text: ERAS[era].name, fill: active ? '#2A2620' : ERAS[era].raw, 'data-era': era }, layer);
     el('text', { x: minX + 16, y: globalMinY + 50, class: 'era-band__range',
       text: ERAS[era].range, fill: active ? '#2A2620' : ERAS[era].raw }, layer);
+  }
+}
+
+function drawScaleBands(layer) {
+  // 尺度维度：按 mesoscopic / cosmic / microscopic / unified / feedback 分行显示
+  const all = NODES.map(n => POS[n.id]).filter(Boolean);
+  if (!all.length) return;
+  const globalMinX = Math.min(...all.map(p => p.x)) - 80;
+  const globalMaxX = Math.max(...all.map(p => p.x)) + 80;
+
+  for (const scale of SCALE_ORDER) {
+    const xs = NODES.filter(n => n.scale === scale).map(n => POS[n.id]).filter(Boolean);
+    if (!xs.length) continue;
+    const minY = Math.min(...xs.map(p => p.y)) - 70;
+    const maxY = Math.max(...xs.map(p => p.y)) + 70;
+    const cfg = SCALE_COLORS[scale];
+    const active = state.filterEra ? false : true; // 在 scale 视图下默认全部高亮
+
+    el('rect', {
+      x: globalMinX, y: minY, width: globalMaxX - globalMinX, height: maxY - minY,
+      fill: cfg.raw, 'fill-opacity': 0.09, rx: 16, class: 'scale-band',
+    }, layer);
+
+    el('text', {
+      x: globalMinX + 18, y: minY + 28,
+      class: 'scale-band__label',
+      text: SCALE_LABEL[scale],
+      fill: cfg.raw,
+    }, layer);
+
+    // 淡淡的下边界分隔线
+    el('line', {
+      x1: globalMinX + 12, y1: maxY - 10,
+      x2: globalMaxX - 12, y2: maxY - 10,
+      stroke: cfg.raw, 'stroke-width': 1.2, 'stroke-opacity': 0.22,
+      class: 'scale-band__line',
+    }, layer);
   }
 }
 
