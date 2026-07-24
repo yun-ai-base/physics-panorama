@@ -3,12 +3,14 @@ import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState } from './renderer.js';
-import { initSidebar, openNode, openEra, closeSidebar } from './sidebar.js';
+import { initSidebar, openNode, openEra, closeSidebar, openPerson } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
+import { buildPeople, renderPeople } from './people.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map();
 let currentLayout = [];
+let PEOPLE_MAP = new Map();
 
 const stage = document.getElementById('stage');
 const mini = document.getElementById('miniCard');
@@ -31,11 +33,16 @@ async function boot() {
   initRenderer(NODES, EDGES, SUMMARIES);
   initSidebar(NODES, SUMMARIES);
   initInteraction();
+  PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
 
   const node = readURL();
-  renderCurrent();
-  setTimeout(fit, 0);
+  if (state.view === 'people') {
+    setView('people');
+  } else {
+    renderCurrent();
+    setTimeout(fit, 0);
+  }
   if (node && byId.has(node)) selectNode(node);
 }
 
@@ -62,10 +69,7 @@ function clearSearchGlow() { document.querySelectorAll('.node.is-search').forEac
 function wireUI() {
   document.getElementById('viewTabs').addEventListener('click', e => {
     const b = e.target.closest('.view-tab'); if (!b) return;
-    const v = b.dataset.view;
-    if (v === 'people') { toast('人物索引视图将于 Phase 2 上线'); return; }
-    document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t === b));
-    state.view = v; renderCurrent(); fit(); updateURL();
+    setView(b.dataset.view);
   });
 
   const eraTabs = document.getElementById('eraTabs');
@@ -122,7 +126,31 @@ function wireUI() {
   });
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
+  window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });
   window.addEventListener('resize', fit);
+}
+
+// 统一视图切换（含人物索引覆盖层）
+function setView(v) {
+  state.view = v;
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === v));
+  const isPeople = v === 'people';
+  document.body.classList.toggle('view-people', isPeople);
+  const stageEl = document.getElementById('stage');
+  const pv = document.getElementById('peopleView');
+  if (stageEl) stageEl.style.visibility = isPeople ? 'hidden' : '';
+  if (pv) pv.hidden = !isPeople;
+  if (isPeople) {
+    renderPeople(document.getElementById('peopleGrid'), [...PEOPLE_MAP.values()], onPickPerson);
+    closeSidebar();
+  } else {
+    renderCurrent(); fit();
+  }
+  updateURL();
+}
+function onPickPerson(name) {
+  const p = PEOPLE_MAP.get(name);
+  if (p) openPerson(name, p.nodeIds);
 }
 
 function showMini(n, g) {

@@ -121,3 +121,23 @@ export function closeSidebar() {
   sb.classList.remove('is-open'); sb.setAttribute('aria-hidden', 'true');
   state.sidebarOpen = false;
 }
+
+export function openPerson(name, nodeIds) {
+  const sb = document.getElementById('sidebar');
+  const body = document.getElementById('sidebarBody');
+  const ids = nodeIds || [];
+  const rel = ids.map(id => `<button class="rel-node" data-id="${esc(id)}">${esc(byId.get(id)?.name || id)}</button>`).join('');
+  body.innerHTML = `
+    <div class="sum-card">
+      <div class="sum-card__era">人物索引</div>
+      <div class="sum-card__name"><span class="person-head">${avatarImg(name)}<span class="person-head__name">${esc(name)}</span></span></div>
+      <div class="sum-card__aha">关联 ${ids.length} 个学说 / 事件</div>
+      <div class="rel-nodes">${rel}</div>
+    </div>`;
+  bindAvatars(body);
+  body.querySelectorAll('.rel-node').forEach(b => b.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: b.dataset.id }));
+  }));
+  sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
+  state.sidebarOpen = true;
+}

@@ -39,6 +39,8 @@ physics-panorama/
 
 ## 部署到 GitHub Pages
 
+> **已上线：** https://yun-ai-base.github.io/physics-panorama/
+
 1. 将本目录作为仓库根推送到 GitHub（`main` 分支）。
 2. 仓库 **Settings → Pages → Build and deployment → Source = Deploy from a branch → Branch = main / root**。
 3. 站点根已含 `.nojekyll`，无需 Jekyll 构建；所有路径使用相对路径，可直接在子路径下工作。
