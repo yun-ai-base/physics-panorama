@@ -3,46 +3,48 @@
 
 /* 纪元背景带 */
 .era-band{transition:opacity .3s;}
-.era-band__label{font-family:var(--font-serif); font-size:15px; font-weight:600; fill:var(--ink); opacity:.42;}
-.era-band__range{font-size:11px; fill:var(--ink-3); opacity:.5;}
+.era-band__label{font-family:var(--font-serif); font-size:16px; font-weight:700; fill:var(--ink); opacity:.65;}
+.era-band__range{font-size:12px; fill:var(--ink-3); opacity:.6;}
 
-/* 连线 */
+/* 连线 —— 加粗提亮 */
 .edge{fill:none; transition:opacity .3s, stroke-width .2s;}
-.edge--inherit{stroke:var(--line-inherit); stroke-width:2;}
-.edge--branch{stroke:var(--line-inherit); stroke-width:1.6; stroke-dasharray:5 6;}
-.edge--revolution{stroke:var(--line-revolution); stroke-width:2.4; stroke-dasharray:7 5; animation:pulseRev 1.4s ease-in-out infinite;}
-.edge--unify{stroke:var(--line-unify); stroke-width:2.4; filter:url(#goldGlow);}
-.edge--conflict{stroke:var(--line-conflict); stroke-width:1.8; stroke-dasharray:2 5; opacity:.65;}
+.edge--inherit{stroke:var(--line-inherit); stroke-width:2.2;}
+.edge--branch{stroke:var(--line-inherit); stroke-width:1.8; stroke-dasharray:5 6;}
+.edge--revolution{stroke:var(--line-revolution); stroke-width:2.8; stroke-dasharray:7 5; animation:pulseRev 1.4s ease-in-out infinite;}
+.edge--unify{stroke:var(--line-unify); stroke-width:2.8; filter:url(#goldGlow);}
+.edge--conflict{stroke:var(--line-conflict); stroke-width:2; stroke-dasharray:2 5; opacity:.7;}
 @keyframes pulseRev{0%,100%{opacity:.55;}50%{opacity:1;}}
-.edge.is-dim{opacity:.1 !important;}
+.edge.is-dim{opacity:.08 !important;}
 
-/* 节点 */
-.node{cursor:pointer; transition:opacity .3s;}
-.node__circle{fill:#fff; transition:transform .2s, fill .2s, stroke .2s;}
-.node:hover .node__circle{transform:scale(1.09); transform-origin:center; transform-box:fill-box;}
+/* 节点 —— 实心浅色填充 + 纪元色描边加粗 */
+.node{cursor:pointer; transition:opacity .3s, transform .2s;}
+.node__circle{fill:#F0EBE0; stroke:var(--ink-3); stroke-width:2.2; transition:transform .2s, fill .2s, stroke .2s, stroke-width .2s;}
+.node:hover .node__circle{transform:scale(1.10); transform-origin:center; transform-box:fill-box;}
 .node.is-selected .node__circle{filter:url(#goldGlow);}
-.node.is-dim{opacity:.16 !important;}
+.node.is-dim{opacity:.14 !important;}
 
-/* 纪元色描边 + 选中填充 */
-.node[data-era="classical"] .node__circle{stroke:var(--era-classical);}
-.node[data-era="relativity"] .node__circle{stroke:var(--era-relativity);}
-.node[data-era="quantum"] .node__circle{stroke:var(--era-quantum);}
-.node[data-era="standard-model"] .node__circle{stroke:var(--era-standard);}
-.node[data-era="frontier"] .node__circle{stroke:var(--era-frontier-b);}
-.node.is-selected[data-era="classical"] .node__circle{fill:var(--era-classical);}
-.node.is-selected[data-era="relativity"] .node__circle{fill:var(--era-relativity);}
-.node.is-selected[data-era="quantum"] .node__circle{fill:var(--era-quantum);}
-.node.is-selected[data-era="standard-model"] .node__circle{fill:var(--era-standard);}
-.node.is-selected[data-era="frontier"] .node__circle{fill:var(--era-frontier-b);}
-.node.is-selected .node__circle{stroke:var(--gold);}
+/* 纪元色：实心浅底 + 深描边（色彩差异化核心） */
+.node[data-era="classical"] .node__circle{fill:#F5E6CC; stroke:#A07840; stroke-width:2.8;}
+.node[data-era="relativity"] .node__circle{fill:#DFE2F2; stroke:#354F9F; stroke-width:2.8;}
+.node[data-era="quantum"] .node__circle{fill:#EBDDF0; stroke:#6B489E; stroke-width:2.8;}
+.node[data-era="standard-model"] .node__circle{fill:#D8EDDE; stroke:#28684E; stroke-width:2.8;}
+.node[data-era="frontier"] .node__circle{fill:#E6DAEC; stroke:#5C3E7C; stroke-width:2.8;}
+
+/* 选中态：深填充 */
+.node.is-selected[data-era="classical"] .node__circle{fill:#E8C97A;}
+.node.is-selected[data-era="relativity"] .node__circle{fill:#7B93DB;}
+.node.is-selected[data-era="quantum"] .node__circle{fill:#A87BC8;}
+.node.is-selected[data-era="standard-model"] .node__circle{fill:#4AA374;}
+.node.is-selected[data-era="frontier"] .node__circle{fill:#9070AD;}
+.node.is-selected .node__circle{stroke:#fff; stroke-width:2.5;}
 
 /* 成熟度样式 */
-.node[data-maturity="foundation"] .node__circle{stroke-width:3.2;}
-.node[data-maturity="speculative"] .node__circle{stroke-dasharray:4 3;}
+.node[data-maturity="foundation"] .node__circle{stroke-width:3.6;}
+.node[data-maturity="speculative"] .node__circle{stroke-dasharray:5 3;}
 
-/* 标签 */
-.node__label{font-family:var(--font-sans); font-size:12.5px; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:#fff; stroke-width:3.2px; stroke-linejoin:round;}
-.node__year{font-size:10px; fill:var(--ink-3); text-anchor:middle; pointer-events:none;}
+/* 标签 —— 加大加粗 */
+.node__label{font-family:var(--font-sans); font-size:14px; font-weight:600; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.75); stroke-width:4px; stroke-linejoin:round;}
+.node__year{font-size:11px; font-weight:500; fill:var(--ink-2); text-anchor:middle; pointer-events:none;}
 
 /* 事件节点：更小更虚 */
 .node[data-type="event"] .node__circle{stroke-dasharray:3 2;}
