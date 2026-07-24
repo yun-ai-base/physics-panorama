@@ -61,15 +61,20 @@ button{font-family:inherit; cursor:pointer;}
   height:var(--eranav-h); flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
   padding:0 22px; background:var(--bg-2); border-bottom:1px solid rgba(42,38,32,.06); z-index:20;
 }
-.era-tabs{display:flex; gap:8px; flex-wrap:wrap;}
+.era-tabs{display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
 .era-tab{
-  border:1px solid transparent; background:#fff; color:var(--ink-2); font-size:13px;
-  padding:6px 14px; border-radius:999px; transition:.2s; display:flex; align-items:center; gap:7px;
+  border:none; border-bottom:2px solid transparent; background:transparent;
+  color:var(--ink-2); font-size:13px; font-weight:500;
+  padding:5px 12px 3px; border-radius:0; transition:.2s; display:flex; align-items:center; gap:6px;
+  cursor:pointer;
 }
-.era-tab .swatch{width:9px; height:9px; border-radius:50%;}
-.era-tab:hover{border-color:rgba(42,38,32,.15);}
-.era-tab.is-active{color:var(--ink); box-shadow:var(--shadow); font-weight:600; border-color:rgba(42,38,32,.12);}
-.era-tab.is-active .swatch{box-shadow:0 0 0 2px #fff,0 0 0 4px currentColor;}
+.era-tab .swatch{width:8px; height:8px; border-radius:50%;}
+.era-tab:hover{color:var(--ink); background:rgba(184,137,59,.06);}
+.era-tab.is-active{
+  color:var(--ink); font-weight:700; border-bottom-color:var(--gold);
+  background:transparent;
+}
+.era-tab.is-active .swatch{box-shadow:0 0 0 2px currentColor;}
 .only-core{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2); cursor:pointer; user-select:none;}
 .only-core input{accent-color:var(--gold); width:15px; height:15px;}
 
@@ -79,8 +84,8 @@ button{font-family:inherit; cursor:pointer;}
   radial-gradient(1200px 600px at 18% -5%, #FBF8F1 0%, var(--bg) 62%);}
 .hint{
   position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
-  font-size:12px; color:var(--ink-3); background:rgba(255,255,255,.72); padding:5px 14px;
-  border-radius:999px; pointer-events:none; white-space:nowrap;
+  font-size:12px; color:var(--ink-3); background:none; padding:0;
+  pointer-events:none; white-space:nowrap; letter-spacing:.5px;
 }
 
 /* 底栏 */

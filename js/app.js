@@ -94,12 +94,15 @@ function wireUI() {
     if (pf) { openEra(pf.dataset.era); }
   });
 
+  /* hover miniCard 已移除 —— 白色浮卡为视觉噪音，节点信息由侧边栏承载 */
+  /*
   stage.addEventListener('mouseover', e => {
     const g = e.target.closest('.node'); if (!g) return;
     const n = byId.get(g.dataset.id); if (!n) return;
     showMini(n, g);
   });
   stage.addEventListener('mouseout', e => { if (e.target.closest('.node')) mini.hidden = true; });
+  */
 
   const si = document.getElementById('searchInput');
   const sr = document.getElementById('searchResults');

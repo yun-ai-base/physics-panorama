@@ -42,20 +42,24 @@ export function renderGraph(view, layoutList) {
 }
 
 function drawEraBands(layer) {
+  // 统一背景带高度：取所有节点中最高/最低点，让五个纪元色卡上下对齐
+  const all = NODES.map(n => POS[n.id]).filter(Boolean);
+  if (!all.length) return;
+  const globalMinY = Math.min(...all.map(p => p.y)) - 90;
+  const globalMaxY = Math.max(...all.map(p => p.y)) + 90;
+
   for (const era of ERA_ORDER) {
     const xs = NODES.filter(n => n.era === era).map(n => POS[n.id]).filter(Boolean);
     if (!xs.length) continue;
     const minX = Math.min(...xs.map(p => p.x)) - 60;
     const maxX = Math.max(...xs.map(p => p.x)) + 60;
-    const minY = Math.min(...xs.map(p => p.y)) - 70;
-    const maxY = Math.max(...xs.map(p => p.y)) + 70;
     const rect = el('rect', {
-      x: minX, y: minY, width: maxX - minX, height: maxY - minY,
+      x: minX, y: globalMinY, width: maxX - minX, height: globalMaxY - globalMinY,
       fill: ERAS[era].raw, 'fill-opacity': 0.08, rx: 18, class: 'era-band',
     }, layer);
-    el('text', { x: minX + 16, y: minY + 28, class: 'era-band__label',
+    el('text', { x: minX + 16, y: globalMinY + 28, class: 'era-band__label',
       text: ERAS[era].name, fill: ERAS[era].raw, 'data-era': era }, layer);
-    el('text', { x: minX + 16, y: minY + 48, class: 'era-band__range',
+    el('text', { x: minX + 16, y: globalMinY + 48, class: 'era-band__range',
       text: ERAS[era].range, fill: ERAS[era].raw }, layer);
   }
 }
