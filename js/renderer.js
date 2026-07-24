@@ -51,10 +51,12 @@ function drawEraBands(layer) {
     const maxY = Math.max(...xs.map(p => p.y)) + 70;
     const rect = el('rect', {
       x: minX, y: minY, width: maxX - minX, height: maxY - minY,
-      fill: ERAS[era].raw, 'fill-opacity': 0.05, rx: 18, class: 'era-band',
+      fill: ERAS[era].raw, 'fill-opacity': 0.08, rx: 18, class: 'era-band',
     }, layer);
-    el('text', { x: minX + 16, y: minY + 26, class: 'era-band__label', text: ERAS[era].name }, layer);
-    el('text', { x: minX + 16, y: minY + 44, class: 'era-band__range', text: ERAS[era].range }, layer);
+    el('text', { x: minX + 16, y: minY + 28, class: 'era-band__label',
+      text: ERAS[era].name, fill: ERAS[era].raw, 'data-era': era }, layer);
+    el('text', { x: minX + 16, y: minY + 48, class: 'era-band__range',
+      text: ERAS[era].range, fill: ERAS[era].raw }, layer);
   }
 }
 
