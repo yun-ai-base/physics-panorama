@@ -62,11 +62,9 @@
 .node[data-type="event"] .node__circle{stroke-dasharray:3 2;}
 
 /* 纪元序言卡 */
-.preface{cursor:pointer;}
-.preface__rect{fill:#fff; stroke:var(--gold); stroke-width:1.4; stroke-dasharray:6 4; filter:var(--shadow);}
-.preface__era{font-family:var(--font-serif); font-size:15px; font-weight:600; fill:var(--ink);}
-.preface__quote{font-family:var(--font-serif); font-size:12px; font-style:italic; fill:var(--ink-2);}
-.preface:hover .preface__rect{stroke-width:2.2;}
+/* preface 序言卡片已禁用 —— 视觉噪音 */
+.preface{display:none !important;}
+.preface__rect,.preface__era,.preface__quote{display:none !important;}
 
 /* 悬停迷你卡 */
 /* miniCard 已禁用 —— 悬停白卡为视觉噪音 */
