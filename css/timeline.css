@@ -16,17 +16,17 @@
 
 /* 连线 —— 加粗提亮 */
 .edge{fill:none; transition:opacity .3s, stroke-width .2s;}
-.edge--inherit{stroke:var(--line-inherit); stroke-width:2.2;}
-.edge--branch{stroke:var(--line-inherit); stroke-width:1.8; stroke-dasharray:5 6;}
-.edge--revolution{stroke:var(--line-revolution); stroke-width:2.8; stroke-dasharray:7 5; animation:pulseRev 1.4s ease-in-out infinite;}
-.edge--unify{stroke:var(--line-unify); stroke-width:2.8; filter:url(#goldGlow);}
-.edge--conflict{stroke:var(--line-conflict); stroke-width:2; stroke-dasharray:2 5; opacity:.7;}
+.edge--inherit{stroke:var(--line-inherit); stroke-width:3.2;}
+.edge--branch{stroke:var(--line-inherit); stroke-width:2.6; stroke-dasharray:5 6;}
+.edge--revolution{stroke:var(--line-revolution); stroke-width:3.8; stroke-dasharray:7 5; animation:pulseRev 1.4s ease-in-out infinite;}
+.edge--unify{stroke:var(--line-unify); stroke-width:3.8; filter:url(#goldGlow);}
+.edge--conflict{stroke:var(--line-conflict); stroke-width:2.8; stroke-dasharray:2 5; opacity:.88;}
 @keyframes pulseRev{0%,100%{opacity:.55;}50%{opacity:1;}}
 .edge.is-dim{opacity:.08 !important;}
 
 /* 连线含义小标签 */
-.edge__label{font-family:var(--font-sans); font-size:9px; font-weight:600; fill:var(--ink-3); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.85); stroke-width:3px; stroke-linejoin:round; opacity:.78; transition:opacity .3s;}
-.edge__label.is-dim{opacity:.06 !important;}
+.edge__label{font-family:var(--font-sans); font-size:10px; font-weight:700; fill:var(--ink-2); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.92); stroke-width:4px; stroke-linejoin:round; opacity:.92; transition:opacity .3s;}
+.edge__label.is-dim{opacity:.08 !important;}
 
 /* 节点 —— 实心浅色填充 + 纪元色描边加粗 */
 .node{cursor:pointer; transition:opacity .3s, transform .2s;}
@@ -54,9 +54,9 @@
 .node[data-maturity="foundation"] .node__circle{stroke-width:3.6;}
 .node[data-maturity="speculative"] .node__circle{stroke-dasharray:5 3;}
 
-/* 标签 —— 加大加粗 */
-.node__label{font-family:var(--font-sans); font-size:14px; font-weight:600; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.75); stroke-width:4px; stroke-linejoin:round;}
-.node__year{font-size:11px; font-weight:500; fill:var(--ink-2); text-anchor:middle; pointer-events:none;}
+/* 标签 —— 加大加粗，描边加厚防被节点遮挡 */
+.node__label{font-family:var(--font-sans); font-size:14px; font-weight:600; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.9); stroke-width:5.5px; stroke-linejoin:round;}
+.node__year{font-size:11px; font-weight:500; fill:var(--ink-2); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.9); stroke-width:4.5px; stroke-linejoin:round;}
 
 /* 事件节点：更小更虚 */
 .node[data-type="event"] .node__circle{stroke-dasharray:3 2;}

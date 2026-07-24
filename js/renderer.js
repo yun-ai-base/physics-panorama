@@ -37,7 +37,7 @@ export function renderGraph(view, layoutList) {
   drawEraBands(L.era);
   drawEdges(L.edges);
   drawNodes(L.nodes);
-  if (view === 'timeline') drawPrefaces(L.preface);
+  if (view === 'timeline') /* drawPrefaces(L.preface); 已移除 —— 序言卡片为视觉噪音 */;
   applyState();
 }
 
@@ -92,9 +92,9 @@ function drawNodes(layer) {
       transform: `translate(${p.x},${p.y})`,
     }, layer);
     el('circle', { class: 'node__circle', r, cx: 0, cy: 0 }, g);
-    el('text', { class: 'node__label', x: 0, y: r + 16, text: n.name }, g);
+    el('text', { class: 'node__label', x: 0, y: r + 24, text: n.name }, g);
     if (typeof n.year === 'number') {
-      el('text', { class: 'node__year', x: 0, y: r + 31, text: String(n.year) }, g);
+      el('text', { class: 'node__year', x: 0, y: r + 41, text: String(n.year) }, g);
     }
     nodeEls.set(n.id, g);
   }
