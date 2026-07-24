@@ -18,20 +18,24 @@
   <div id="app">
     <!-- 顶栏 -->
     <header class="topbar">
-      <div class="brand">
-        <span class="brand__mark" aria-hidden="true"></span>
-        <span class="brand__title">物理学全景图</span>
-        <span class="brand__sub">Physics Panorama</span>
+      <div class="brand-row">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__title">物理学全景图</span>
+          <span class="brand__sub">Physics Panorama</span>
+        </div>
       </div>
-      <nav class="views" id="viewTabs" aria-label="视图切换">
-        <button class="view-tab is-active" data-view="timeline">时间线</button>
-        <button class="view-tab" data-view="unification">统一之路</button>
-        <button class="view-tab" data-view="scale">尺度维度</button>
-        <button class="view-tab" data-view="people">人物索引</button>
-      </nav>
-      <div class="search">
-        <input id="searchInput" type="search" placeholder="搜索学说 / 人名 / 关键词…" autocomplete="off" />
-        <div class="search__results" id="searchResults" hidden></div>
+      <div class="nav-row">
+        <nav class="views" id="viewTabs" aria-label="视图切换">
+          <button class="view-tab is-active" data-view="timeline">时间线</button>
+          <button class="view-tab" data-view="unification">统一之路</button>
+          <button class="view-tab" data-view="scale">尺度维度</button>
+          <button class="view-tab" data-view="people">人物索引</button>
+        </nav>
+        <div class="search" id="searchBox">
+          <input id="searchInput" type="search" placeholder="搜索学说 / 人名 / 关键词…" autocomplete="off" />
+          <div class="search__results" id="searchResults" hidden></div>
+        </div>
       </div>
     </header>
 
