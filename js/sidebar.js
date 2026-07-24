@@ -32,7 +32,8 @@ function renderDim(node, key) {
       let tex = '';
       try { tex = window.katex ? katex.renderToString(f.latex || '', { throwOnError: false, displayMode: false }) : esc(f.latex || ''); }
       catch (e) { tex = esc(f.latex || ''); }
-      return `<div class="formula"><div class="formula__latex">${tex}</div><div class="formula__plain">${esc(f.plain || '')}</div></div>`;
+      const nameTag = f.name ? `<div class="formula__name">${esc(f.name)}</div>` : '';
+      return `<div class="formula">${nameTag}<div class="formula__latex">${tex}</div><div class="formula__plain">${esc(f.plain || '')}</div></div>`;
     }).join('');
   }
 
@@ -155,10 +156,13 @@ export function openEra(era) {
   const sum = SUMMARIES[era]; const e = ERAS[era];
   const sb = document.getElementById('sidebar'); const body = document.getElementById('sidebarBody');
   const txt = typeof sum === 'string' ? sum : (sum?.quote || sum?.text || '');
+  const count = NODES.filter(n => n.era === era).length;
+  const events = NODES.filter(n => n.era === era && n.type === 'event').length;
   body.innerHTML = `<div class="sum-card">
     <div class="sum-card__era"><span class="swatch" style="background:${e.raw}"></span>${e.name} · ${e.range}</div>
-    <div class="sum-card__name">${esc(e.name)}</div>
-    <div class="sum-card__aha">${esc(txt || '')}</div>
+    <div class="sum-card__name">${esc(e.name)}<small>纪元综述</small></div>
+    <div class="era-summary">${esc(txt || '')}</div>
+    <div class="era-stats">本纪元收录 <b>${count}</b> 个学说 / 事件${events ? `，含 <b>${events}</b> 个里程碑事件` : ''}。点击时间线上的节点可深入探索。</div>
   </div>`;
   sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
   state.sidebarOpen = true;

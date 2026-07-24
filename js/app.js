@@ -78,18 +78,23 @@ function wireUI() {
   eraTabs.addEventListener('click', e => {
     const b = e.target.closest('.era-tab'); if (!b) return;
     const a = b.dataset.era;
-    state.filterEra = a === 'all' ? null : a;
-    document.querySelectorAll('.era-tab').forEach(t => t.classList.toggle('is-active', t === b));
-    applyState(); updateURL();
+    if (a === 'all') {
+      state.filterEra = null; state.activeEra = null; closeSidebar();
+    } else {
+      state.filterEra = a; state.activeEra = a; openEra(a); // 激活纪元：聚焦筛选 + 高亮 + 综述
+    }
+    reflectEraActive(); applyState(); updateURL();
   });
 
   document.getElementById('onlyCore').addEventListener('change', e => { state.onlyCore = e.target.checked; applyState(); updateURL(); });
-  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); state.selected = null; state.highlight = new Set(); applyState(); updateURL(); });
+  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; reflectEraActive(); applyState(); updateURL(); });
 
   stage.addEventListener('click', e => {
     if (consumeDrag()) return;
     const g = e.target.closest('.node');
     if (g) { selectNode(g.dataset.id); return; }
+    const lbl = e.target.closest('.era-band__label');
+    if (lbl) { toggleEraLabel(lbl.dataset.era); return; } // 时间线纪元大字：轻量激活（高亮 + 综述，不改筛选）
     const pf = e.target.closest('.preface');
     if (pf) { openEra(pf.dataset.era); }
   });
@@ -121,7 +126,7 @@ function wireUI() {
   });
 
   window.addEventListener('pp:esc', () => {
-    if (state.sidebarOpen) { closeSidebar(); state.selected = null; state.highlight = new Set(); applyState(); updateURL(); }
+    if (state.sidebarOpen) { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; reflectEraActive(); applyState(); updateURL(); }
   });
 
   document.getElementById('shareBtn').addEventListener('click', () => {
@@ -131,6 +136,23 @@ function wireUI() {
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
   window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });
   window.addEventListener('resize', fit);
+}
+
+// 纪元激活态：统一反映顶部导航 + 时间线大字的 UI 改造
+function reflectEraActive() {
+  document.querySelectorAll('.era-tab').forEach(t => {
+    const era = t.dataset.era;
+    const on = era === 'all' ? (!state.activeEra && !state.filterEra)
+                             : (state.activeEra === era || state.filterEra === era);
+    t.classList.toggle('is-active', on);
+  });
+}
+// 时间线纪元大字点击：轻量激活（高亮 + 综述，不改筛选）；再次点击同纪元取消
+function toggleEraLabel(era) {
+  if (state.activeEra === era) { state.activeEra = null; closeSidebar(); }
+  else { state.activeEra = era; openEra(era); }
+  document.querySelectorAll('.era-band__label').forEach(l => l.classList.toggle('is-active-era', l.dataset.era === state.activeEra));
+  reflectEraActive(); updateURL();
 }
 
 // 统一视图切换（含人物索引覆盖层）
@@ -178,7 +200,8 @@ function readURL() {
   if (p.get('era')) state.filterEra = p.get('era');
   if (p.get('core') === '0') state.onlyCore = false;
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === state.view));
-  document.querySelectorAll('.era-tab').forEach(t => t.classList.toggle('is-active', (t.dataset.era === 'all' && !state.filterEra) || t.dataset.era === state.filterEra));
+  state.activeEra = state.filterEra; // 激活态随筛选态恢复（刷新后保留高亮 + 综述）
+  reflectEraActive();
   document.getElementById('onlyCore').checked = state.onlyCore;
   return p.get('node');
 }

@@ -53,14 +53,20 @@ function drawEraBands(layer) {
     if (!xs.length) continue;
     const minX = Math.min(...xs.map(p => p.x)) - 60;
     const maxX = Math.max(...xs.map(p => p.x)) + 60;
+    const active = era === state.activeEra;
     const rect = el('rect', {
       x: minX, y: globalMinY, width: maxX - minX, height: globalMaxY - globalMinY,
-      fill: ERAS[era].raw, 'fill-opacity': 0.08, rx: 18, class: 'era-band',
+      fill: ERAS[era].raw, 'fill-opacity': active ? 0.14 : 0.08, rx: 18, class: 'era-band',
     }, layer);
-    el('text', { x: minX + 16, y: globalMinY + 28, class: 'era-band__label',
-      text: ERAS[era].name, fill: ERAS[era].raw, 'data-era': era }, layer);
-    el('text', { x: minX + 16, y: globalMinY + 48, class: 'era-band__range',
-      text: ERAS[era].range, fill: ERAS[era].raw }, layer);
+    if (active) {
+      const hlW = ERAS[era].name.length * 20 + 22;
+      el('rect', { class: 'era-band__hl', x: minX + 6, y: globalMinY + 4, width: hlW, height: 38, rx: 10,
+        fill: ERAS[era].raw, 'fill-opacity': 0.20 }, layer);
+    }
+    el('text', { x: minX + 16, y: globalMinY + 30, class: 'era-band__label' + (active ? ' is-active-era' : ''),
+      text: ERAS[era].name, fill: active ? '#2A2620' : ERAS[era].raw, 'data-era': era }, layer);
+    el('text', { x: minX + 16, y: globalMinY + 50, class: 'era-band__range',
+      text: ERAS[era].range, fill: active ? '#2A2620' : ERAS[era].raw }, layer);
   }
 }
 

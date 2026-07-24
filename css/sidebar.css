@@ -43,6 +43,7 @@
 
 /* 公式 */
 .formula{background:var(--bg-2); border-left:3px solid var(--gold); border-radius:8px; padding:12px 14px; margin:10px 0; overflow-x:auto;}
+.formula__name{font-size:11px; font-weight:600; color:var(--gold); margin-bottom:6px; letter-spacing:.3px;}
 .formula__latex{font-size:15px;}
 .formula__plain{font-size:12.5px; color:var(--ink-2); margin-top:6px;}
 
@@ -58,3 +59,8 @@
 .person-head{display:flex; align-items:center; gap:12px;}
 .person-head .avatar{width:48px; height:48px; font-size:18px;}
 .person-head__name{font-family:var(--font-serif); font-size:21px; font-weight:600; color:var(--ink);}
+
+/* 纪元综述（点击纪元标签触发，替代原小白卡） */
+.era-summary{margin-top:14px; font-size:14.5px; line-height:1.9; color:var(--ink); font-family:var(--font-sans);}
+.era-stats{margin-top:16px; padding:11px 14px; background:var(--bg-2); border:1px solid rgba(42,38,32,.07); border-radius:var(--radius-sm); font-size:12.5px; color:var(--ink-2); line-height:1.6;}
+.era-stats b{color:var(--gold); font-weight:700;}

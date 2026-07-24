@@ -13,6 +13,12 @@
   letter-spacing:1px; paint-order:stroke; stroke:rgba(247,243,234,.9); stroke-width:3px;
   stroke-linejoin:round; opacity:.78;
 }
+/* 激活纪元：高亮底块 + 大字改造（替代原小白卡） */
+.era-band__hl{pointer-events:none;}
+.era-band__label.is-active-era{
+  font-size:26px; font-weight:900; letter-spacing:3px;
+  stroke:rgba(247,243,234,.95); stroke-width:6px; opacity:1;
+}
 
 /* 连线 —— 加粗提亮 */
 .edge{fill:none; transition:opacity .3s, stroke-width .2s;}
