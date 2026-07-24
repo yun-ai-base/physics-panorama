@@ -143,9 +143,9 @@ function drawNodes(layer) {
       transform: `translate(${p.x},${p.y})`,
     }, layer);
     el('circle', { class: 'node__circle', r, cx: 0, cy: 0 }, g);
-    el('text', { class: 'node__label', x: 0, y: r + 24, text: n.name }, g);
+    el('text', { class: 'node__label', x: 0, y: r + 32, text: n.name }, g);
     if (typeof n.year === 'number') {
-      el('text', { class: 'node__year', x: 0, y: r + 41, text: String(n.year) }, g);
+      el('text', { class: 'node__year', x: 0, y: r + 50, text: String(n.year) }, g);
     }
     nodeEls.set(n.id, g);
   }
