@@ -67,7 +67,24 @@
     ],
     "aha": "不用画受力图，用能量就能推导出整个运动方程",
     "summary": "用广义坐标和能量（动能减势能）描述系统，通过最小作用量原理导出运动方程。比牛顿力学更优雅，处理约束系统尤其强大。",
-    "formula": [],
+    "formula": [
+      {
+        "latex": "L = T - V",
+        "plain": "拉格朗日量 = 动能 - 势能"
+      },
+      {
+        "latex": "\frac{d}{dt}\frac{partial L}{partial dot{q}_i} - \frac{partial L}{partial q_i} = 0",
+        "plain": "欧拉-拉格朗日方程（运动方程的统一形式）"
+      },
+      {
+        "latex": "S = int_{t_1}^{t_2} L,dt",
+        "plain": "作用量 S：拉格朗日量对时间的积分"
+      },
+      {
+        "latex": "H = sum p_i dot{q}_i - L",
+        "plain": "哈密顿量 H（通过勒让德变换从 L 导出）"
+      }
+    ],
     "limitation": "仍然属于经典力学范畴，不涉及量子效应和相对论效应。",
     "prevIds": [
       "newton-mechanics"
@@ -704,7 +721,16 @@
     ],
     "aha": "你知道粒子在哪就不知道它往哪飞，反之亦然",
     "summary": "海森堡指出：粒子的位置和动量不能同时被精确测量，精度乘积有个下限（约化普朗克常数的一半）。这不是测量技术问题，而是自然界的根本属性。",
-    "formula": [],
+    "formula": [
+      {
+        "latex": "Delta x Delta p geq \frac{hbar}{2}",
+        "plain": "位置-动量不确定性关系（海森堡）"
+      },
+      {
+        "latex": "Delta E Delta t geq \frac{hbar}{2}",
+        "plain": "能量-时间不确定性关系"
+      }
+    ],
     "limitation": "适用于所有量子系统，是根本性限制而非实验精度问题。",
     "prevIds": [
       "quantum-mechanics"
@@ -828,7 +854,16 @@
     ],
     "aha": "给物理定律定个本地规则，力就从规则里自己长出来了",
     "summary": "杨振宁和米尔斯提出：如果物理定律在某种\"本地规范变换\"下保持不变，就会自然产生一种传递相互作用的场。这是现代规范场论的起源，为弱力和强力的统一奠定了数学基础。",
-    "formula": [],
+    "formula": [
+      {
+        "latex": "F_{mu\nu}^a = partial_mu A_\nu^a - partial_\nu A_mu^a + g f^{abc} A_mu^b A_\nu^c",
+        "plain": "杨-米尔斯场强张量（非阿贝尔规范场）"
+      },
+      {
+        "latex": "mathcal{L} = -\frac{1}{4}F_{mu\nu}^a F^{amu\nu}",
+        "plain": "杨-米尔斯拉格朗日量（纯规范场部分）"
+      }
+    ],
     "limitation": "理论本身预言规范玻色子无质量；描述弱力时需要希格斯机制通过对称性自发破缺赋予W/Z玻色子质量。对于强力（QCD），胶子仍保持无质量。",
     "prevIds": [
       "qed"

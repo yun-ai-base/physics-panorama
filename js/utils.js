@@ -67,3 +67,8 @@ export function edgePath(a, b) {
   const mx = (a.x + b.x) / 2;
   return `M ${a.x} ${a.y} C ${mx} ${a.y}, ${mx} ${b.y}, ${b.x} ${b.y}`;
 }
+
+// 取上述 cubic-bezier 在 t=0.5 处的点，用于放置边标签
+export function bezierMidpoint(a, b) {
+  return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+}

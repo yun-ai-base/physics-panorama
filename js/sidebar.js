@@ -35,16 +35,36 @@ function renderDim(node, key) {
       return `<div class="formula"><div class="formula__latex">${tex}</div><div class="formula__plain">${esc(f.plain || '')}</div></div>`;
     }).join('');
   }
-  let val = '';
-  if (key === 'figures') {
-    const a = node.deepContent?.figures_detail || '';
-    const b = node.deepContent?.biography || '';
-    val = (a ? a : '') + (b ? '\n\n' + b : '');
-    if (!val.trim()) return '<p class="empty-note">暂无人物详情</p>';
-  } else {
-    val = node.deepContent?.[key] || '';
+
+  // deep 节点：从 deepContent 取
+  if (node.depth === 'deep' && node.deepContent) {
+    if (key === 'figures') {
+      const a = node.deepContent.figures_detail || '';
+      const b = node.deepContent.biography || '';
+      val = (a ? a : '') + (b ? '\n\n' + b : '');
+      if (!val.trim()) return '<p class="empty-note">暂无人物详情</p>';
+      return formatDim(val);
+    }
+    return formatDim(node.deepContent?.[key] || '');
   }
-  return formatDim(val);
+
+  // light 节点：从基础字段映射
+  const map = {
+    history: node.summary || '',
+    paradigm: node.aha || '',
+    limitation: node.limitation || '',
+    figures: '',
+  };
+  if (key in map) {
+    if (key === 'figures') {
+      // 用 figures 列表生成简要介绍
+      if (!node.figures?.length) return '<p class="empty-note">暂无详情</p>';
+      return `<p class="empty-note">代表人物见上方卡片。${node.summary ? '<br><br>' + esc(node.summary) : ''}</p>`;
+    }
+    return formatDim(map[key]);
+  }
+
+  return '<p class="empty-note">该节点暂无此维度内容</p>';
 }
 function miniMapHTML(node) {
   const pts = NODES.map(n => ({ id: n.id, x: n.layout?.timeline?.x ?? 0, y: n.layout?.timeline?.y ?? 0 }));
@@ -71,8 +91,36 @@ export function openNode(id) {
   const isDeep = node.depth === 'deep' && node.deepContent;
   const scaleLabel = SCALE_LABEL[node.scale] || node.scale;
   const maturityLabel = MATURITY_LABEL[node.maturity] || '';
-  const dims = isDeep ? DIMENSIONS : DIMENSIONS.filter(d => d.key !== 'formula' || (node.formula && node.formula.length));
-  const defaultTab = isDeep ? 'history' : 'history';
+
+  // 智能标签过滤：deep 节点显示全部 12 维；light 节点仅显示有内容的标签
+  const hasFormula = node.formula && node.formula.length;
+  const hasLimitation = !!node.limitation?.trim();
+  const hasSummary = !!node.summary?.trim();
+  const hasAha = !!node.aha?.trim();
+  const hasFigures = !!(node.figures && node.figures.length);
+
+  let dims;
+  if (isDeep) {
+    dims = DIMENSIONS;
+  } else {
+    // light 节点：只保留公式(如有)、局限(如有)、以及从 deepContent 中实际有值的维度
+    dims = DIMENSIONS.filter(d => {
+      if (d.key === 'formula') return hasFormula;
+      if (d.key === 'limitation') return hasLimitation;
+      // 其他维度依赖 deepContent
+      return node.deepContent?.[key] && String(node.deepContent[d.key]).trim();
+    });
+    // 如果过滤后标签太少，至少保留概览类标签
+    if (dims.length < 2) {
+      const extra = [];
+      if (hasSummary && !dims.find(d => d.key === 'history')) extra.push({ key: 'history', label: '脉络', icon: '📜' });
+      if (hasAha && !dims.find(d => d.key === 'paradigm')) extra.push({ key: 'paradigm', label: '思想', icon: '💡' });
+      if (hasFigures && !dims.find(d => d.key === 'figures')) extra.push({ key: 'figures', label: '人物', icon: '👤' });
+      dims = [...dims, ...extra];
+    }
+  }
+
+  const defaultTab = dims[0]?.key || 'history';
   body.innerHTML = `
     <div class="sum-card">
       <div class="sum-card__era"><span class="swatch" style="background:${era.raw}"></span>${era.name} · ${era.range}</div>

@@ -1,6 +1,14 @@
 import { state } from './state.js';
-import { el, esc, edgePath } from './utils.js';
+import { el, esc, edgePath, bezierMidpoint } from './utils.js';
 import { ERAS, ERA_ORDER, EDGE_CLASS } from './config.js';
+
+const EDGE_LABELS = {
+  inherit: '继承',
+  branch: '分支',
+  revolution: '革命',
+  unify: '统一',
+  conflict: '冲突',
+};
 
 let NODES = [], EDGES = [], SUMMARIES = {}, POS = {};
 const byId = new Map();
@@ -54,10 +62,17 @@ function drawEdges(layer) {
   for (const e of EDGES) {
     const a = POS[e.from], b = POS[e.to];
     if (!a || !b) continue;
+    const d = edgePath(a, b);
     const path = el('path', {
-      d: edgePath(a, b), class: `edge ${EDGE_CLASS[e.type]}`,
+      d, class: `edge ${EDGE_CLASS[e.type]}`,
     }, layer);
-    edgeEls.push({ from: e.from, to: e.to, el: path });
+    const m = bezierMidpoint(a, b);
+    const label = el('text', {
+      x: m.x, y: m.y - 5,
+      class: 'edge__label',
+      text: EDGE_LABELS[e.type] || e.type,
+    }, layer);
+    edgeEls.push({ from: e.from, to: e.to, el: path, label });
   }
 }
 
@@ -136,7 +151,9 @@ export function applyState() {
   for (const e of edgeEls) {
     const vis = visible.has(e.from) && visible.has(e.to);
     e.el.style.display = vis ? '' : 'none';
+    if (e.label) e.label.style.display = vis ? '' : 'none';
     const dim = state.selected ? !(state.highlight.has(e.from) && state.highlight.has(e.to)) : false;
     e.el.classList.toggle('is-dim', dim);
+    if (e.label) e.label.classList.toggle('is-dim', dim);
   }
 }
