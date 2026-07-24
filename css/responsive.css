@@ -3,7 +3,11 @@
   .brand__sub{display:none;}
   .search input{width:180px;}
   .people-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); max-width:960px;}
+  /* 平板：节点标签稍小 */
+  .node__label{font-size:13px;}
+  .era-band__label{font-size:14px;}
 }
+
 @media (max-width:768px){
   .stage-wrap{flex-direction:column;}
   .sidebar{position:absolute; right:0; top:0; bottom:0; width:100%; max-width:430px; z-index:40; border-left:none; box-shadow:-12px 0 40px rgba(0,0,0,.18);}
@@ -17,7 +21,20 @@
   .hint{display:none;}
   .minimap{display:none;}
   .people-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; padding:0 4px;}
+
+  /* 手机端 SVG 节点优化 */
+  .node__circle{stroke-width:2.2 !important;} /* 描边略细省空间 */
+  .node__label{font-size:12.5px; stroke-width:3.5px;}
+  .node__year{font-size:10px;}
+  .era-band__label{font-size:13px;}
+  .era-band__range{font-size:10px;}
+  /* 触摸目标加大 */
+  .node{touch-action:manipulation;}
+  /* 底栏精简 */
+  .bottombar{height:auto; flex-wrap:wrap; padding:8px 14px; gap:6px;}
+  .bottombar__tour{width:100%; justify-content:center;}
 }
+
 @media (max-width:480px){
   .brand__title{font-size:17px;}
   .brand__mark{width:15px; height:15px;}
@@ -27,4 +44,11 @@
   .person-card__avatar .avatar{width:52px; height:52px; font-size:19px;}
   .sidebar{width:100%; max-width:none;}
   .era-tab{padding:5px 11px; font-size:12px;}
+
+  /* 小屏极致精简 */
+  .node__label{font-size:11.5px; stroke-width:3px;}
+  .node__year{display:none;} /* 隐藏年份省空间 */
+  .preface__quote{display:none;}
+  .nav-row{gap:6px;}
+  .view-tab{padding:5px 9px; font-size:11.5px;}
 }
