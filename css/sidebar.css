@@ -100,10 +100,15 @@
 .sb-empty{color:var(--ink-3); font-style:italic; font-size:13px; padding:12px 0;}
 
 /* ── 公式块 (sb-fm) ────────────────────────────── */
-.sb-fm{background:linear-gradient(135deg,var(--bg-2),#FFFDF8); border-left:3.5px solid var(--gold); border-radius:10px; padding:14px 16px; margin:10px 0; overflow-x:visible; box-shadow:0 1px 4px rgba(184,137,59,.06);}
+.sb-fm{background:linear-gradient(135deg,var(--bg-2),#FFFDF8); border-left:3.5px solid var(--gold); border-radius:10px; padding:14px 16px; margin:10px 0; overflow-x:visible; box-shadow:0 1px 4px rgba(184,137,59,.06); position:relative;}
+.sb-fm::before,.sb-fm::after{content:''; position:absolute; top:14px; bottom:34px; width:14px; pointer-events:none; opacity:0; transition:opacity .25s ease; z-index:2;}
+.sb-fm::before{left:16px; background:linear-gradient(to right, var(--bg-2), transparent);}
+.sb-fm::after{right:16px; background:linear-gradient(to left, var(--bg-2), transparent);}
+.sb-fm.is-scrollable::before,.sb-fm.is-scrollable::after{opacity:1;}
 .sb-fm__name{font-size:11px; font-weight:700; color:var(--gold); margin-bottom:6px; letter-spacing:.4px; text-transform:uppercase;}
 .sb-fm__row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:nowrap;}
-.sb-fm__tex{font-size:15.5px; margin:6px 0; flex:1 1 auto; min-width:0; overflow-x:auto;}
+.sb-fm__tex{font-size:15.5px; margin:6px 0; flex:1 1 auto; min-width:0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; -ms-overflow-style:none;}
+.sb-fm__tex::-webkit-scrollbar{display:none;}
 .sb-fm__plain{font-size:12px; color:var(--ink-2); margin-top:8px; line-height:1.6;}
 
 /* 应用拓展按钮 */

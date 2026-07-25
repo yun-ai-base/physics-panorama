@@ -583,6 +583,14 @@ export function openNode(id) {
     tabBody.innerHTML = renderDim(node, key);
     tabs.forEach(t => t.classList.toggle('is-active', t.dataset.key === key));
     window.dispatchEvent(new CustomEvent('pp:updateURL'));
+    // 公式块溢出检测：长出可视区时给外层加 is-scrollable，显示左右渐变提示
+    requestAnimationFrame(() => {
+      tabBody.querySelectorAll('.sb-fm__tex').forEach(tex => {
+        const wrap = tex.closest('.sb-fm');
+        if (!wrap) return;
+        wrap.classList.toggle('is-scrollable', tex.scrollWidth > tex.clientWidth + 1);
+      });
+    });
     // 绑定公式“应用拓展”展开/收起
     tabBody.querySelectorAll('.sb-fm__app-btn').forEach(btn => {
       btn.addEventListener('click', () => {

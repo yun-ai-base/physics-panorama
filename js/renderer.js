@@ -42,10 +42,9 @@ export function renderGraph(view, layoutList) {
     era: document.getElementById('layer-era'),
     edges: document.getElementById('layer-edges'),
     nodes: document.getElementById('layer-nodes'),
-    labels: document.getElementById('layer-labels'),
     preface: document.getElementById('layer-preface'),
   };
-  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.labels); clear(L.preface);
+  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface);
   nodeEls = new Map(); edgeEls = []; prefaceEls = []; relationEls = [];
   scaleBandY = {};
 
@@ -56,7 +55,7 @@ export function renderGraph(view, layoutList) {
     drawEraBands(L.era);
   }
   drawEdges(L.edges);
-  drawNodes(L.nodes, L.labels);
+  drawNodes(L.nodes);
   if (view === 'timeline') /* drawPrefaces(L.preface); 已移除 —— 序言卡片为视觉噪音 */;
   applyState();
 }
