@@ -255,6 +255,8 @@ function splitImplicitCategories(block) {
   // 领域后缀词列表
   const suffixes = ['领域', '方面', '学科', '界', '学中', '中', '里', '内'];
   const puncts = '[，,：:;；]';
+  // 先去掉加粗标记，避免 "在**粒子物理学**中" 无法匹配
+  const plain = block.replace(/\*\*(.+?)\*\*/g, '$1');
   const re = new RegExp(
     '在([\\u4e00-\\u9fff]{2,12})(' + suffixes.join('|') + ')(' + puncts + ')',
     'g'
@@ -264,13 +266,13 @@ function splitImplicitCategories(block) {
   let m;
   // 非分类前缀黑名单：以这些词开头的匹配通常是"在某XX中"而非领域分类
   const blacklist = /^(最|某|更|这|那|该|其|此|任|各|每|一|前|后|左|右|上|下|内|外|大|小|新|旧|真|假)/;
-  while ((m = re.exec(block)) !== null) {
+  while ((m = re.exec(plain)) !== null) {
     const title = m[1] + m[2];
     if (!blacklist.test(m[1])) {
       matches.push({
         full: m[0],       // 完整匹配如 "在数学领域，"
         title: title,      // 分类名如 "数学领域"
-        index: m.index     // 在原文中的位置
+        index: m.index     // 在 plain 中的位置
       });
     }
   }
@@ -281,8 +283,8 @@ function splitImplicitCategories(block) {
   const sections = [];
   for (let i = 0; i < matches.length; i++) {
     const start = matches[i].index + matches[i].full.length;
-    const end = (i + 1 < matches.length) ? matches[i + 1].index : block.length;
-    let body = block.slice(start, end).trim();
+    const end = (i + 1 < matches.length) ? matches[i + 1].index : plain.length;
+    let body = plain.slice(start, end).trim();
     // 去掉可能的句首连接词
     body = body.replace(/^[，,；;\s]+/, '');
     if (body.length > 8) {
@@ -292,7 +294,7 @@ function splitImplicitCategories(block) {
 
   // 处理开头引导语（第一个分类之前的文字）
   if (sections.length > 0 && matches[0].index > 10) {
-    const preamble = block.slice(0, matches[0].index).trim();
+    const preamble = plain.slice(0, matches[0].index).trim();
     if (preamble.length > 6) {
       sections.unshift({ title: '概述', body: preamble });
     }
@@ -310,8 +312,8 @@ function splitImplicitCategories(block) {
  * 如果 ≥2 个标题，拆为多个 sb-section 分区卡，与量子力学等节点的手工 **标题** 卡片视觉一致。
  */
 function splitBlockByHeadings(block) {
-  // 匹配：行首/句首 + 可选列举前缀 + **标题**
-  const re = /(?:^|\n|[，。；：:,])\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*\*\*([^*]+?)\*\*/g;
+  // 匹配：行首/句首 + 可选简短引导语/列举前缀 + **标题**
+  const re = /(?:^|\n|[，。；：:,])\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*[^，。；：:\n]{0,10}?\*\*([^*]+?)\*\*/g;
   const matches = [];
   let m;
   while ((m = re.exec(block)) !== null) {
@@ -367,8 +369,8 @@ function parseContent(raw) {
       continue;
     }
 
-    // 规则2：**标题** 开头（可带第X项/此外/首先等列举前缀）→ 分区卡
-    const headingMatch = block.match(/^\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*\*\*(.+?)\*\*(?:[\s：:])/);
+    // 规则2：**标题** 开头（可带简短引导语/列举前缀）→ 分区卡
+    const headingMatch = block.match(/^\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*[^，。；：:\n]{0,10}?\*\*(.+?)\*\*(?:[\s：:])/);
     if (headingMatch) {
       const title = headingMatch[1];
       let body = block.slice(headingMatch[0].length).trim();
@@ -389,6 +391,7 @@ function parseContent(raw) {
 
     // 规则2.6：块内多 **标题** 拆分（如 QED 实验/影响/人物等段落）
     const headingSections = splitBlockByHeadings(block);
+    if (headingSections) {
       html.push(`<div class="sb-section sb-section--implicit">${headingSections.map(sec =>
         `<div class="sb-section" style="margin:8px 0;"><div class="sb-section__title">${esc(sec.title)}</div><div class="sb-section__body">${inlineBoldToTag(sec.body)}</div></div>`
       ).join('')}</div>`);
