@@ -92,6 +92,44 @@ function splitTimelineItemsSafe(block) {
 }
 
 /**
+ * 纯散文智能分段——对没有 **标题** / #标题 / 时间线 / 列表 的长文本，
+ * 检测中文论述标记（首先/其次/此外/另一方面/然而/总之等），
+ * 在标记处拆分成带小标题的子区块，避免整块文字墙。
+ *
+ * 只对 >400 字符的块启用（短段落不需要拆）。
+ */
+function splitProseByMarkers(block) {
+  if (block.length < 400) return null;
+
+  // 中文论述标记正则（单行，匹配标记+紧随的标点）
+  const markerRe = /(?:^|\n\s*)(首先|其次|再次|然后|最后|另外|此外|同时|而且|加之|另一方面|相比之下|不过|然而|但是|反之|总之|综上|由此可见|简言之|总而言之|换言之|因此|所以|故而|因而|由此|这样一来|值得一提的是|值得注意的是|需要指出的是|具体来说)([：:,，。])/gi;
+
+  const parts = [];
+  let lastEnd = 0;
+  let match;
+  while ((match = markerRe.exec(block)) !== null) {
+    const prefix = block.slice(lastEnd, match.index).trim();
+    if (prefix.length > 20) parts.push({ text: prefix, title: '' });
+    const marker = match[1].trim();
+    const afterMarker = block.slice(match.index + match[0].length);
+    const firstSentence = afterMarker.match(/[^。！？\n]{0,30}[。！？]?/);
+    const titleExtra = firstSentence ? firstSentence[0].trim() : '';
+    parts.push({ text: afterMarker.trim(), title: marker + (titleExtra && titleExtra.length <= 15 ? '…' : '') });
+    lastEnd = match.index + match[0].length;
+  }
+  const tail = block.slice(lastEnd).trim();
+  if (tail.length > 20) {
+    if (parts.length > 0 && !parts[parts.length - 1].title) {
+      parts[parts.length - 1].text += '\n' + tail;
+    } else {
+      parts.push({ text: tail, title: '' });
+    }
+  }
+  if (parts.length < 3) return null;
+  return parts.filter(p => p.text.trim().length > 15);
+}
+
+/**
  * 核心解析器：将原始长文转为结构化 HTML。
  *
  * 解析规则（按优先级）：
@@ -99,7 +137,8 @@ function splitTimelineItemsSafe(block) {
  *   2. **加粗标题** 开头（:/: ：）→ .sb-section 分区卡片
  *   3. looksLikeTimeline() 通过 → .sb-tl 时间线索引
  *   4. - 开头的列表（≥2项）→ .sb-ref-list 参考文献列表
- *   5. 其他 → .sb-para 普通段落
+ *   5. 长纯散文 → splitProseByMarkers() 智能分段为子卡片
+ *   6. 其他 → .sb-para 普通段落
  */
 function parseContent(raw) {
   if (!raw || typeof raw !== 'string' || !raw.trim()) return '<p class="sb-empty">暂无内容</p>';
@@ -152,7 +191,18 @@ function parseContent(raw) {
       continue;
     }
 
-    // 规则5：普通段落
+    // 规则5：长纯散文智能分段
+    const proseParts = splitProseByMarkers(block);
+    if (proseParts) {
+      html.push(`<div class="sb-prose">${proseParts.map(p =>
+        p.title
+          ? `<div class="sb-prose__sec"><div class="sb-prose__title">${esc(p.title)}</div><div class="sb-prose__body">${inlineBoldToTag(p.text)}</div></div>`
+          : `<div class="sb-prose__body">${inlineBoldToTag(p.text)}</div>`
+      ).join('')}</div>`);
+      continue;
+    }
+
+    // 规则6：普通段落
     html.push(`<div class="sb-para">${inlineBoldToTag(block)}</div>`);
   }
 
