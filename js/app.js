@@ -334,7 +334,7 @@ function setView(v) {
   if (vv) vv.hidden = !isVoid;
   if (smb) smb.hidden = (v !== 'scale');
   const eraNav = document.getElementById('eraNav');
-  if (eraNav) eraNav.hidden = isVoid;
+  if (eraNav) eraNav.style.display = isVoid ? 'none' : '';
   if (isPeople) {
     renderPeople(document.getElementById('peopleGrid'), [...PEOPLE_MAP.values()], onPickPerson);
     closeSidebar();

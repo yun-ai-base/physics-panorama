@@ -229,3 +229,14 @@ body.view-people .hint{display:none;}
 .void-view__verse + .void-view__verse{margin-top:.28em;}
 .void-view__sub{display:block; margin-top:34px; font-size:14px; color:var(--ink-3); letter-spacing:.2em;}
 @keyframes voidIn{from{transform:translateY(18px); opacity:0;} to{transform:none; opacity:1;}}
+
+/* 虚无-图景淡墨水印 */
+.void-view__watermark{
+  position:absolute; right:6vw; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:row; gap:22px; opacity:.18; pointer-events:none; z-index:0;
+  font-family:var(--font-serif); color:var(--ink-2); writing-mode:vertical-rl; text-orientation:upright;
+}
+.void-view__watermark span{
+  font-size:clamp(18px, 2.6vw, 32px); letter-spacing:.22em; line-height:1.9;
+  text-shadow:0 1px 0 rgba(255,255,255,.6), 0 0 28px rgba(184,137,59,.08);
+}
