@@ -136,12 +136,19 @@ function renderDim(node, key) {
   if (key === 'formula') {
     const fs = node.formula || [];
     if (!fs.length) return '<p class="sb-empty">该节点未提供公式</p>';
-    return fs.map(f => {
+    return fs.map((f, idx) => {
       let tex = '';
       try { tex = window.katex ? katex.renderToString(f.latex || '', { throwOnError: false, displayMode: false }) : esc(f.latex || ''); }
       catch (e) { tex = esc(f.latex || ''); }
       const nameTag = f.name ? `<div class="sb-fm__name">${esc(f.name)}</div>` : '';
-      return `<div class="sb-fm">${nameTag}<div class="sb-fm__tex">${tex}</div><div class="sb-fm__plain">${esc(f.plain || '')}</div></div>`;
+      const appText = (f.applications || '').trim();
+      const appBtn = appText
+        ? `<button class="sb-fm__app-btn" type="button" data-fm="${node.id}-${idx}" title="应用拓展" aria-expanded="false"><span class="sb-fm__app-icon">✦</span><span class="sb-fm__app-label">应用拓展</span></button>`
+        : '';
+      const appPanel = appText
+        ? `<div class="sb-fm__app-panel" id="fm-app-${node.id}-${idx}" hidden><div class="sb-fm__app-title">实用场景与背后逻辑</div><div class="sb-fm__app-body">${parseContent(appText)}</div></div>`
+        : '';
+      return `<div class="sb-fm" data-fm-wrap="${node.id}-${idx}">${nameTag}<div class="sb-fm__row"><div class="sb-fm__tex">${tex}</div>${appBtn}</div><div class="sb-fm__plain">${esc(f.plain || '')}</div>${appPanel}</div>`;
     }).join('');
   }
 
@@ -255,6 +262,17 @@ export function openNode(id) {
   const show = key => {
     tabBody.innerHTML = renderDim(node, key);
     tabs.forEach(t => t.classList.toggle('is-active', t.dataset.key === key));
+    // 绑定公式“应用拓展”展开/收起
+    tabBody.querySelectorAll('.sb-fm__app-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = tabBody.querySelector(`#fm-app-${btn.dataset.fm}`);
+        const wrap = tabBody.querySelector(`[data-fm-wrap="${btn.dataset.fm}"]`);
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        if (panel) panel.hidden = expanded;
+        if (wrap) wrap.classList.toggle('is-app-open', !expanded);
+      });
+    });
   };
   tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.key)));
   show(defaultTab);
