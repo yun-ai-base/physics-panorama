@@ -237,7 +237,7 @@ body.view-people .hint{display:none;}
   font-family:var(--font-serif); color:var(--ink-2); writing-mode:vertical-rl; text-orientation:upright;
 }
 .void-view__watermark span{
-  font-size:clamp(18px, 2.6vw, 32px); letter-spacing:.22em; line-height:1.9;
+  font-size:clamp(24px, 3.6vw, 46px); letter-spacing:.22em; line-height:1.9;
   text-shadow:0 1px 0 rgba(255,255,255,.6), 0 0 28px rgba(184,137,59,.08);
 }
 .void-view__watermark--left{
@@ -247,5 +247,5 @@ body.view-people .hint{display:none;}
   transform:translateY(-50%);
 }
 .void-view__watermark--left span{
-  font-size:clamp(15px, 1.9vw, 22px); letter-spacing:.14em; line-height:1.6;
+  font-size:clamp(20px, 2.8vw, 32px); letter-spacing:.14em; line-height:1.6;
 }
