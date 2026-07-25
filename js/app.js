@@ -317,21 +317,28 @@ function reflectScaleActive() {
     l.classList.toggle('is-active-scale', l.dataset.scale === state.activeScale));
 }
 
-// 统一视图切换（含人物索引覆盖层）
+// 统一视图切换（含人物索引与虚无-图景覆盖层）
 function setView(v) {
   state.view = v;
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === v));
   const isPeople = v === 'people';
-  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people');
+  const isVoid = v === 'void';
+  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people','view-void');
   document.body.classList.add(`view-${v}`);
   const stageEl = document.getElementById('stage');
   const pv = document.getElementById('peopleView');
+  const vv = document.getElementById('voidView');
   const smb = document.getElementById('scaleMapBar');
-  if (stageEl) stageEl.style.visibility = isPeople ? 'hidden' : '';
+  if (stageEl) stageEl.style.visibility = (isPeople || isVoid) ? 'hidden' : '';
   if (pv) pv.hidden = !isPeople;
+  if (vv) vv.hidden = !isVoid;
   if (smb) smb.hidden = (v !== 'scale');
+  const eraNav = document.getElementById('eraNav');
+  if (eraNav) eraNav.hidden = isVoid;
   if (isPeople) {
     renderPeople(document.getElementById('peopleGrid'), [...PEOPLE_MAP.values()], onPickPerson);
+    closeSidebar();
+  } else if (isVoid) {
     closeSidebar();
   } else {
     renderCurrent(); fit();

@@ -28,10 +28,11 @@
       </div>
       <div class="nav-row">
         <nav class="views" id="viewTabs" aria-label="视图切换">
-          <button class="view-tab is-active" data-view="timeline">时间线</button>
+          <button class="view-tab" data-view="timeline">时间线</button>
           <button class="view-tab" data-view="unification">统一之路</button>
           <button class="view-tab" data-view="scale">尺度维度</button>
           <button class="view-tab" data-view="people">人物索引</button>
+          <button class="view-tab" data-view="void">虚无-图景</button>
         </nav>
         <div class="search" id="searchBox">
           <input id="searchInput" type="search" placeholder="搜索学说 / 人名 / 关键词…" autocomplete="off" />
@@ -91,6 +92,17 @@
           <p class="people-view__sub">物理学三百年的代表人物 · 点击查看其关联的学说与事件</p>
         </div>
         <div class="people-grid" id="peopleGrid"></div>
+      </div>
+
+      <!-- 虚无-图景占位视图 -->
+      <div class="void-view" id="voidView" hidden>
+        <div class="void-view__card">
+          <p class="void-view__verse">一花一世界</p>
+          <p class="void-view__verse">一沙一天国</p>
+          <p class="void-view__verse">君掌盛无边</p>
+          <p class="void-view__verse">刹那含永劫</p>
+          <span class="void-view__sub">—— 虚无 · 图景 · 暂居</span>
+        </div>
       </div>
 
       <!-- 详情侧边栏 -->
