@@ -318,7 +318,7 @@
   },
   "罗伯特·米尔斯": {
     "placeholder": "罗伯特·米尔斯.svg",
-    "real_image": "罗伯特·米尔斯.jpg",
+    "real_image": null,
     "related_nodes": [
       "yang-mills"
     ]
@@ -524,7 +524,7 @@
   },
   "雷纳·韦斯": {
     "placeholder": "雷纳·韦斯.svg",
-    "real_image": "雷纳·韦斯.png",
+    "real_image": null,
     "related_nodes": [
       "ligo"
     ]
