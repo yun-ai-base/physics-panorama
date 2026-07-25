@@ -9,6 +9,7 @@ export const state = {
   filterEra: null,         // 纪元筛选（null = 全部）
   activeEra: null,         // 当前激活/选中的纪元（顶部导航或时间线标签点击，UI 高亮 + 综述）
   activeScale: null,       // 当前激活/选中的尺度维度（尺度视图标签点击，UI 高亮 + 概念解析面板）
+  activeRelation: null,    // 当前高亮的跨尺度渗透关系（关联条箭头触发）
   onlyCore: true,          // 仅显示主干
   view: 'timeline',        // 当前视图
   tour: null,              // 漫游模式

@@ -131,3 +131,13 @@ export const SCALE_DESC = {
     ],
   },
 };
+
+/* 尺度维度跨尺度渗透关系 —— 用于 SVG 关系图与顶部导航条联动
+ * id: 内部标识；from/to: 源/目标尺度；label: 箭头标签；rel: 与 SCALE_DESC.extend[].rel 及 HTML data-rel 对应 */
+export const SCALE_RELATIONS = [
+  { id: 'emergence',   from: 'microscopic', to: 'mesoscopic',  label: '涌现',     rel: '微观 → 宏观 · 涌现',           color: '#6B489E' },
+  { id: 'gravity',     from: 'mesoscopic',  to: 'cosmic',      label: '引力桥梁', rel: '宏观 ↔ 宇观 · 引力桥梁',       color: '#A07840' },
+  { id: 'unification', from: 'cosmic',      to: 'unified',     label: '大统一',   rel: '统一 → 宇观',                  color: '#41518F' },
+  { id: 'feedback',    from: 'unified',     to: 'feedback',    label: '技术回流', rel: '统一 → 反哺',                  color: '#28684E' },
+  { id: 'loop',        from: 'feedback',    to: 'microscopic', label: '闭环',     rel: '反哺 ← 微观',                  color: '#7A5BA6' },
+];

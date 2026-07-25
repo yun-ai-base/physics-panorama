@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { el, esc, edgePath, bezierMidpoint } from './utils.js';
-import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
+import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS, SCALE_DESC, SCALE_RELATIONS } from './config.js';
 
 const EDGE_LABELS = {
   inherit: '继承',
@@ -15,7 +15,9 @@ const byId = new Map();
 let nodeEls = new Map();
 let edgeEls = [];
 let prefaceEls = [];
+let relationEls = [];
 let currentView = 'timeline';
+let scaleBandY = {}; // scale 视图每行的 y 范围，用于绘制跨尺度关系连线
 
 export function initRenderer(nodes, edges, summaries) {
   NODES = nodes; EDGES = edges; SUMMARIES = summaries || {};
@@ -43,10 +45,12 @@ export function renderGraph(view, layoutList) {
     preface: document.getElementById('layer-preface'),
   };
   clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface);
-  nodeEls = new Map(); edgeEls = []; prefaceEls = [];
+  nodeEls = new Map(); edgeEls = []; prefaceEls = []; relationEls = [];
+  scaleBandY = {};
 
   if (view === 'scale') {
     drawScaleBands(L.era);
+    drawScaleRelations(L.era);
   } else {
     drawEraBands(L.era);
   }
@@ -97,6 +101,7 @@ function drawScaleBands(layer) {
     if (!xs.length) continue;
     const minY = Math.min(...xs.map(p => p.y)) - 70;
     const maxY = Math.max(...xs.map(p => p.y)) + 70;
+    scaleBandY[scale] = { minY, maxY, midY: (minY + maxY) / 2 };
     const cfg = SCALE_COLORS[scale];
     const active = state.filterEra ? false : true; // 在 scale 视图下默认全部高亮
 
