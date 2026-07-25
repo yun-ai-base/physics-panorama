@@ -61,6 +61,15 @@
 .sb-ref-list__item::before{content:'·'; position:absolute; left:4px; color:var(--gold); font-weight:700; font-size:14px;}
 .sb-ref-list__item em{font-style:italic; color:var(--ink-2);}
 
+/* ── 防止中文括号被换行拆开 ─────────────────── */
+.sb-para, .sb-tl__text, .sb-section__body, .sb-ref-list__item{
+  word-break:break-word; overflow-wrap:break-word;
+  /* 保持 （与 ）不分离 */
+  -webkit-line-clamp:unset;
+}
+/* 全角括号粘连：左括号粘前、右括号粘后 */
+.sb-para, .sb-tl__text, .sb-section__body{ text-wrap:pretty; }
+
 /* ── 时间线索引 (sb-tl) ────────────────────────── */
 .sb-tl{margin:10px 0;}
 .sb-tl__item{display:flex; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(42,38,32,.07);}
@@ -101,7 +110,7 @@
 
 /* ── 路径上下文 (sb-path) ──────────────────────── */
 .sb-path{margin-top:18px; padding-top:14px; border-top:1px dashed rgba(42,38,32,.14); font-size:12px; display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; line-height:1.7;}
-.sb-path__label{font-weight:700; color:var(--ink); font-size:11px; text-transform:uppercase; letter-spacing:.3px;}
+.sb-path__label{display:inline-block; font-weight:500; color:var(--ink-3); font-size:10px; text-transform:uppercase; letter-spacing:.5px; background:var(--bg-2); border:1px solid rgba(42,38,32,.08); border-radius:5px; padding:1px 6px; vertical-align:baseline;}
 .sb-path__val{color:var(--ink-2);}
 .sb-path__sep{width:18px; text-align:center; color:var(--ink-3);}
 .sb-path__link{background:none; border:none; border-bottom:1.5px dashed var(--gold); color:var(--ink); font-size:12px; font-weight:600; cursor:pointer; padding:0 2px; border-radius:0; transition:.15s;}
@@ -114,6 +123,20 @@
 /* ── 段落小标题 (sb-sec-label) ─────────────────── */
 .sb-sec-label{margin:16px 0 2px; font-family:var(--font-sans); font-size:12px; font-weight:700; letter-spacing:1px; color:var(--gold); border-left:3px solid var(--gold); padding-left:9px;}
 .sb-sec-label:first-child{margin-top:4px;}
+
+/* ── 概念解析卡片（定义/特征尺度/理论/现象） ── */
+.sb-dl{display:grid; grid-template-columns:72px 1fr; gap:6px 12px; align-items:start; margin:9px 0; padding:10px 13px; background:var(--bg-2); border:1px solid rgba(42,38,32,.06); border-radius:10px;}
+.sb-dl dt{flex:0 0 72px; font-size:11.5px; font-weight:700; color:var(--ink-3); letter-spacing:.5px; padding-top:1px;}
+.sb-dl dd{margin:0; font-size:13.5px; line-height:1.72; color:var(--ink);}
+.sb-tags{display:flex; flex-wrap:wrap; gap:5px;}
+.sb-tag{display:inline-block; background:color-mix(in srgb, var(--tag, #8B6914) 12%, #fff); border:1px solid color-mix(in srgb, var(--tag, #8B6914) 32%, #fff); color:var(--tag, #8B6914); border-radius:7px; padding:2px 9px; font-size:12px; font-weight:600; line-height:1.5;}
+
+/* ── 尺度间渗透列表 ── */
+.sb-rel-list{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+.sb-rel-item{border:1px solid rgba(42,38,32,.08); border-left:3px solid var(--gold); background:#fff; border-radius:9px; padding:10px 13px; transition:.2s;}
+.sb-rel-item.is-focus{border-color:var(--gold); border-left-width:5px; box-shadow:0 0 0 3px var(--gold-tint); background:var(--gold-tint);}
+.sb-rel-item__rel{font-size:12px; font-weight:700; color:var(--gold); margin-bottom:5px; letter-spacing:.3px;}
+.sb-rel-item__text{font-size:13px; line-height:1.74; color:var(--ink);}
 
 /* ── 人物索引 ───────────────────────────────────── */
 .sb-person{display:flex; align-items:center; gap:12px;}

@@ -30,12 +30,25 @@ function inlineBoldToTag(text) {
 
 /**
  * 检测文本是否为"时间线索引格式"。
- * 严格条件：必须包含 ≥3 组「2个以上中文/字母 + （年份数据」模式。
- * 普通传记/论述即使含年份也不会通过（因为年份前没有足够的前缀文字）。
+ * 严格条件（必须全部满足）：
+ *   1. ≥3 组「2个以上中文/字母 + （年份数据」模式
+ *   2. 这些模式必须出现在**行首**（前面是 ^ 或 \n）→ 排除传记内联生卒年
+ *   3. 年份后不紧跟 ） → 排除 （1853-1928） 这种生卒年格式
  */
 function looksLikeTimeline(block) {
-  const marks = (block.match(/[\u4e00-\u9fff\u0041-\u007a]{2,}（\d{3,4}[-—–]?\d{0,4}年?/g) || []);
-  return marks.length >= 3;
+  const re = /[\u4e00-\u9fff\u0041-\u007a]{2,}（(\d{3,4}[-—–]?\d{0,4}年?)/g;
+  let match;
+  let lineHeadCount = 0;
+  while ((match = re.exec(block)) !== null) {
+    // 检查匹配位置前是否为行首
+    const prefix = block.slice(Math.max(0, match.index - 2), match.index);
+    if (/^|\n\s*$/.test(prefix)) {
+      // 检查年份后是否紧跟 ）（生卒年特征）
+      const after = block[match.index + match[0].length] || '';
+      if (after !== ')') lineHeadCount++;
+    }
+  }
+  return lineHeadCount >= 3;
 }
 
 /**
@@ -311,12 +324,30 @@ export function openEra(era) {
 }
 
 /* ── 打开尺度维度概念解析 ─────────────────────────────── */
-export function openScale(scale) {
+export function openScale(scale, focusRel) {
   const d = SCALE_DESC[scale]; if (!d) return;
   const cfg = SCALE_COLORS[scale];
+  const c = d.concept || {};
   const sb = document.getElementById('sidebar'); const body = document.getElementById('sidebarBody');
   const count = NODES.filter(n => n.scale === scale).length;
   const names = NODES.filter(n => n.scale === scale).map(n => n.name).join('、');
+
+  const chips = arr => (arr || []).map(t => `<span class="sb-tag" style="--tag:${cfg.raw}">${esc(t)}</span>`).join('');
+  const defRow = c.def ? `<div class="sb-dl"><dt>定义</dt><dd>${esc(c.def)}</dd></div>` : '';
+  const scaleRow = c.scale ? `<div class="sb-dl"><dt>特征尺度</dt><dd>${esc(c.scale)}</dd></div>` : '';
+  const theoryRow = (c.theories && c.theories.length)
+    ? `<div class="sb-dl"><dt>代表理论</dt><dd><div class="sb-tags">${chips(c.theories)}</div></dd></div>` : '';
+  const phenoRow = (c.phenomena && c.phenomena.length)
+    ? `<div class="sb-dl"><dt>典型现象</dt><dd><div class="sb-tags">${chips(c.phenomena)}</div></dd></div>` : '';
+
+  const relItems = (d.extend || []).map((e, i) => {
+    const isFocus = focusRel && e.rel === focusRel;
+    return `<div class="sb-rel-item${isFocus ? ' is-focus' : ''}" data-rel="${esc(e.rel)}">
+      <div class="sb-rel-item__rel">${esc(e.rel)}</div>
+      <div class="sb-rel-item__text">${esc(e.text)}</div>
+    </div>`;
+  }).join('');
+
   body.innerHTML = `
     <div class="sb-head">
       <div class="sb-head__era"><span class="sb-swatch" style="background:${cfg.raw}"></span>${SCALE_LABEL[scale]} · 尺度维度</div>
@@ -325,11 +356,18 @@ export function openScale(scale) {
     </div>
     <div class="sb-panel">
       <div class="sb-sec-label">概念解析</div>
-      <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(d.concept || '')}</div>
-      <div class="sb-sec-label">延伸</div>
-      <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(d.extend || '')}</div>
+      ${defRow}${scaleRow}${theoryRow}${phenoRow}
+      <div class="sb-sec-label">尺度间渗透</div>
+      <div class="sb-rel-list">${relItems}</div>
       <div class="sb-stats">本尺度收录 <b>${count}</b> 个学说 / 事件：${esc(names)}</div>
     </div>`;
+
+  // 若从「尺度关联图」箭头定位而来，滚动并高亮对应渗透说明
+  if (focusRel) {
+    const target = body.querySelector('.sb-rel-item.is-focus');
+    if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  }
+
   sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
   state.sidebarOpen = true;
 }
