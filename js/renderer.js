@@ -106,7 +106,7 @@ function drawScaleBands(layer) {
     }, layer);
 
     el('text', {
-      x: globalMinX + 18, y: minY + 28,
+      x: globalMinX + 18, y: minY + 32,
       class: 'scale-band__label' + (state.activeScale === scale ? ' is-active-scale' : ''),
       text: SCALE_LABEL[scale],
       fill: cfg.raw,
@@ -118,7 +118,7 @@ function drawScaleBands(layer) {
     const desc = SCALE_DESC[scale];
     if (desc && desc.tag) {
       el('text', {
-        x: globalMinX + 20, y: minY + 46,
+        x: globalMinX + 20, y: minY + 54,
         class: 'scale-band__tag',
         text: desc.tag,
         fill: cfg.raw,
@@ -265,8 +265,13 @@ export function applyState() {
     const vis = visible.has(e.from) && visible.has(e.to);
     e.el.style.display = vis ? '' : 'none';
     if (e.label) e.label.style.display = vis ? '' : 'none';
-    const dim = state.selected ? !(state.highlight.has(e.from) && state.highlight.has(e.to)) : false;
+    const relatedEdge = state.selected && state.highlight.has(e.from) && state.highlight.has(e.to);
+    const dim = state.selected ? !relatedEdge : false;
+    e.el.classList.toggle('is-related', relatedEdge);
     e.el.classList.toggle('is-dim', dim);
-    if (e.label) e.label.classList.toggle('is-dim', dim);
+    if (e.label) {
+      e.label.classList.toggle('is-related', relatedEdge);
+      e.label.classList.toggle('is-dim', dim);
+    }
   }
 }

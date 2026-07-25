@@ -122,7 +122,12 @@ function wireUI() {
     const sl = e.target.closest('.scale-band__label');
     if (sl) { toggleScaleLabel(sl.dataset.scale); return; } // 尺度维度标签：点击展开概念解析面板
     const pf = e.target.closest('.preface');
-    if (pf) { openEra(pf.dataset.era); }
+    if (pf) { openEra(pf.dataset.era); return; }
+    // 点击画布空白（非节点/非标签/非前言）：退出聚焦态，清除选中与关联高亮
+    if (state.selected || state.activeEra || state.activeScale) {
+      state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null;
+      reflectEraActive(); reflectScaleActive(); applyState(); updateURL();
+    }
   });
 
   // 顶部尺度维度关联图：chip 打开概念解析面板，arrow 打开目标尺度的「尺度间渗透」说明

@@ -248,12 +248,12 @@ function splitBySentences(block) {
  * 检测"在XX领域/方面/学科/界/学中，"等隐式分类标记，
  * 将纯散文自动提升为 .sb-section 分区卡（与 **标题** 格式视觉一致）。
  *
- * 匹配模式：在（2~12字中文领域名）（领域|方面|学科|界|学中）（[，,：:]）
+ * 匹配模式：在（2~12字中文领域名）（领域|方面|学科|界|学中|中|里|内）（[，,：:]）
  * 要求 ≥2 个分类才激活（避免误判）。
  */
 function splitImplicitCategories(block) {
   // 领域后缀词列表
-  const suffixes = ['领域', '方面', '学科', '界', '学中'];
+  const suffixes = ['领域', '方面', '学科', '界', '学中', '中', '里', '内'];
   const puncts = '[，,：:;；]';
   const re = new RegExp(
     '在([\\u4e00-\\u9fff]{2,12})(' + suffixes.join('|') + ')(' + puncts + ')',
@@ -262,12 +262,17 @@ function splitImplicitCategories(block) {
 
   const matches = [];
   let m;
+  // 非分类前缀黑名单：以这些词开头的匹配通常是"在某XX中"而非领域分类
+  const blacklist = /^(最|某|更|这|那|该|其|此|任|各|每|一|前|后|左|右|上|下|内|外|大|小|新|旧|真|假)/;
   while ((m = re.exec(block)) !== null) {
-    matches.push({
-      full: m[0],       // 完整匹配如 "在数学领域，"
-      title: m[1] + m[2], // 分类名如 "数学领域"
-      index: m.index     // 在原文中的位置
-    });
+    const title = m[1] + m[2];
+    if (!blacklist.test(m[1])) {
+      matches.push({
+        full: m[0],       // 完整匹配如 "在数学领域，"
+        title: title,      // 分类名如 "数学领域"
+        index: m.index     // 在原文中的位置
+      });
+    }
   }
 
   // 至少需要 2 个隐式分类才启用此规则
