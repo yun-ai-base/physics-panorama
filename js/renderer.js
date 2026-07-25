@@ -249,12 +249,22 @@ function drawNodes(layer) {
       transform: `translate(${p.x},${p.y})`,
     }, layer);
     el('circle', { class: 'node__circle', r, cx: 0, cy: 0 }, g);
-    // 标签直接绘在圆体下方，靠文字描边（paint-order:stroke）保证清晰，不叠加白色底板保持简洁
-    const nameY = r + 22;
-    el('text', { class: 'node__label', x: 0, y: nameY, text: n.name }, g);
-    if (typeof n.year === 'number') {
-      const yearY = r + 38;
-      el('text', { class: 'node__year', x: 0, y: yearY, text: String(n.year) }, g);
+    // 标签策略：大节点(core/hub)名字写在圆圈内部底部，小节点写在外面下方
+    const isLarge = n.tier === 'core' || n.tier === 'hub';
+    if (isLarge) {
+      // 圆圈内：名字居中偏下，年份在更下面
+      el('text', { class: 'node__label node__label--inner', x: 0, y: r * 0.28, text: n.name }, g);
+      if (typeof n.year === 'number') {
+        el('text', { class: 'node__year node__year--inner', x: 0, y: r * 0.62, text: String(n.year) }, g);
+      }
+    } else {
+      // 圆圈外：名字和年份在正下方
+      const nameY = r + 20;
+      el('text', { class: 'node__label', x: 0, y: nameY, text: n.name }, g);
+      if (typeof n.year === 'number') {
+        const yearY = r + 36;
+        el('text', { class: 'node__year', x: 0, y: yearY, text: String(n.year) }, g);
+      }
     }
     nodeEls.set(n.id, g);
   }
