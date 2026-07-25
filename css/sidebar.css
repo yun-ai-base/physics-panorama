@@ -137,7 +137,7 @@
 .sb-term__name{font-family:var(--font-serif); font-size:15.5px; font-weight:700; color:var(--ink);}
 .sb-term__img{width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin:8px 0 10px; border:1px solid rgba(42,38,32,.08); background:var(--bg-2);}
 /* 内容中的 markdown 图片（如索尔维会议合影） */
-.sb-img{display:block; width:100%; max-width:320px; border-radius:10px; margin:12px auto; box-shadow:0 2px 8px rgba(42,38,32,.10); border:1px solid rgba(42,38,32,.06);}
+.sb-img{display:block; width:100%; max-width:100%; border-radius:10px; margin:12px auto; box-shadow:0 2px 8px rgba(42,38,32,.10); border:1px solid rgba(42,38,32,.06);}
 .sb-term__def{font-size:13px; line-height:1.7; color:var(--gold-dark,#8B6914); font-weight:600; padding:8px 12px; background:var(--gold-tint); border-radius:8px; margin-bottom:10px;}
 .sb-term__body{font-size:12.5px; line-height:1.8; color:var(--ink);}
 .sb-term__body .sb-para{margin:8px 0;}
