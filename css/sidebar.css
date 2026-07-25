@@ -35,9 +35,8 @@
 .sb-fig__name{font-weight:600;}
 
 /* ── 标签栏 (sb-tabs) ──────────────────────────── */
-.sb-tabs{display:flex; flex-wrap:nowrap; gap:5px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(42,38,32,.06); overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; -webkit-overflow-scrolling:touch;}
-.sb-tabs::-webkit-scrollbar{display:none;}
-.sb-tab{flex:0 0 auto; border:1px solid rgba(42,38,32,.10); background:#fff; color:var(--ink-2); font-size:11px; padding:4px 10px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500; white-space:nowrap;}
+.sb-tabs{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(42,38,32,.06);}
+.sb-tab{border:1px solid rgba(42,38,32,.10); background:#fff; color:var(--ink-2); font-size:11px; padding:4px 10px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500; white-space:nowrap;}
 .sb-tab:hover{border-color:var(--gold); color:var(--gold);}
 .sb-tab.is-active{background:var(--gold); color:#fff; border-color:var(--gold); font-weight:700;}
 

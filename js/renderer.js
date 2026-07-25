@@ -140,6 +140,58 @@ function drawScaleBands(layer) {
   }
 }
 
+function drawScaleRelations(layer) {
+  if (currentView !== 'scale' || !Object.keys(scaleBandY).length) return;
+  const all = NODES.map(n => POS[n.id]).filter(Boolean);
+  if (!all.length) return;
+  const globalMaxX = Math.max(...all.map(p => p.x)) + 80;
+  const spineX = globalMaxX + 55;
+
+  // 每个尺度在右侧脊柱上的节点
+  for (const scale of SCALE_ORDER) {
+    const y = scaleBandY[scale]; if (!y) continue;
+    el('circle', {
+      cx: spineX, cy: y.midY, r: 4,
+      fill: SCALE_COLORS[scale].raw, 'fill-opacity': 0.55,
+      class: 'scale-relation__dot',
+    }, layer);
+  }
+
+  // 跨尺度渗透曲线（默认低透明度，active 时高亮）
+  for (const r of SCALE_RELATIONS) {
+    const y1 = scaleBandY[r.from], y2 = scaleBandY[r.to];
+    if (!y1 || !y2) continue;
+    const my = (y1.midY + y2.midY) / 2;
+    const d = `M ${spineX} ${y1.midY} C ${spineX + 70} ${y1.midY}, ${spineX + 70} ${y2.midY}, ${spineX} ${y2.midY}`;
+    const path = el('path', {
+      d, fill: 'none', stroke: r.color, 'stroke-width': 2, 'stroke-opacity': 0.32,
+      class: 'scale-relation__line', 'data-rel': r.rel,
+    }, layer);
+
+    // 箭头指向目标尺度
+    const dir = y2.midY > y1.midY ? 1 : -1;
+    const ay = y2.midY - dir * 5;
+    el('path', {
+      d: `M ${spineX} ${ay} l -4 ${-dir * 3} l 8 0 z`,
+      fill: r.color, 'fill-opacity': 0.55, class: 'scale-relation__arrow', 'data-rel': r.rel,
+    }, layer);
+
+    // 标签
+    const lw = labelW(r.label, 12) + 10;
+    const lx = spineX + 78;
+    el('rect', {
+      x: lx - lw / 2, y: my - 8, width: lw, height: 14, rx: 4,
+      fill: '#fff', 'fill-opacity': 0.82, class: 'scale-relation__label-bg', 'data-rel': r.rel,
+    }, layer);
+    el('text', {
+      x: lx, y: my + 3, 'text-anchor': 'middle', class: 'scale-relation__label',
+      text: r.label, fill: r.color, 'data-rel': r.rel,
+    }, layer);
+
+    relationEls.push({ path, rel: r.rel });
+  }
+}
+
 function scaleEdgePath(a, b) {
   // 尺度维度视图用正交折线：同行水平，跨行先垂后平再垂，像地铁图
   const dy = Math.abs(b.y - a.y);
@@ -278,5 +330,12 @@ export function applyState() {
       e.label.classList.toggle('is-related', relatedEdge);
       e.label.classList.toggle('is-dim', dim);
     }
+  }
+  // 跨尺度渗透关系线：默认低透明度，active 时高亮
+  for (const r of relationEls) {
+    const active = !!state.activeRelation && r.rel === state.activeRelation;
+    r.path.classList.toggle('is-active', active);
+    r.path.setAttribute('stroke-width', active ? 3 : 2);
+    r.path.setAttribute('stroke-opacity', active ? 1 : 0.32);
   }
 }

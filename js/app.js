@@ -124,23 +124,30 @@ function wireUI() {
     const pf = e.target.closest('.preface');
     if (pf) { openEra(pf.dataset.era); return; }
     // 点击画布空白（非节点/非标签/非前言）：退出聚焦态，清除选中与关联高亮
-    if (state.selected || state.activeEra || state.activeScale) {
-      state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null;
+    if (state.selected || state.activeEra || state.activeScale || state.activeRelation) {
+      state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null; state.activeRelation = null;
       reflectEraActive(); reflectScaleActive(); applyState(); updateURL();
     }
   });
 
-  // 顶部尺度维度关联图：chip 打开概念解析面板，arrow 打开目标尺度的「尺度间渗透」说明
+  // 顶部尺度维度关联图：chip 打开概念解析面板，arrow 打开目标尺度的「尺度间渗透」说明并高亮 SVG 关系线
   const scaleMapBar = document.getElementById('scaleMapBar');
   if (scaleMapBar) {
     scaleMapBar.addEventListener('click', e => {
-      const chip = e.target.closest('.scale-map-bar__chip');
-      if (chip) { toggleScaleLabel(chip.dataset.scale); return; }
       const arrow = e.target.closest('.scale-map-bar__arrow');
       if (arrow) {
+        state.activeRelation = arrow.dataset.rel;
         state.activeScale = arrow.dataset.scale;
         openScale(arrow.dataset.scale, arrow.dataset.rel);
         reflectScaleActive();
+        applyState(); // 高亮对应跨尺度关系线
+        return;
+      }
+      const chip = e.target.closest('.scale-map-bar__chip');
+      if (chip) {
+        state.activeRelation = null; // 切到 chip 时清除关系线高亮
+        toggleScaleLabel(chip.dataset.scale);
+        return;
       }
     });
   }
