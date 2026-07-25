@@ -33,7 +33,7 @@ export function computeLayout(nodes, view) {
  * 同行节点在同一 y 线上，避免 era 偏移带来的杂乱。
  */
 function computeScaleLayout(nodes) {
-  const scales = ['mesoscopic', 'cosmic', 'microscopic', 'unified', 'feedback'];
+  const scales = ['microscopic', 'mesoscopic', 'cosmic', 'unified', 'feedback'];
   const ROW_H = 320;
   const START_Y = 140;
   const PAD_X = 220; // 左右留白加大，避免左侧 scale 标签被截断
@@ -41,8 +41,8 @@ function computeScaleLayout(nodes) {
   const groups = {};
   for (const s of scales) groups[s] = [];
   for (const n of nodes) {
-    const s = n.scale || 'mesoscopic';
-    (groups[s] || groups.mesoscopic).push(n);
+    const s = n.scale || 'microscopic';
+    (groups[s] || groups.microscopic).push(n);
   }
 
   const pos = [];

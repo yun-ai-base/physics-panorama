@@ -44,8 +44,8 @@ export const DIMENSIONS = [
 
 // 浅色视图布局用的排名
 export const ERA_RANK = { classical:0, relativity:1, quantum:2, 'standard-model':3, frontier:4 };
-export const SCALE_RANK = { mesoscopic:0, cosmic:1, microscopic:2, unified:3, feedback:4 };
-export const SCALE_ORDER = ['mesoscopic','cosmic','microscopic','unified','feedback'];
+export const SCALE_RANK = { microscopic:0, mesoscopic:1, cosmic:2, unified:3, feedback:4 };
+export const SCALE_ORDER = ['microscopic','mesoscopic','cosmic','unified','feedback'];
 export const SCALE_LABEL = {
   mesoscopic:'宏观', cosmic:'宇观', microscopic:'微观', unified:'统一', feedback:'反哺',
 };

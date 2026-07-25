@@ -92,41 +92,99 @@ function splitTimelineItemsSafe(block) {
 }
 
 /**
- * 纯散文智能分段——对没有 **标题** / #标题 / 时间线 / 列表 的长文本，
- * 检测中文论述标记（首先/其次/此外/另一方面/然而/总之等），
- * 在标记处拆分成带小标题的子区块，避免整块文字墙。
- *
- * 只对 >400 字符的块启用（短段落不需要拆）。
+ * 纯散文智能分段（综合版）——对没有 **标题** / #标题 / 时间线 / 列表 的长文本，
+ * 依次尝试三种策略，任一能拆出 ≥3 段（或兜底 ≥2 段）即用：
+ *   A. 论述标记分段：首先/其次/第三是/然而/因此/值得一提的是…（标记可出现在句中，后跟 是|：|,|。|、）
+ *   B. 编年史分段：按 （19|20）XX年， 推进的叙述史
+ *   C. 句子累积兜底：按句号切句，每累积 ~140 字断一块
+ * 避免任何长文本渲染成「单一文字墙」。
  */
 function splitProseByMarkers(block) {
-  if (block.length < 400) return null;
+  if (block.length < 350) return null;
 
-  // 中文论述标记正则（单行，匹配标记+紧随的标点）
-  const markerRe = /(?:^|\n\s*)(首先|其次|再次|然后|最后|另外|此外|同时|而且|加之|另一方面|相比之下|不过|然而|但是|反之|总之|综上|由此可见|简言之|总而言之|换言之|因此|所以|故而|因而|由此|这样一来|值得一提的是|值得注意的是|需要指出的是|具体来说)([：:,，。])/gi;
+  const byMarkers = splitByMarkers(block);
+  if (byMarkers && byMarkers.length >= 3) return byMarkers;
 
+  const byChronicle = splitByChronicle(block);
+  if (byChronicle && byChronicle.length >= 3) return byChronicle;
+
+  const bySentences = splitBySentences(block);
+  if (bySentences && bySentences.length >= 2) return bySentences;
+
+  return null;
+}
+
+/** 策略A：中文论述标记分段（标记可出现在任意位置，后跟 是|：|,|。|、） */
+function splitByMarkers(block) {
+  const markers = [
+    '第一点', '第二点', '第三点', '第四点', '第五点',
+    '首先', '其次', '再次', '然后', '最后', '另外', '此外', '同时', '而且', '加之',
+    '另一方面', '相比之下', '不过', '然而', '但是', '反之',
+    '总之', '综上', '由此可见', '简言之', '总而言之', '换言之',
+    '因此', '所以', '故而', '因而', '由此', '这样一来',
+    '值得一提的是', '值得注意的是', '需要指出的是', '具体来说',
+    '第一', '第二', '第三', '第四', '第五', '第六',
+    '其一', '其二', '其三', '其四', '其五'
+  ];
+  const re = new RegExp('(' + markers.join('|') + ')([：:,，。是、])', 'g');
   const parts = [];
   let lastEnd = 0;
-  let match;
-  while ((match = markerRe.exec(block)) !== null) {
-    const prefix = block.slice(lastEnd, match.index).trim();
-    if (prefix.length > 20) parts.push({ text: prefix, title: '' });
-    const marker = match[1].trim();
-    const afterMarker = block.slice(match.index + match[0].length);
-    const firstSentence = afterMarker.match(/[^。！？\n]{0,30}[。！？]?/);
-    const titleExtra = firstSentence ? firstSentence[0].trim() : '';
-    parts.push({ text: afterMarker.trim(), title: marker + (titleExtra && titleExtra.length <= 15 ? '…' : '') });
-    lastEnd = match.index + match[0].length;
+  let m;
+  while ((m = re.exec(block)) !== null) {
+    const prefix = block.slice(lastEnd, m.index).trim();
+    if (prefix.length > 15) parts.push({ text: prefix, title: '' });
+    const marker = m[1].trim();
+    const after = block.slice(m.index + m[0].length);
+    const fsent = after.match(/[^。！？\n]{0,24}[。！？]?/);
+    const extra = fsent ? fsent[0].trim() : '';
+    const title = (extra && extra.length <= 16) ? marker + '…' + extra.slice(0, 12) : marker;
+    parts.push({ text: after.trim(), title });
+    lastEnd = m.index + m[0].length;
   }
   const tail = block.slice(lastEnd).trim();
-  if (tail.length > 20) {
-    if (parts.length > 0 && !parts[parts.length - 1].title) {
-      parts[parts.length - 1].text += '\n' + tail;
-    } else {
-      parts.push({ text: tail, title: '' });
-    }
+  if (tail.length > 15) {
+    if (parts.length && !parts[parts.length - 1].title) parts[parts.length - 1].text += '\n' + tail;
+    else parts.push({ text: tail, title: '' });
   }
   if (parts.length < 3) return null;
   return parts.filter(p => p.text.trim().length > 15);
+}
+
+/** 策略B：编年史分段（按 XXXX年， 推进） */
+function splitByChronicle(block) {
+  const re = /(\d{4}年[，,])/g;
+  const pos = [];
+  let m;
+  while ((m = re.exec(block)) !== null) pos.push({ index: m.index, year: m[1].slice(0, 5) });
+  if (pos.length < 4) return null;
+  const parts = [];
+  const head = block.slice(0, pos[0].index).trim();
+  if (head.length > 10) parts.push({ text: head, title: '' });
+  for (let i = 0; i < pos.length; i++) {
+    const start = pos[i].index;
+    const end = (i + 1 < pos.length) ? pos[i + 1].index : block.length;
+    const text = block.slice(start, end).trim();
+    if (text.length > 15) parts.push({ text, title: pos[i].year });
+  }
+  if (parts.length < 3) return null;
+  return parts;
+}
+
+/** 策略C：句子累积兜底（每 ~140 字断一块，打破长墙） */
+function splitBySentences(block) {
+  const sents = block.split(/(?<=。|！|？|\n)/).map(s => s.trim()).filter(s => s.length > 4);
+  if (sents.length < 3) return null;
+  const parts = [];
+  let cur = '';
+  let cnt = 0;
+  for (const s of sents) {
+    cur += (cur ? '' : '') + s;
+    cnt += s.length;
+    if (cnt >= 140) { parts.push({ text: cur, title: '' }); cur = ''; cnt = 0; }
+  }
+  if (cur.trim()) parts.push({ text: cur, title: '' });
+  if (parts.length < 2) return null;
+  return parts;
 }
 
 /**
@@ -486,6 +544,7 @@ export function openScale(scale, focusRel) {
 
 /* ── 关闭侧边栏 ───────────────────────────────────────── */
 export function closeSidebar() {
+  console.log('[DBG] CLOSE_SIDEBAR');
   const sb = document.getElementById('sidebar');
   sb.classList.remove('is-open'); sb.setAttribute('aria-hidden', 'true');
   state.sidebarOpen = false;

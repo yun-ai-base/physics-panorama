@@ -64,7 +64,21 @@ function selectNode(id) {
   state.highlight = relatedSet(NODES, id, state.expandAll);
   applyState();
   openNode(id);
+  // 移动端：点击节点后自动聚焦到选中节点及其关联节点，避免缩略画布上看不清关联高亮
+  if (window.matchMedia('(max-width:768px)').matches) focusNode(id);
   updateURL();
+}
+
+// 计算选中节点 + 关联节点的包围盒并 fit 到视口（移动端聚焦用）
+function focusNode(id) {
+  const ids = new Set([id, ...state.highlight]);
+  const pts = currentLayout.filter(p => ids.has(p.id));
+  if (!pts.length) return;
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  fitView(
+    { minX: Math.min(...xs), maxX: Math.max(...xs), minY: Math.min(...ys), maxY: Math.max(...ys) },
+    stage.clientWidth, stage.clientHeight, 120
+  );
 }
 function nodeEl(id) { return document.querySelector(`.node[data-id="${id}"]`); }
 function clearSearchGlow() { document.querySelectorAll('.node.is-search').forEach(n => n.classList.remove('is-search')); }

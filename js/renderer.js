@@ -86,7 +86,7 @@ function drawEraBands(layer) {
 }
 
 function drawScaleBands(layer) {
-  // 尺度维度：按 mesoscopic / cosmic / microscopic / unified / feedback 分行显示
+  // 尺度维度：按 microscopic / mesoscopic / cosmic / unified / feedback 分行显示
   const all = NODES.map(n => POS[n.id]).filter(Boolean);
   if (!all.length) return;
   const globalMinX = Math.min(...all.map(p => p.x)) - 160;
@@ -252,7 +252,11 @@ export function applyState() {
   for (const n of NODES) {
     const g = nodeEls.get(n.id);
     if (!g || !visible.has(n.id)) continue;
-    g.classList.toggle('is-selected', n.id === state.selected);
+    const isSel = n.id === state.selected;
+    g.classList.toggle('is-selected', isSel);
+    // 关联节点（选中节点的直系父子，非选中本身）→ 明确高亮，让它在画布上"显出来"
+    const related = state.selected ? state.highlight.has(n.id) : false;
+    g.classList.toggle('is-related', related && !isSel);
     const dim = state.selected ? !state.highlight.has(n.id) : false;
     g.classList.toggle('is-dim', dim);
   }
