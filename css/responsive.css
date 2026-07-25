@@ -18,7 +18,8 @@
   .search{order:-1; width:100%; display:flex; justify-content:center; margin-bottom:2px;}
   .search input{width:100%; max-width:300px;}
   .era-nav{flex-wrap:wrap; gap:8px; height:auto; padding:8px 14px;}
-  .hint{display:none;}
+  .hint{display:block; bottom:10px; font-size:0; color:transparent; white-space:nowrap;}
+  .hint::after{content:"单指拖拽平移 · 双指捏合缩放 · 点击节点"; font-size:11px; color:var(--ink-3); letter-spacing:.5px;}
   .minimap{display:none;}
   .people-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; padding:0 4px;}
 

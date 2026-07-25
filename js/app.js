@@ -37,12 +37,7 @@ async function boot() {
   wireUI();
 
   const node = readURL();
-  if (state.view === 'people') {
-    setView('people');
-  } else {
-    renderCurrent();
-    setTimeout(fit, 0);
-  }
+  setView(state.view); // 统一走视图切换逻辑（激活 tab、body class、尺度关联条显隐等）
   if (node && byId.has(node)) selectNode(node);
 }
 
