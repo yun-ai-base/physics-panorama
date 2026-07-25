@@ -188,10 +188,28 @@
 .sb-rel-item__text{font-size:13px; line-height:1.74; color:var(--ink);}
 
 /* ── 人物索引 ───────────────────────────────────── */
-.sb-person{display:flex; align-items:center; gap:12px;}
-.sb-person .avatar{width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid var(--gold-tint); flex:0 0 auto; background:var(--gold-tint);}
-.sb-person .avatar--fallback{display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-serif); font-size:19px; color:var(--gold); background:var(--gold-tint); font-weight:700; border-radius:50%; width:48px; height:48px;}
-.sb-person__name{font-family:var(--font-serif); font-size:21px; font-weight:700; color:var(--ink);}
-.sb-rels{display:flex; flex-wrap:wrap; gap:7px; margin-top:14px;}
-.sb-rel{border:1px solid rgba(42,38,32,.10); background:var(--bg-2); color:var(--ink); font-size:12px; padding:6px 13px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500;}
-.sb-rel:hover{border-color:var(--gold); color:var(--gold); background:var(--gold-tint);}
+.sb-head--person .sb-head__era{margin-bottom:10px;}
+.sb-person-head{display:flex; align-items:center; gap:14px; margin-top:4px;}
+.sb-person-head__avatar .avatar{width:72px; height:72px; border-radius:50%; object-fit:cover; border:2px solid var(--gold-tint); flex:0 0 auto; background:var(--gold-tint); box-shadow:0 2px 8px rgba(42,38,32,.08); font-size:28px;}
+.sb-person-head__avatar .avatar--fallback{display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-serif); font-size:28px; color:var(--gold); background:var(--gold-tint); font-weight:700; border-radius:50%; width:72px; height:72px;}
+.sb-person-head__text{flex:1; min-width:0;}
+.sb-person-head__name{font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--ink); line-height:1.25;}
+.sb-person-head__meta{font-size:12px; color:var(--ink-3); margin-top:5px;}
+
+/* 人物简介 */
+.sb-bio{background:#fff; border:1px solid rgba(42,38,32,.07); border-left:3.5px solid var(--gold); border-radius:10px; padding:14px 16px; margin:14px 0; box-shadow:0 1px 4px rgba(42,38,32,.04);}
+.sb-bio__title{font-size:12px; font-weight:700; color:var(--gold); letter-spacing:.4px; margin-bottom:8px; text-transform:uppercase;}
+.sb-bio__body{font-size:13px; line-height:1.8; color:var(--ink);}
+.sb-bio__body p{margin:8px 0;}
+.sb-bio__body p:first-child{margin-top:0;}
+.sb-bio__body p:last-child{margin-bottom:0;}
+
+/* 关联学说 / 事件卡片 */
+.sb-node-list{display:flex; flex-direction:column; gap:10px; margin-top:6px;}
+.sb-node-card{display:block; width:100%; text-align:left; border:1px solid rgba(42,38,32,.08); background:#fff; border-radius:10px; padding:12px 14px; transition:.2s; cursor:pointer; box-shadow:0 1px 3px rgba(42,38,32,.03);}
+.sb-node-card:hover{border-color:var(--gold); box-shadow:0 4px 14px rgba(184,137,59,.12); transform:translateY(-1px);}
+.sb-node-card__head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.sb-node-card__name{font-family:var(--font-serif); font-size:15px; font-weight:700; color:var(--ink);}
+.sb-node-card__meta{display:flex; align-items:center; gap:6px; flex-shrink:0;}
+.sb-node-card__meta .sb-chip{font-size:10.5px; padding:2px 8px;}
+.sb-node-card__snippet{font-size:12.5px; line-height:1.65; color:var(--ink-2); margin-top:7px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}

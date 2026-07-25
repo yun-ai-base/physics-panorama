@@ -767,21 +767,75 @@ export function closeSidebar() {
   state.sidebarOpen = false;
 }
 
+/* 将 **粗体** / *斜体* 标记去掉，用于短摘要 */
+function stripInlineBold(s) {
+  return String(s || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1');
+}
+
+/* 从节点 deepContent/summary/aha 中提取与该人物相关的段落 */
+function personSnippet(node, name) {
+  const dc = node.deepContent || {};
+  const text = dc.figures_detail || dc.biography || node.summary || node.aha || '';
+  if (!text) return '';
+  const paragraphs = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  const target = paragraphs.find(p => p.startsWith(`**${name}**`) || p.startsWith(name) || p.includes(name));
+  const snippet = target || paragraphs[0] || text;
+  const oneLine = snippet.replace(/\s+/g, ' ').trim();
+  return oneLine.length > 220 ? oneLine.slice(0, 220) + '…' : oneLine;
+}
+
 /* ── 人物索引 ──────────────────────────────────────────── */
 export function openPerson(name, nodeIds) {
   const sb = document.getElementById('sidebar');
   const body = document.getElementById('sidebarBody');
-  const ids = nodeIds || [];
-  const rel = ids.map(id => `<button class="sb-rel" data-id="${esc(id)}">${esc(byId.get(id)?.name || id)}</button>`).join('');
+  const ids = (nodeIds || []).filter(id => byId.has(id));
+  const nodes = ids.map(id => byId.get(id));
+
+  const eras = [...new Set(nodes.map(n => n.era))].map(e => ERAS[e]?.name).filter(Boolean);
+  const eraLabel = eras.length ? ` · ${eras.join(' / ')}` : '';
+
+  // 聚合人物简介：取最长一段（优先 figures_detail/biography，其次 summary）
+  const bios = nodes.map(n => personSnippet(n, name)).filter(Boolean);
+  const mainBio = bios.reduce((best, cur) => cur.length > best.length ? cur : best, '');
+
+  const bioHtml = mainBio
+    ? `<div class="sb-bio"><div class="sb-bio__title">人物简介</div><div class="sb-bio__body">${parseContent(mainBio)}</div></div>`
+    : '';
+
+  const cards = nodes.map(n => {
+    const era = ERAS[n.era];
+    const snippet = personSnippet(n, name);
+    const cleanSnippet = esc(stripInlineBold(snippet)).replace(/\n/g, ' ');
+    return `
+      <button class="sb-node-card" data-id="${esc(n.id)}">
+        <div class="sb-node-card__head">
+          <span class="sb-node-card__name">${esc(n.name)}</span>
+          <span class="sb-node-card__meta">
+            <span class="sb-chip" style="background:${era.raw}18;color:${era.raw};border-color:${era.raw}40">${esc(era.name)}</span>
+            <span class="sb-chip">${esc(String(n.year))}</span>
+          </span>
+        </div>
+        ${cleanSnippet ? `<div class="sb-node-card__snippet">${cleanSnippet}</div>` : ''}
+      </button>`;
+  }).join('');
+
   body.innerHTML = `
-    <div class="sb-head">
+    <div class="sb-head sb-head--person">
       <div class="sb-head__era">人物索引</div>
-      <div class="sb-head__title"><span class="sb-person">${avatarImg(name)}<span class="sb-person__name">${esc(name)}</span></span></div>
-      <div class="sb-head__quote">关联 ${ids.length} 个学说 / 事件</div>
+      <div class="sb-person-head">
+        <span class="sb-person-head__avatar">${avatarImg(name)}</span>
+        <div class="sb-person-head__text">
+          <div class="sb-person-head__name">${esc(name)}</div>
+          <div class="sb-person-head__meta">关联 ${ids.length} 个学说 / 事件${eraLabel}</div>
+        </div>
+      </div>
     </div>
-    <div class="sb-rels">${rel}</div>`;
+    ${bioHtml}
+    <div class="sb-sec-label">关联学说 / 事件</div>
+    <div class="sb-node-list">${cards}</div>`;
+
   bindAvatars(body);
-  body.querySelectorAll('.sb-rel').forEach(b => b.addEventListener('click', () => {
+  body.querySelectorAll('.sb-node-card').forEach(b => b.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: b.dataset.id }));
   }));
   sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
