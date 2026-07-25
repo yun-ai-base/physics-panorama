@@ -310,15 +310,15 @@ function splitImplicitCategories(block) {
  * 如果 ≥2 个标题，拆为多个 sb-section 分区卡，与量子力学等节点的手工 **标题** 卡片视觉一致。
  */
 function splitBlockByHeadings(block) {
-  // 匹配：行首 + 可选列举前缀 + **标题**
-  const prefix = '(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?';
-  const re = new RegExp('(?:^|\\n)\\s*' + prefix + '\\s*\\*\\*([^*]+?)\\*\\*', 'g');
+  // 匹配：行首/句首 + 可选列举前缀 + **标题**
+  const re = /(?:^|\n|[，。；：:,])\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*\*\*([^*]+?)\*\*/g;
   const matches = [];
   let m;
   while ((m = re.exec(block)) !== null) {
     matches.push({ index: m.index, title: m[1].trim(), fullLen: m[0].length });
   }
-  if (matches.length < 2) return null;
+  // 单标题且前面有引导语时也拆分（如"QED最令人信服...第一项关键实验是**兰姆移位**"）
+  if (matches.length < 1) return null;
 
   const sections = [];
   for (let i = 0; i < matches.length; i++) {
@@ -337,7 +337,7 @@ function splitBlockByHeadings(block) {
       sections.unshift({ title: '概述', body: preamble });
     }
   }
-  return sections.length >= 2 ? sections : null;
+  return sections.length >= 1 ? sections : null;
 }
 
 /**
@@ -367,8 +367,8 @@ function parseContent(raw) {
       continue;
     }
 
-    // 规则2：**标题** 开头 → 分区卡
-    const headingMatch = block.match(/^\s*\*\*(.+?)\*\*(?:[\s：:])/);
+    // 规则2：**标题** 开头（可带第X项/此外/首先等列举前缀）→ 分区卡
+    const headingMatch = block.match(/^\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*\*\*(.+?)\*\*(?:[\s：:])/);
     if (headingMatch) {
       const title = headingMatch[1];
       let body = block.slice(headingMatch[0].length).trim();
@@ -389,7 +389,6 @@ function parseContent(raw) {
 
     // 规则2.6：块内多 **标题** 拆分（如 QED 实验/影响/人物等段落）
     const headingSections = splitBlockByHeadings(block);
-    if (headingSections) {
       html.push(`<div class="sb-section sb-section--implicit">${headingSections.map(sec =>
         `<div class="sb-section" style="margin:8px 0;"><div class="sb-section__title">${esc(sec.title)}</div><div class="sb-section__body">${inlineBoldToTag(sec.body)}</div></div>`
       ).join('')}</div>`);
