@@ -77,16 +77,35 @@
 .sb-empty{color:var(--ink-3); font-style:italic; font-size:13px; padding:12px 0;}
 
 /* ── 公式块 (sb-fm) ────────────────────────────── */
-.sb-fm{background:linear-gradient(135deg,var(--bg-2),#FFFDF8); border-left:3.5px solid var(--gold); border-radius:10px; padding:14px 16px; margin:10px 0; overflow-x:auto; box-shadow:0 1px 4px rgba(184,137,59,.06);}
+.sb-fm{background:linear-gradient(135deg,var(--bg-2),#FFFDF8); border-left:3.5px solid var(--gold); border-radius:10px; padding:14px 16px; margin:10px 0; overflow-x:visible; box-shadow:0 1px 4px rgba(184,137,59,.06);}
 .sb-fm__name{font-size:11px; font-weight:700; color:var(--gold); margin-bottom:6px; letter-spacing:.4px; text-transform:uppercase;}
-.sb-fm__tex{font-size:15.5px; margin:6px 0;}
+.sb-fm__row{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:nowrap;}
+.sb-fm__tex{font-size:15.5px; margin:6px 0; flex:1 1 auto; min-width:0; overflow-x:auto;}
 .sb-fm__plain{font-size:12px; color:var(--ink-2); margin-top:8px; line-height:1.6;}
+
+/* 应用拓展按钮 */
+.sb-fm__app-btn{flex:0 0 auto; display:inline-flex; align-items:center; gap:5px; border:1px solid var(--gold); background:#fff; color:var(--gold); border-radius:999px; padding:5px 11px; font-size:11.5px; font-weight:700; cursor:pointer; transition:.18s; white-space:nowrap; box-shadow:0 1px 3px rgba(184,137,59,.08);}
+.sb-fm__app-btn:hover{background:var(--gold); color:#fff;}
+.sb-fm__app-icon{font-size:13px; line-height:1;}
+.sb-fm__app-label{line-height:1;}
+
+/* 应用拓展面板 */
+.sb-fm__app-panel{margin-top:12px; padding:14px 16px; background:#fff; border:1px solid rgba(184,137,59,.18); border-radius:10px; box-shadow:0 2px 8px rgba(42,38,32,.05); animation:sb-fm-app-in .22s ease;}
+.sb-fm__app-title{font-size:12px; font-weight:700; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:6px;}
+.sb-fm__app-title::before{content:''; width:3px; height:14px; background:var(--gold); border-radius:2px; flex-shrink:0;}
+.sb-fm__app-body{font-size:12.5px; line-height:1.8; color:var(--ink);}
+.sb-fm__app-body .sb-section{margin:8px 0;}
+.sb-fm__app-body .sb-section:first-child{margin-top:0;}
+.sb-fm__app-body .sb-para{margin:8px 0;}
+@keyframes sb-fm-app-in{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);}}
 
 /* ── 路径上下文 (sb-path) ──────────────────────── */
 .sb-path{margin-top:18px; padding-top:14px; border-top:1px dashed rgba(42,38,32,.14); font-size:12px; display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; line-height:1.7;}
 .sb-path__label{font-weight:700; color:var(--ink); font-size:11px; text-transform:uppercase; letter-spacing:.3px;}
 .sb-path__val{color:var(--ink-2);}
 .sb-path__sep{width:18px; text-align:center; color:var(--ink-3);}
+.sb-path__link{background:none; border:none; border-bottom:1.5px dashed var(--gold); color:var(--ink); font-size:12px; font-weight:600; cursor:pointer; padding:0 2px; border-radius:0; transition:.15s;}
+.sb-path__link:hover{color:var(--gold); border-bottom-style:solid; background:var(--gold-tint);}
 
 /* ── 纪元统计 (sb-stats) ───────────────────────── */
 .sb-stats{margin-top:14px; padding:12px 15px; background:var(--bg-2); border:1px solid rgba(42,38,32,.06); border-radius:10px; font-size:12.5px; color:var(--ink-2); line-height:1.65;}

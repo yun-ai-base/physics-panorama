@@ -193,13 +193,19 @@ function miniMapHTML(node) {
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${dots}</svg>`;
 }
 
-/* ── 路径上下文 ───────────────────────────────────────── */
+/* ── 路径上下文（可点击跳转） ───────────────────── */
 function pathCtxHTML(node) {
   const c = chain(NODES, node.id);
   const nm = id => byId.get(id)?.name || id;
-  const up = c.parents.length ? c.parents.map(nm).join('、') : '（理论起点）';
-  const down = c.children.length ? c.children.map(nm).join('、') : '（脉络延续）';
-  return `<div class="sb-path"><span class="sb-path__label">继承自</span> <span class="sb-path__val">${esc(up)}</span><span class="sb-path__sep"></span><span class="sb-path__label">影响至</span> <span class="sb-path__val">${esc(down)}</span></div>`;
+  const upIds = c.parents || [];
+  const downIds = c.children || [];
+  const upHtml = upIds.length
+    ? upIds.map(id => `<button class="sb-path__link" data-id="${esc(id)}">${esc(nm(id))}</button>`).join('')
+    : '<span class="sb-path__val">（理论起点）</span>';
+  const downHtml = downIds.length
+    ? downIds.map(id => `<button class="sb-path__link" data-id="${esc(id)}">${esc(nm(id))}</button>`).join('')
+    : '<span class="sb-path__val">（脉络延续）</span>';
+  return `<div class="sb-path"><span class="sb-path__label">继承自</span> ${upHtml}<span class="sb-path__sep"></span><span class="sb-path__label">影响至</span> ${downHtml}</div>`;
 }
 
 /* ── 打开节点侧边栏 ───────────────────────────────────── */
@@ -257,6 +263,10 @@ export function openNode(id) {
   `;
 
   bindAvatars(body);
+  // 绑定"继承自/影响至"跳转链接
+  body.querySelectorAll('.sb-path__link').forEach(b => b.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: b.dataset.id }));
+  }));
   const tabs = body.querySelectorAll('.sb-tab');
   const tabBody = body.querySelector('#tabBody');
   const show = key => {
