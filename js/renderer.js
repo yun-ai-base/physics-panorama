@@ -138,6 +138,51 @@ function drawScaleBands(layer, labelLayer) {
       class: 'scale-band__line',
     }, layer);
   }
+
+  // ── 尺度间桥接标签（涌现 / 引力桥梁 / 统一 / 反哺）──
+  // 在相邻尺度带的交界处绘制关系标签线 + 文字
+  for (let i = 0; i < SCALE_ORDER.length - 1; i++) {
+    const sA = SCALE_ORDER[i];
+    const sB = SCALE_ORDER[i + 1];
+    const bandA = scaleBandY[sA];
+    const bandB = scaleBandY[sB];
+    if (!bandA || !bandB) continue;
+
+    // 交界 Y 坐标（两个带的中点之间）
+    const gapY = (bandA.maxY + bandB.minY) / 2;
+
+    // 从当前尺度的 extend 中找指向下一个尺度的关系标签
+    const descA = SCALE_DESC[sA];
+    const relEntry = (descA?.extend || []).find(e => e.rel && (e.rel.includes(sB) || e.rel.includes(SCALE_LABEL[sB])));
+    const relLabel = relEntry ? relEntry.rel : '';
+
+    if (!relLabel) continue;
+
+    // 画虚线分隔
+    el('line', {
+      x1: globalMinX + 20, y1: gapY,
+      x2: globalMaxX - 20, y2: gapY,
+      stroke: '#9E8B66', 'stroke-width': 1,
+      'stroke-dasharray': '6 4', 'stroke-opacity': 0.45,
+    }, layer);
+
+    // 画标签背景（圆角矩形）
+    const labelW = relLabel.length * 13 + 24;
+    const labelX = globalMinX + 50;
+    el('rect', {
+      x: labelX, y: gapY - 11,
+      width: labelW, height: 22, rx: 11,
+      fill: '#FFF9F0', stroke: '#C4A96A', 'stroke-width': 0.8, 'stroke-opacity': 0.5,
+    }, layer);
+
+    // 画标签文字
+    el('text', {
+      x: labelX + labelW / 2, y: gapY + 4,
+      class: 'scale-gap__label',
+      text: relLabel,
+      fill: '#8B7340',
+    }, layer);
+  }
 }
 
 function scaleEdgePath(a, b) {
