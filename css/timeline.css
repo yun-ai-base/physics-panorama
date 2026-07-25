@@ -87,20 +87,20 @@
 .scale-band{transition:opacity .3s;}
 .scale-band__label{
   font-family:var(--font-serif); font-size:26px; font-weight:900;
-  letter-spacing:3px; paint-order:stroke; stroke:#fff; stroke-width:7px;
+  letter-spacing:3px; paint-order:stroke; stroke:#fff; stroke-width:5px;
   stroke-linejoin:round; opacity:.94;
 }
 .scale-band__line{pointer-events:none;}
 /* 标签下概念解析小字 */
 .scale-band__tag{
   font-family:var(--font-sans); font-size:12px; font-weight:600;
-  letter-spacing:.5px; paint-order:stroke; stroke:rgba(247,243,234,.85); stroke-width:3px;
+  letter-spacing:.5px; paint-order:stroke; stroke:rgba(247,243,234,.85); stroke-width:2px;
   stroke-linejoin:round; opacity:.78; pointer-events:none;
 }
 /* 激活尺度：加粗放大 + 白描边底块，提示可点击展开 */
 .scale-band__label.is-active-scale{
   font-size:30px; font-weight:900; letter-spacing:4px;
-  stroke:rgba(247,243,234,.96); stroke-width:8px; opacity:1;
+  stroke:rgba(247,243,234,.96); stroke-width:6px; opacity:1;
 }
 
 /* 纪元序言卡 */

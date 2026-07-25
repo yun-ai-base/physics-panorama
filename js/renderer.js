@@ -42,13 +42,14 @@ export function renderGraph(view, layoutList) {
     edges: document.getElementById('layer-edges'),
     nodes: document.getElementById('layer-nodes'),
     preface: document.getElementById('layer-preface'),
+    scaleLabels: document.getElementById('layer-scale-labels'),
   };
-  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface);
+  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface); clear(L.scaleLabels);
   nodeEls = new Map(); edgeEls = []; prefaceEls = [];
   scaleBandY = {};
 
   if (view === 'scale') {
-    drawScaleBands(L.era);
+    drawScaleBands(L.era, L.scaleLabels);
   } else {
     drawEraBands(L.era);
   }
@@ -87,12 +88,14 @@ function drawEraBands(layer) {
   }
 }
 
-function drawScaleBands(layer) {
+function drawScaleBands(layer, labelLayer) {
   // 尺度维度：按 microscopic / mesoscopic / cosmic / unified / feedback 分行显示
   const all = NODES.map(n => POS[n.id]).filter(Boolean);
   if (!all.length) return;
   const globalMinX = Math.min(...all.map(p => p.x)) - 160;
   const globalMaxX = Math.max(...all.map(p => p.x)) + 80;
+  // 若顶层标签层不存在，回退到原 layer（兼容旧 HTML）
+  const labelL = labelLayer || layer;
 
   for (const scale of SCALE_ORDER) {
     const xs = NODES.filter(n => n.scale === scale).map(n => POS[n.id]).filter(Boolean);
@@ -103,11 +106,13 @@ function drawScaleBands(layer) {
     const cfg = SCALE_COLORS[scale];
     const active = state.filterEra ? false : true; // 在 scale 视图下默认全部高亮
 
+    // 背景带仍放在底层 layer，节点在其上方经过
     el('rect', {
       x: globalMinX, y: minY, width: globalMaxX - globalMinX, height: maxY - minY,
       fill: cfg.raw, 'fill-opacity': 0.09, rx: 16, class: 'scale-band',
     }, layer);
 
+    // 标签与说明文字放到顶层 labelLayer，避免被节点圆圈遮挡
     el('text', {
       x: globalMinX + 18, y: minY + 32,
       class: 'scale-band__label' + (state.activeScale === scale ? ' is-active-scale' : ''),
@@ -115,7 +120,7 @@ function drawScaleBands(layer) {
       fill: cfg.raw,
       'data-scale': scale,
       style: 'cursor:pointer;',
-    }, layer);
+    }, labelL);
 
     // 标签下加一行概念解析小字
     const desc = SCALE_DESC[scale];
@@ -125,7 +130,7 @@ function drawScaleBands(layer) {
         class: 'scale-band__tag',
         text: desc.tag,
         fill: cfg.raw,
-      }, layer);
+      }, labelL);
     }
 
     // 淡淡的下边界分隔线

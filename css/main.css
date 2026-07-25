@@ -101,12 +101,12 @@ body.view-scale .era-nav{display:none;}
 }
 .scale-map-bar__chip:hover{filter:brightness(.95); transform:translateY(-1px);}
 .scale-map-bar__arrow{
-  display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:700; color:var(--gold);
-  padding:3px 8px; border-radius:999px; background:rgba(184,137,59,.10); cursor:pointer; transition:.18s;
+  display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:500; color:rgba(184,137,59,.70);
+  padding:2px 7px; border-radius:999px; background:rgba(184,137,59,.08); cursor:pointer; transition:.18s;
 }
-.scale-map-bar__arrow:hover{background:rgba(184,137,59,.18);}
-.scale-map-bar__arrow--loop{font-weight:800; color:#7A5BA6; background:rgba(107,78,140,.10);}
-.scale-map-bar__arrow--loop:hover{background:rgba(107,78,140,.18);}
+.scale-map-bar__arrow:hover{background:rgba(184,137,59,.16); color:rgba(184,137,59,.90);}
+.scale-map-bar__arrow--loop{font-weight:600; color:rgba(107,78,140,.70); background:rgba(107,78,140,.08);}
+.scale-map-bar__arrow--loop:hover{background:rgba(107,78,140,.16); color:rgba(107,78,140,.90);}
 
 /* 主舞台 */
 .stage-wrap{flex:1 1 auto; display:flex; min-height:0; position:relative;}
