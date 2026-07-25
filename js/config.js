@@ -27,6 +27,7 @@ export const UNIFY_NODES = new Set(['electroweak','standard-model']);
 
 // 12 维度标签（顺序即侧边栏标签顺序）；formula 取自节点级，figures 合并 biography
 export const DIMENSIONS = [
+  { key:'summary',     label:'📌 综述' },
   { key:'history',     label:'📖 脉络' },
   { key:'figures',     label:'👤 人物' },
   { key:'branches',    label:'🔬 分支' },

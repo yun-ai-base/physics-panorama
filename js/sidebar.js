@@ -513,6 +513,7 @@ function renderDim(node, key) {
 
   // light 节点：从基础字段映射
   const map = {
+    summary: node.summary || '',
     history: node.summary || '',
     paradigm: node.aha || '',
     limitation: node.limitation || '',
@@ -581,6 +582,7 @@ export function openNode(id) {
       if (d.key === 'formula') return hasFormula;
       if (d.key === 'limitation') return hasLimitation;
       if (d.key === 'terms') return hasTerms;
+      if (d.key === 'summary') return !!node.summary?.trim();
       return node.deepContent?.[d.key] && String(node.deepContent[d.key]).trim();
     });
     if (dims.length < 2) {
