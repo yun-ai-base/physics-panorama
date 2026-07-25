@@ -563,6 +563,7 @@ export function openNode(id) {
     </div>
     ${backBtn}
     <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${d.label}</button>`).join('')}</div>
+    <div class="sb-mobile-tip">✦ 已高亮画布上的关联节点，关闭侧栏即可查看</div>
     <div class="sb-panel" id="tabBody"></div>
     ${pathCtxHTML(node)}
   `;
