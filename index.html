@@ -114,8 +114,23 @@
         <button class="tour-btn" id="tour10" disabled>10 分钟全览</button>
       </div>
     </footer>
+
+    <!-- 更新日记（角落低调入口） -->
+    <div class="changelog" id="changelog">
+      <button class="changelog__toggle" id="clToggle" type="button" aria-label="更新日记" title="更新日记" aria-expanded="false">
+        <span class="changelog__dot"></span>
+      </button>
+      <div class="changelog__panel" id="clPanel" hidden>
+        <div class="changelog__head">
+          <span>更新日记</span>
+          <button class="changelog__close" id="clClose" type="button" aria-label="收起">×</button>
+        </div>
+        <div class="changelog__list" id="clList"></div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="js/app.js"></script>
+  <script defer src="js/changelog.js"></script>
 </body>
 </html>

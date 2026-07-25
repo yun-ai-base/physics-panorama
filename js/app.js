@@ -20,7 +20,26 @@ const st = document.createElement('style');
 st.textContent = '.node.is-search .node__circle{stroke:var(--gold)!important;stroke-width:3.6!important;}';
 document.head.appendChild(st);
 
+// 移动端首页提醒：检测到移动设备后弹出，停留 2 秒自动淡出
+function maybeShowMobileNotice() {
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+  if (!isMobile) return;
+  const box = document.createElement('div');
+  box.className = 'mobile-notice';
+  box.id = 'mobileNotice';
+  box.innerHTML = '<div class="mobile-notice__box">' +
+    '<div class="mobile-notice__icon">🖥️</div>' +
+    '<div class="mobile-notice__text">为了更好浏览体验，请电脑网页端查看</div>' +
+    '</div>';
+  document.body.appendChild(box);
+  setTimeout(() => {
+    box.classList.add('is-hide');
+    setTimeout(() => box.remove(), 600);
+  }, 2000);
+}
+
 async function boot() {
+  maybeShowMobileNotice(); // 移动端首页提醒（在任何 await 之前弹出，确保首屏即可见）
   const [nodeRes, metaRes] = await Promise.all([
     fetch('nodes.json').then(r => r.json()),
     fetch('physics-data.json').then(r => r.json()),
