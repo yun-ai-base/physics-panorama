@@ -168,11 +168,19 @@ function termsHTML(terms) {
     const def = esc(t.definition || '');
     const details = parseContent(t.details || '');
     const img = t.image ? `<img class="sb-term__img" src="${esc(t.image)}" alt="${name}" loading="lazy">` : '';
+    const targetId = t.target || '';
+    let linkCls = '', jump = '';
+    if (targetId) {
+      const tName = byId.get(targetId)?.name || targetId;
+      linkCls = ' sb-term--link';
+      jump = `<span class="sb-term__jump">↗ 跳转至 ${esc(tName)}</span>`;
+    }
     return `
-      <div class="sb-term">
+      <div class="sb-term${linkCls}"${targetId ? ` data-target="${esc(targetId)}"` : ''}>
         <div class="sb-term__head">
           <span class="sb-term__icon">${icon}</span>
           <span class="sb-term__name">${name}</span>
+          ${jump}
         </div>
         ${img}
         <div class="sb-term__def">${def}</div>
@@ -341,6 +349,13 @@ export function openNode(id) {
         btn.setAttribute('aria-expanded', String(!expanded));
         if (panel) panel.hidden = expanded;
         if (wrap) wrap.classList.toggle('is-app-open', !expanded);
+      });
+    });
+    // 绑定术语卡片“点击跳转至对应节点”视觉锚点
+    tabBody.querySelectorAll('.sb-term--link').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.dataset.target;
+        if (id) window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: id }));
       });
     });
   };
