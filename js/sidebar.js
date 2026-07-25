@@ -98,7 +98,11 @@ function linkTerms(html) {
  */
 function inlineBoldToTag(text) {
   return text
+    // Markdown 图片语法：![alt](src) → <img class="sb-img" src="..." alt="...">
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => `<img class="sb-img" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`)
+    // 加粗
     .replace(/\*\*([^\s*][^*]*?)\*\*/g, '<strong>$1</strong>')
+    // 斜体
     .replace(/(?<![\w])\*([^\s*][^*]*?)\*(?![\w])/g, '<em>$1</em>');
 }
 
