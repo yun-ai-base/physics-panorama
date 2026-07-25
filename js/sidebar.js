@@ -87,10 +87,19 @@ function linkTerms(html) {
 
 /* ── 智能内容解析器 ─────────────────────────────────── */
 
-/** 把内联 **bold** → <strong>，*italic* → <em> */
+/**
+ * 把内联 Markdown 强调转为 HTML 标签：
+ *   **粗体** → <strong>…</strong>
+ *   *斜体*   → <em>…</em>
+ * 单星号 * 必须位于"词边界"：opener 前不能是字母/数字、closer 后不能是字母/数字，
+ * 且内容首字符不可为空格/星号、内容中不可含星号——以此避开物理正文里的乘法星号
+ * （如 a*b、F=k*x）、指数双星（如 10**3）与列表标记，避免误判破坏文本结构。
+ * 双写 ** 优先于单 * 处理，故 **粗体** 不会被拆成 <em>。
+ */
 function inlineBoldToTag(text) {
-  return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-             .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  return text
+    .replace(/\*\*([^\s*][^*]*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?<![\w])\*([^\s*][^*]*?)\*(?![\w])/g, '<em>$1</em>');
 }
 
 /**
