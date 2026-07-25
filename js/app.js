@@ -109,6 +109,21 @@ function wireUI() {
     if (pf) { openEra(pf.dataset.era); }
   });
 
+  // 顶部尺度维度关联图：chip 打开概念解析面板，arrow 打开目标尺度的「尺度间渗透」说明
+  const scaleMapBar = document.getElementById('scaleMapBar');
+  if (scaleMapBar) {
+    scaleMapBar.addEventListener('click', e => {
+      const chip = e.target.closest('.scale-map-bar__chip');
+      if (chip) { toggleScaleLabel(chip.dataset.scale); return; }
+      const arrow = e.target.closest('.scale-map-bar__arrow');
+      if (arrow) {
+        state.activeScale = arrow.dataset.scale;
+        openScale(arrow.dataset.scale, arrow.dataset.rel);
+        reflectScaleActive();
+      }
+    });
+  }
+
   /* hover miniCard 已移除 —— 白色浮卡为视觉噪音，节点信息由侧边栏承载 */
   /*
   stage.addEventListener('mouseover', e => {

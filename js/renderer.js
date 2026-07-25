@@ -47,7 +47,6 @@ export function renderGraph(view, layoutList) {
 
   if (view === 'scale') {
     drawScaleBands(L.era);
-    drawScaleMap(L.era);
   } else {
     drawEraBands(L.era);
   }
@@ -134,71 +133,6 @@ function drawScaleBands(layer) {
       class: 'scale-band__line',
     }, layer);
   }
-}
-
-/* ── 尺度关联图（导航条） ──
- * 画在尺度视图顶部空白处（y≈16–62）：五个尺度 chip 横向串联，
- * 箭头标注涌现/引力桥梁/统一/技术回流，外加反哺→微观的闭环虚线。
- * chip 点击 openScale(scale)；arrow 点击 openScale(scale, focusRel)。 */
-function drawScaleMap(layer) {
-  const all = NODES.map(n => POS[n.id]).filter(Boolean);
-  if (!all.length) return;
-  const gMinX = Math.min(...all.map(p => p.x)) - 160;
-  const gMaxX = Math.max(...all.map(p => p.x)) + 80;
-  const yc = 36, n = SCALE_ORDER.length, m = 70;
-  const left = gMinX + m, right = gMaxX - m, step = (right - left) / (n - 1);
-  const cx = i => left + i * step;
-  const chipW = scale => SCALE_LABEL[scale].length * 15 + 26;
-
-  // 主链背景条
-  el('rect', { x: left - 24, y: yc - 22, width: (right - left) + 48, height: 44, rx: 12,
-    fill: '#8B6914', 'fill-opacity': 0.05, class: 'scale-map__bg' }, layer);
-
-  // 五个尺度 chip
-  for (let i = 0; i < n; i++) {
-    const scale = SCALE_ORDER[i], cfg = SCALE_COLORS[scale], w = chipW(scale), h = 26;
-    const x = cx(i) - w / 2, y = yc - h / 2;
-    el('rect', { x, y, width: w, height: h, rx: 13, fill: cfg.raw, 'fill-opacity': 0.14,
-      stroke: cfg.raw, 'stroke-width': 1.4, class: 'scale-map__chip', 'data-scale': scale,
-      style: 'cursor:pointer;', tabindex: '0', role: 'button' }, layer);
-    el('text', { x: cx(i), y: yc + 4.5, 'text-anchor': 'middle', class: 'scale-map__chip-label',
-      text: SCALE_LABEL[scale], fill: cfg.raw, 'data-scale': scale,
-      style: 'cursor:pointer;pointer-events:none;' }, layer);
-  }
-
-  // 相邻 chip 之间的主链箭头（含关键词标签）
-  const arrowLabels = ['涌现', '引力桥梁', '统一', '技术回流'];
-  const arrowFocus = [
-    { scale: 'microscopic', rel: '微观 → 宏观 · 涌现' },
-    { scale: 'mesoscopic',  rel: '宏观 ↔ 宇观 · 引力桥梁' },
-    { scale: 'unified',     rel: '统一 → 宇观' },
-    { scale: 'unified',     rel: '统一 → 反哺' },
-  ];
-  for (let i = 0; i < n - 1; i++) {
-    const x1 = cx(i) + chipW(SCALE_ORDER[i]) / 2 + 7;
-    const x2 = cx(i + 1) - chipW(SCALE_ORDER[i + 1]) / 2 - 7;
-    const y = yc;
-    const f = arrowFocus[i];
-    el('line', { x1, y1: y, x2, y2: y, stroke: '#8B6914', 'stroke-width': 1.6,
-      'stroke-opacity': 0.5, class: 'scale-map__arrow', 'data-scale': f.scale, 'data-rel': f.rel,
-      style: 'cursor:pointer;' }, layer);
-    el('path', { d: `M ${x2} ${y} l -7 -4 l 0 8 z`, fill: '#8B6914', 'fill-opacity': 0.6,
-      class: 'scale-map__arrow', 'data-scale': f.scale, 'data-rel': f.rel,
-      style: 'cursor:pointer;' }, layer);
-    el('text', { x: (x1 + x2) / 2, y: y - 7, 'text-anchor': 'middle', class: 'scale-map__arrow-label',
-      text: arrowLabels[i], fill: '#8B6914', 'data-scale': f.scale, 'data-rel': f.rel,
-      style: 'cursor:pointer;pointer-events:auto;' }, layer);
-  }
-
-  // 反哺 → 微观 闭环虚线
-  const xF = cx(n - 1), xM = cx(2), yb = yc + 24;
-  el('path', { d: `M ${xF} ${yc + 13} C ${xF} ${yb + 10}, ${xM} ${yb + 10}, ${xM} ${yc + 13}`,
-    fill: 'none', stroke: '#8B6914', 'stroke-width': 1.4, 'stroke-dasharray': '5 4',
-    'stroke-opacity': 0.5, class: 'scale-map__arrow', 'data-scale': 'feedback', 'data-rel': '反哺 ← 微观',
-    style: 'cursor:pointer;' }, layer);
-  el('text', { x: (xF + xM) / 2, y: yb + 6, 'text-anchor': 'middle', class: 'scale-map__arrow-label',
-    text: '闭环', fill: '#8B6914', 'data-scale': 'feedback', 'data-rel': '反哺 ← 微观',
-    style: 'cursor:pointer;pointer-events:auto;' }, layer);
 }
 
 function scaleEdgePath(a, b) {
