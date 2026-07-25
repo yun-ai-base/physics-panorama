@@ -311,30 +311,42 @@ function splitImplicitCategories(block) {
  *   **理查德·费曼**（1918-1988）：...
  * 如果 ≥2 个标题，拆为多个 sb-section 分区卡，与量子力学等节点的手工 **标题** 卡片视觉一致。
  */
+// 判断 **X** 是否为"标题级"加粗（而非强调性整句）。
+// 真正的章节标题通常较短、且不含句末/句读标点。
+function isHeadingLike(title) {
+  if (!title) return false;
+  if (title.length > 16) return false;          // 过长 → 视为强调句
+  if (/[。！？；]/.test(title)) return false;     // 含句末标点 → 强调句
+  return true;
+}
+
 function splitBlockByHeadings(block) {
   // 匹配：行首/句首 + 可选简短引导语/列举前缀 + **标题**
   const re = /(?:^|\n|[，。；：:,])\s*(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?\s*[^，。；：:\n]{0,10}?\*\*([^*]+?)\*\*/g;
   const matches = [];
   let m;
   while ((m = re.exec(block)) !== null) {
-    matches.push({ index: m.index, title: m[1].trim(), fullLen: m[0].length });
+    const title = m[1].trim();
+    matches.push({ index: m.index, title, fullLen: m[0].length, heading: isHeadingLike(title) });
   }
-  // 单标题且前面有引导语时也拆分（如"QED最令人信服...第一项关键实验是**兰姆移位**"）
-  if (matches.length < 1) return null;
+  // 没有任何"标题级"加粗 → 整段交给 prose 规则渲染（强调句保持行内加粗，不当作标题）
+  if (!matches.some(x => x.heading)) return null;
 
   const sections = [];
-  for (let i = 0; i < matches.length; i++) {
-    const start = matches[i].index + matches[i].fullLen;
-    const end = (i + 1 < matches.length) ? matches[i + 1].index : block.length;
+  // 仅以"标题级"加粗作为切分点；强调句留在正文内行内加粗
+  const heads = matches.filter(x => x.heading);
+  for (let i = 0; i < heads.length; i++) {
+    const start = heads[i].index + heads[i].fullLen;
+    const end = (i + 1 < heads.length) ? heads[i + 1].index : block.length;
     let body = block.slice(start, end).trim();
     body = body.replace(/^[：:\s]+/, '');
     if (body.length > 8) {
-      sections.push({ title: matches[i].title, body });
+      sections.push({ title: heads[i].title, body });
     }
   }
   // 第一个标题前有引导语时，作为"概述"卡
-  if (matches[0].index > 10) {
-    const preamble = block.slice(0, matches[0].index).trim();
+  if (heads[0].index > 10) {
+    const preamble = block.slice(0, heads[0].index).trim();
     if (preamble.length > 6) {
       sections.unshift({ title: '概述', body: preamble });
     }
