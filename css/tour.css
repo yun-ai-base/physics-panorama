@@ -1,0 +1,122 @@
+/* 引导式漫游（tour）样式 —— 独立文件，不改动任何既有样式 */
+.pp-tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+/* 聚光灯：用超大 box-shadow 制造四周暗化，仅露出目标区域 */
+.pp-tour-spot {
+  position: fixed;
+  z-index: 1001;
+  border-radius: 14px;
+  box-shadow: 0 0 0 9999px rgba(22, 19, 14, 0.74);
+  pointer-events: none;
+  display: none;
+  transition: left .35s cubic-bezier(.4, 0, .2, 1),
+              top .35s cubic-bezier(.4, 0, .2, 1),
+              width .35s cubic-bezier(.4, 0, .2, 1),
+              height .35s cubic-bezier(.4, 0, .2, 1);
+}
+.pp-tour-spot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  border: 2px solid var(--gold, #B8893B);
+  opacity: .92;
+}
+
+/* 旁白卡片 */
+.pp-tour-card {
+  position: fixed;
+  z-index: 1002;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 360px;
+  max-height: 80vh;
+  overflow: auto;
+  background: var(--card, #fff);
+  border: 1px solid rgba(184, 137, 59, 0.28);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  padding: 20px 22px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  color: var(--ink, #2A2620);
+}
+.pp-tour-card__kicker {
+  font-size: 11px;
+  letter-spacing: .6px;
+  color: var(--gold, #B8893B);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.pp-tour-card__title {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 19px;
+  font-weight: 700;
+  margin: 8px 0 10px;
+  color: var(--ink, #2A2620);
+  line-height: 1.35;
+}
+.pp-tour-card__body {
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: var(--ink-2, #6B6358);
+  letter-spacing: .2px;
+}
+.pp-tour-card__body b {
+  color: var(--ink, #2A2620);
+  font-weight: 700;
+}
+.pp-tour-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  gap: 10px;
+}
+.pp-tour-card__nav {
+  display: flex;
+  gap: 8px;
+}
+.pp-tour-btn {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  transition: .18s;
+}
+.pp-tour-btn--ghost {
+  background: transparent;
+  color: var(--ink-2, #6B6358);
+  border-color: rgba(42, 38, 32, 0.16);
+}
+.pp-tour-btn--ghost:hover {
+  background: var(--gold-tint, #F3E9D6);
+  color: var(--ink, #2A2620);
+  border-color: var(--gold, #B8893B);
+}
+.pp-tour-btn--primary {
+  background: var(--gold, #B8893B);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(184, 137, 59, 0.32);
+}
+.pp-tour-btn--primary:hover {
+  background: var(--gold-soft, #C9A14A);
+}
+
+/* 移动端：卡片移到底部全宽，聚光灯仍可工作 */
+@media (max-width: 768px) {
+  .pp-tour-card {
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    top: auto !important;
+    bottom: 14px;
+    transform: none !important;
+    max-height: 58vh;
+  }
+}
