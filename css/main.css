@@ -240,3 +240,4 @@ body.view-people .hint{display:none;}
   font-size:clamp(18px, 2.6vw, 32px); letter-spacing:.22em; line-height:1.9;
   text-shadow:0 1px 0 rgba(255,255,255,.6), 0 0 28px rgba(184,137,59,.08);
 }
+.void-view__watermark--left{left:6vw; right:auto;}
