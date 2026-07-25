@@ -103,11 +103,6 @@
   stroke:rgba(247,243,234,.96); stroke-width:6px; opacity:1;
 }
 
-/* 纪元序言卡 */
-/* preface 序言卡片已禁用 —— 视觉噪音 */
-.preface{display:none !important;}
-.preface__rect,.preface__era,.preface__quote{display:none !important;}
-
 /* 悬停迷你卡 */
 /* miniCard 已禁用 —— 悬停白卡为视觉噪音 */
 .mini-card{display:none !important;}

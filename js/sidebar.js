@@ -551,17 +551,6 @@ function renderDim(node, key) {
   return '<p class="sb-empty">该节点暂无此维度内容</p>';
 }
 
-/* ── 迷你全景缩略图（保留 DOM 但隐藏） ────────────────── */
-function miniMapHTML(node) {
-  const pts = NODES.map(n => ({ id: n.id, x: n.layout?.timeline?.x ?? 0, y: n.layout?.timeline?.y ?? 0 }));
-  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const W = 300, H = 118, pad = 8;
-  const sx = W / (maxX - minX || 1), sy = H / (maxY - minY || 1);
-  const dots = pts.map(p => `<circle class="${p.id === node.id ? 'dot--cur' : 'dot--other'}" cx="${pad + (p.x - minX) * sx}" cy="${pad + (p.y - minY) * sy}" r="2.4"/>`).join('');
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${dots}</svg>`;
-}
-
 /* ── 路径上下文（可点击跳转） ───────────────────── */
 function pathCtxHTML(node) {
   const c = chain(NODES, node.id);

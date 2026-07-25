@@ -109,7 +109,11 @@ export function initInteraction() {
 
   // ── 键盘控制 ──
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') window.dispatchEvent(new CustomEvent('pp:esc'));
+    // 输入框聚焦时仅放行 Esc（关闭侧栏），方向键/-/+ 交还输入框（光标移动、正常输入）
+    const t = e.target;
+    const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+    if (e.key === 'Escape') { window.dispatchEvent(new CustomEvent('pp:esc')); return; }
+    if (typing) return;
     if (e.key === '+' || e.key === '=') { zoomAt(window.innerWidth / 2, window.innerHeight / 2, 1.12); }
     if (e.key === '-' || e.key === '_') { zoomAt(window.innerWidth / 2, window.innerHeight / 2, 1 / 1.12); }
     if (e.key.startsWith('Arrow')) {

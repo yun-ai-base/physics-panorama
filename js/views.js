@@ -1,6 +1,5 @@
 import { ERA_RANK, SCALE_RANK } from './config.js';
 
-const YEAR_MIN = 1600, YEAR_MAX = 2025;
 const W = 2600; // 画布宽度
 const NODE_R = 32; // 节点碰撞半径（含标签）
 const MIN_DIST = NODE_R * 2.4; // 最小中心距 ≈ 77px

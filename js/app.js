@@ -13,7 +13,6 @@ let currentLayout = [];
 let PEOPLE_MAP = new Map();
 
 const stage = document.getElementById('stage');
-const mini = document.getElementById('miniCard');
 
 // 搜索高亮的极简样式注入
 const st = document.createElement('style');
@@ -40,14 +39,20 @@ function maybeShowMobileNotice() {
 
 async function boot() {
   maybeShowMobileNotice(); // 移动端首页提醒（在任何 await 之前弹出，确保首屏即可见）
-  const [nodeRes, metaRes] = await Promise.all([
-    fetch('nodes.json').then(r => r.json()),
-    fetch('physics-data.json').then(r => r.json()),
-  ]);
-  NODES = nodeRes;
-  EDGES = buildEdges(NODES, metaRes.conflicts || []);
-  SUMMARIES = metaRes.summaries || {};
-  NODES.forEach(n => byId.set(n.id, n));
+  try {
+    const [nodeRes, metaRes] = await Promise.all([
+      fetch('nodes.json').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),
+      fetch('physics-data.json').then(r => { if (!r.ok) throw new Error('physics-data.json → ' + r.status); return r.json(); }),
+    ]);
+    NODES = nodeRes;
+    EDGES = buildEdges(NODES, metaRes.conflicts || []);
+    SUMMARIES = metaRes.summaries || {};
+    NODES.forEach(n => byId.set(n.id, n));
+  } catch (err) {
+    console.error('[boot] 数据加载失败：', err);
+    toast('数据加载失败，请检查网络后刷新重试');
+    return;
+  }
 
   initRenderer(NODES, EDGES, SUMMARIES);
   initSidebar(NODES, SUMMARIES);
@@ -168,16 +173,6 @@ function wireUI() {
       }
     });
   }
-
-  /* hover miniCard 已移除 —— 白色浮卡为视觉噪音，节点信息由侧边栏承载 */
-  /*
-  stage.addEventListener('mouseover', e => {
-    const g = e.target.closest('.node'); if (!g) return;
-    const n = byId.get(g.dataset.id); if (!n) return;
-    showMini(n, g);
-  });
-  stage.addEventListener('mouseout', e => { if (e.target.closest('.node')) mini.hidden = true; });
-  */
 
   const si = document.getElementById('searchInput');
   const sr = document.getElementById('searchResults');
@@ -303,14 +298,6 @@ function setView(v) {
 function onPickPerson(name) {
   const p = PEOPLE_MAP.get(name);
   if (p) openPerson(name, p.nodeIds);
-}
-
-function showMini(n, g) {
-  mini.innerHTML = `<div class="mini-card__name">${esc(n.name)}<span class="mini-card__year">${esc(String(n.year))}</span></div><div class="mini-card__aha">${esc(n.aha || '')}</div>`;
-  const r = g.getBoundingClientRect(); const sr = stage.getBoundingClientRect();
-  mini.style.left = (r.right - sr.left + 12) + 'px';
-  mini.style.top = (r.top - sr.top) + 'px';
-  mini.hidden = false;
 }
 
 function updateURL() {

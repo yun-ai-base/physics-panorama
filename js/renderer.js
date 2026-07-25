@@ -14,7 +14,6 @@ let NODES = [], EDGES = [], SUMMARIES = {}, POS = {};
 const byId = new Map();
 let nodeEls = new Map();
 let edgeEls = [];
-let prefaceEls = [];
 let currentView = 'timeline';
 let scaleBandY = {}; // scale 视图每行的 y 范围，用于绘制跨尺度关系连线
 
@@ -41,11 +40,10 @@ export function renderGraph(view, layoutList) {
     era: document.getElementById('layer-era'),
     edges: document.getElementById('layer-edges'),
     nodes: document.getElementById('layer-nodes'),
-    preface: document.getElementById('layer-preface'),
     scaleLabels: document.getElementById('layer-scale-labels'),
   };
-  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface); clear(L.scaleLabels);
-  nodeEls = new Map(); edgeEls = []; prefaceEls = [];
+  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.scaleLabels);
+  nodeEls = new Map(); edgeEls = [];
   scaleBandY = {};
 
   if (view === 'scale') {
@@ -55,7 +53,6 @@ export function renderGraph(view, layoutList) {
   }
   drawEdges(L.edges);
   drawNodes(L.nodes);
-  if (view === 'timeline') /* drawPrefaces(L.preface); 已移除 —— 序言卡片为视觉噪音 */;
   applyState();
 }
 
@@ -221,30 +218,6 @@ function drawNodes(layer) {
   }
 }
 
-function drawPrefaces(layer) {
-  for (const era of ERA_ORDER) {
-    const sum = SUMMARIES[era];
-    const xs = NODES.filter(n => n.era === era).map(n => POS[n.id]);
-    if (!xs.length) continue;
-    const minX = Math.min(...xs.map(p => p.x));
-    const topY = Math.min(...xs.map(p => p.y)) - 130;
-    const quote = typeof sum === 'string' ? sum : (sum?.quote || sum?.text || '');
-    const g = el('g', { class: 'preface', 'data-era': era, transform: `translate(${minX},${topY})` }, layer);
-    el('rect', { class: 'preface__rect', x: 0, y: 0, width: 230, height: 104, rx: 14 }, g);
-    el('text', { class: 'preface__era', x: 16, y: 28, text: ERAS[era].name }, g);
-    const qt = quote ? quote.replace(/\s+/g, ' ').slice(0, 56) + (quote.length > 56 ? '…' : '') : '';
-    // 多行引言
-    const words = qt.split('');
-    let line = '', ly = 52;
-    for (const ch of words) {
-      if (line.length > 14) { el('text', { class: 'preface__quote', x: 16, y: ly, text: line }); line = ''; ly += 18; }
-      line += ch;
-    }
-    if (line) el('text', { class: 'preface__quote', x: 16, y: ly, text: line });
-    prefaceEls.push(g);
-  }
-}
-
 export function applyState() {
   const visible = new Set();
   for (const n of NODES) {
@@ -257,10 +230,6 @@ export function applyState() {
     if (state.selected && state.highlight.has(n.id)) show = true;
     g.style.display = show ? '' : 'none';
     if (show) visible.add(n.id);
-  }
-  // 序言卡随筛选
-  for (const g of prefaceEls) {
-    g.style.display = (state.filterEra && g.dataset.era !== state.filterEra) ? 'none' : '';
   }
   // 节点高亮
   for (const n of NODES) {

@@ -1,7 +1,7 @@
 :root{
   --bg:#F7F3EA; --bg-2:#FBF8F1; --card:#FFFFFF;
   --ink:#2A2620; --ink-2:#6B6358; --ink-3:#9A8F7E;
-  --gold:#B8893B; --gold-soft:#C9A14A; --gold-tint:#F3E9D6;
+  --gold:#B8893B; --gold-soft:#C9A14A; --gold-tint:#F3E9D6; --gold-dark:#8B6914;
   --era-classical:#C29A4E; --era-relativity:#41518F; --era-quantum:#7A5BA6;
   --era-standard:#357A5E; --era-frontier-a:#8C4A6B; --era-frontier-b:#6B4E8C;
   --line-inherit:#7D6E58; --line-revolution:#8B3B24; --line-unify:#8F6A22; --line-conflict:#5E5346;
@@ -135,10 +135,6 @@ body.view-scale .era-nav{display:none;}
 }
 .tour-btn:not(:disabled):hover{border-color:var(--gold); color:var(--gold);}
 .tour-btn:disabled{opacity:.45; cursor:not-allowed;}
-
-/* 迷你地图 */
-.minimap{position:absolute; right:14px; bottom:52px; width:168px; height:104px; background:rgba(255,255,255,.88); border:1px solid rgba(42,38,32,.12); border-radius:10px; box-shadow:var(--shadow); overflow:hidden; z-index:15;}
-.minimap svg{width:100%; height:100%; display:block; cursor:pointer;}
 
 /* 人物索引视图 —— 居中全屏网格 */
 .people-view{position:absolute; inset:0; z-index:30; background:var(--bg); overflow:auto; padding:20px 28px 40px; display:flex; flex-direction:column; align-items:center;}
