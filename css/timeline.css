@@ -71,9 +71,11 @@
 .node__label{font-family:var(--font-sans); font-size:14px; font-weight:600; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,1); stroke-width:6.5px; stroke-linejoin:round;}
 .node__year{font-size:11px; font-weight:500; fill:var(--ink-2); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,1); stroke-width:5.5px; stroke-linejoin:round;}
 
-/* 大节点(core/hub)圆圈内标签：字号缩小、深色文字、无描边（在实心色底上直接显示） */
-.node__label--inner{font-size:12px; font-weight:700; fill:#fff; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(0,0,0,.35); stroke-width:3.5px; stroke-linejoin:round; letter-spacing:.5px;}
-.node__year--inner{font-size:10px; font-weight:600; fill:rgba(255,255,255,.88); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(0,0,0,.28); stroke-width:2.5px;}
+/* 大节点(core/hub)圆圈内标签：浅色圆底上用深色字+白描边才清晰（选中变深底时反转） */
+.node__label--inner{font-size:12px; font-weight:700; fill:#3A3228; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(255,255,255,.92); stroke-width:3px; stroke-linejoin:round; letter-spacing:.5px;}
+.node__year--inner{font-size:10px; font-weight:600; fill:#5A5147; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(255,255,255,.88); stroke-width:2.2px;}
+.node.is-selected .node__label--inner{fill:#fff; stroke:rgba(0,0,0,.32);}
+.node.is-selected .node__year--inner{fill:rgba(255,255,255,.9); stroke:rgba(0,0,0,.25);}
 
 /* 标签防遮挡底板：页面底色实心，盖住经过它的节点圆体（后绘制者在上层） */
 .node__label-bg, .node__year-bg{fill:var(--bg);}

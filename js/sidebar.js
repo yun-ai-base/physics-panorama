@@ -302,6 +302,45 @@ function splitImplicitCategories(block) {
 }
 
 /**
+ * 规则2.6：块内多 **标题** 拆分。
+ * 检测一个大段内包含多个以 **标题** 引导的子段落，例如：
+ *   第一项关键实验是**兰姆移位**（1947年）：...
+ *   **粒子物理学**中：...
+ *   **理查德·费曼**（1918-1988）：...
+ * 如果 ≥2 个标题，拆为多个 sb-section 分区卡，与量子力学等节点的手工 **标题** 卡片视觉一致。
+ */
+function splitBlockByHeadings(block) {
+  // 匹配：行首 + 可选列举前缀 + **标题**
+  const prefix = '(?:第[一二三四五六七八九十]项(?:关键实验是|是|核心成就是|重要发现是|关键步骤是)?|此外，?|同时，?|另外，?|首先，?|其次，?|最后，?)?';
+  const re = new RegExp('(?:^|\\n)\\s*' + prefix + '\\s*\\*\\*([^*]+?)\\*\\*', 'g');
+  const matches = [];
+  let m;
+  while ((m = re.exec(block)) !== null) {
+    matches.push({ index: m.index, title: m[1].trim(), fullLen: m[0].length });
+  }
+  if (matches.length < 2) return null;
+
+  const sections = [];
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].index + matches[i].fullLen;
+    const end = (i + 1 < matches.length) ? matches[i + 1].index : block.length;
+    let body = block.slice(start, end).trim();
+    body = body.replace(/^[：:\s]+/, '');
+    if (body.length > 8) {
+      sections.push({ title: matches[i].title, body });
+    }
+  }
+  // 第一个标题前有引导语时，作为"概述"卡
+  if (matches[0].index > 10) {
+    const preamble = block.slice(0, matches[0].index).trim();
+    if (preamble.length > 6) {
+      sections.unshift({ title: '概述', body: preamble });
+    }
+  }
+  return sections.length >= 2 ? sections : null;
+}
+
+/**
  * 核心解析器：将原始长文转为结构化 HTML。
  *
  * 解析规则（按优先级）：
@@ -343,6 +382,15 @@ function parseContent(raw) {
     const implicitSections = splitImplicitCategories(block);
     if (implicitSections) {
       html.push(`<div class="sb-section sb-section--implicit">${implicitSections.map(sec =>
+        `<div class="sb-section" style="margin:8px 0;"><div class="sb-section__title">${esc(sec.title)}</div><div class="sb-section__body">${inlineBoldToTag(sec.body)}</div></div>`
+      ).join('')}</div>`);
+      continue;
+    }
+
+    // 规则2.6：块内多 **标题** 拆分（如 QED 实验/影响/人物等段落）
+    const headingSections = splitBlockByHeadings(block);
+    if (headingSections) {
+      html.push(`<div class="sb-section sb-section--implicit">${headingSections.map(sec =>
         `<div class="sb-section" style="margin:8px 0;"><div class="sb-section__title">${esc(sec.title)}</div><div class="sb-section__body">${inlineBoldToTag(sec.body)}</div></div>`
       ).join('')}</div>`);
       continue;
