@@ -42,9 +42,10 @@ export function renderGraph(view, layoutList) {
     era: document.getElementById('layer-era'),
     edges: document.getElementById('layer-edges'),
     nodes: document.getElementById('layer-nodes'),
+    labels: document.getElementById('layer-labels'),
     preface: document.getElementById('layer-preface'),
   };
-  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.preface);
+  clear(L.era); clear(L.edges); clear(L.nodes); clear(L.labels); clear(L.preface);
   nodeEls = new Map(); edgeEls = []; prefaceEls = []; relationEls = [];
   scaleBandY = {};
 
@@ -55,7 +56,7 @@ export function renderGraph(view, layoutList) {
     drawEraBands(L.era);
   }
   drawEdges(L.edges);
-  drawNodes(L.nodes);
+  drawNodes(L.nodes, L.labels);
   if (view === 'timeline') /* drawPrefaces(L.preface); 已移除 —— 序言卡片为视觉噪音 */;
   applyState();
 }
@@ -235,7 +236,9 @@ function drawEdges(layer) {
   }
 }
 
-function drawNodes(layer) {
+function drawNodes(layer, labelLayer) {
+  // 第一遍：只画圆圈（不含标签），存位置信息
+  const nodeMeta = []; // { id, r, x, y, name, year }
   for (const n of NODES) {
     const p = POS[n.id];
     if (!p) continue;
@@ -249,18 +252,22 @@ function drawNodes(layer) {
       transform: `translate(${p.x},${p.y})`,
     }, layer);
     el('circle', { class: 'node__circle', r, cx: 0, cy: 0 }, g);
-    // 标签防遮挡底板：后绘制，盖住任何经过它的节点圆体（根治文字被圆体吃掉，对全部视图/节点统一生效）
-    const nameY = r + 32;
-    const nw = labelW(n.name, 14);
-    el('rect', { class: 'node__label-bg', x: -nw / 2 - 6, y: nameY - 12, width: nw + 12, height: 18, rx: 5 }, g);
-    el('text', { class: 'node__label', x: 0, y: nameY, text: n.name }, g);
-    if (typeof n.year === 'number') {
-      const yearY = r + 50;
-      const yw = labelW(n.year, 11);
-      el('rect', { class: 'node__year-bg', x: -yw / 2 - 5, y: yearY - 10, width: yw + 10, height: 15, rx: 5 }, g);
-      el('text', { class: 'node__year', x: 0, y: yearY, text: String(n.year) }, g);
-    }
     nodeEls.set(n.id, g);
+    nodeMeta.push({ id: n.id, r, x: p.x, y: p.y, name: n.name, year: n.year });
+  }
+  // 第二遍：统一绘制所有标签到顶层（永远在所有圆圈之上，根治遮挡）
+  for (const m of nodeMeta) {
+    const nameY = m.y + m.r + 36;   // 增大间距 32→36
+    const nw = labelW(m.name, 14);
+    const g = el('g', { transform: `translate(${m.x},${m.y})`, class: 'node-labels-group', 'data-id': m.id }, labelLayer);
+    el('rect', { class: 'node__label-bg', x: -nw / 2 - 6, y: m.r + 24, width: nw + 12, height: 20, rx: 5 }, g);
+    el('text', { class: 'node__label', x: 0, y: nameY, text: m.name }, g);
+    if (typeof m.year === 'number') {
+      const yearY = m.y + m.r + 54;
+      const yw = labelW(String(m.year), 11);
+      el('rect', { class: 'node__year-bg', x: -yw / 2 - 5, y: m.y + m.r + 44, width: yw + 10, height: 16, rx: 5 }, g);
+      el('text', {class: 'node__year', x: 0, y: yearY, text: String(m.year)}, g);
+    }
   }
 }
 
