@@ -39,6 +39,7 @@ export const DIMENSIONS = [
   { key:'limits',      label:'⚠ 局限' },
   { key:'future',      label:'🔮 猜想' },
   { key:'formula',     label:'📐 公式' },
+  { key:'terms',       label:'🧩 术语' },
 ];
 
 // 浅色视图布局用的排名

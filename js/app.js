@@ -53,10 +53,10 @@ function renderCurrent() {
 function bounds() {
   const xs = currentLayout.map(p => p.x), ys = currentLayout.map(p => p.y);
   let minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  // scale 视图左侧要容纳尺度标签（如“中观”“宇观”），顶部还要容纳尺度关联图导航条
+  // scale 视图左侧要容纳尺度标签（如“中观”“宇观”），需额外留白
   if (state.view === 'scale') {
     minX -= 220;
-    minY -= 120;
+    minY -= 80;
     maxX += 80;
     maxY += 80;
   }
@@ -105,15 +105,6 @@ function wireUI() {
     if (lbl) { toggleEraLabel(lbl.dataset.era); return; } // 时间线纪元大字：轻量激活（高亮 + 综述，不改筛选）
     const sl = e.target.closest('.scale-band__label');
     if (sl) { toggleScaleLabel(sl.dataset.scale); return; } // 尺度维度标签：点击展开概念解析面板
-    const chip = e.target.closest('.scale-map__chip');
-    if (chip) { toggleScaleLabel(chip.dataset.scale); return; } // 尺度关联图 chip：打开该尺度概念解析
-    const arrow = e.target.closest('.scale-map__arrow');
-    if (arrow) { // 尺度关联图箭头：打开目标尺度的「尺度间渗透」并定位到对应说明
-      state.activeScale = arrow.dataset.scale;
-      openScale(arrow.dataset.scale, arrow.dataset.rel);
-      reflectScaleActive();
-      return;
-    }
     const pf = e.target.closest('.preface');
     if (pf) { openEra(pf.dataset.era); }
   });
@@ -191,11 +182,14 @@ function setView(v) {
   state.view = v;
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === v));
   const isPeople = v === 'people';
-  document.body.classList.toggle('view-people', isPeople);
+  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people');
+  document.body.classList.add(`view-${v}`);
   const stageEl = document.getElementById('stage');
   const pv = document.getElementById('peopleView');
+  const smb = document.getElementById('scaleMapBar');
   if (stageEl) stageEl.style.visibility = isPeople ? 'hidden' : '';
   if (pv) pv.hidden = !isPeople;
+  if (smb) smb.hidden = (v !== 'scale');
   if (isPeople) {
     renderPeople(document.getElementById('peopleGrid'), [...PEOPLE_MAP.values()], onPickPerson);
     closeSidebar();

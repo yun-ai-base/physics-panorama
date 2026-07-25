@@ -108,6 +108,16 @@
 .sb-fm__app-body .sb-para{margin:8px 0;}
 @keyframes sb-fm-app-in{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);}}
 
+/* ── 术语卡片 (sb-term) ────────────────────────── */
+.sb-term{background:#fff; border:1px solid rgba(42,38,32,.08); border-left:3.5px solid var(--gold); border-radius:10px; padding:14px 16px; margin:10px 0; box-shadow:0 1px 4px rgba(42,38,32,.05);}
+.sb-term__head{display:flex; align-items:center; gap:9px; margin-bottom:9px;}
+.sb-term__icon{font-size:20px; line-height:1; flex-shrink:0;}
+.sb-term__name{font-family:var(--font-serif); font-size:15.5px; font-weight:700; color:var(--ink);}
+.sb-term__img{width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin:8px 0 10px; border:1px solid rgba(42,38,32,.08); background:var(--bg-2);}
+.sb-term__def{font-size:13px; line-height:1.7; color:var(--gold-dark,#8B6914); font-weight:600; padding:8px 12px; background:var(--gold-tint); border-radius:8px; margin-bottom:10px;}
+.sb-term__body{font-size:12.5px; line-height:1.8; color:var(--ink);}
+.sb-term__body .sb-para{margin:8px 0;}
+
 /* ── 路径上下文 (sb-path) ──────────────────────── */
 .sb-path{margin-top:18px; padding-top:14px; border-top:1px dashed rgba(42,38,32,.14); font-size:12px; display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; line-height:1.7;}
 .sb-path__label{display:inline-block; font-weight:500; color:var(--ink-3); font-size:10px; text-transform:uppercase; letter-spacing:.5px; background:var(--bg-2); border:1px solid rgba(42,38,32,.08); border-radius:5px; padding:1px 6px; vertical-align:baseline;}

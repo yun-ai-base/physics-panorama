@@ -54,6 +54,10 @@ function looksLikeTimeline(block) {
 /**
  * 安全的时间线拆分——只在 looksLikeTimeline() 返回 true 后调用。
  * 用 matchAll 找出每个「前缀文字+（年份」的位置，在其前后切割。
+ *
+ * 关键防护：切割后做**项长度校验**——
+ * 真正的时间线/参考文献每条较短（<80字符）；
+ * 传记段落被误切后各项会很长（>80字符），此时回退为普通段落。
  */
 function splitTimelineItemsSafe(block) {
   const items = [];
@@ -72,6 +76,18 @@ function splitTimelineItemsSafe(block) {
     else items.push({ year: '', text: tail });
   }
   if (items.length < 2) return [{ year: '', text: block }];
+
+  // ★ 项长度校验：任何非年份项的文本超过 80 字符 → 不是时间线，回退
+  const longItem = items.find(it => !it.year && it.text.length > 80);
+  if (longItem) return [{ year: '', text: block }];
+
+  // 年份项后面的文本也检查（不含年份标签本身的纯文本部分）
+  for (const it of items) {
+    if (it.year && it.text.replace(/[\u4e00-\u9fff\u0041-\u007a]{2,}（\d{3,4}[-—–]?\d{0,4}年?/, '').trim().length > 80) {
+      return [{ year: '', text: block }];
+    }
+  }
+
   return items.filter(it => it.text.trim().length > 10);
 }
 
@@ -143,8 +159,36 @@ function parseContent(raw) {
   return html.join('') || '<p class="sb-empty">暂无内容</p>';
 }
 
+/* ── 术语卡片 ─────────────────────────────────────────── */
+function termsHTML(terms) {
+  if (!terms || !terms.length) return '<p class="sb-empty">该节点未提供术语释义</p>';
+  return terms.map((t, idx) => {
+    const icon = esc(t.icon || '🧩');
+    const name = esc(t.name || `术语 ${idx + 1}`);
+    const def = esc(t.definition || '');
+    const details = parseContent(t.details || '');
+    const img = t.image ? `<img class="sb-term__img" src="${esc(t.image)}" alt="${name}" loading="lazy">` : '';
+    return `
+      <div class="sb-term">
+        <div class="sb-term__head">
+          <span class="sb-term__icon">${icon}</span>
+          <span class="sb-term__name">${name}</span>
+        </div>
+        ${img}
+        <div class="sb-term__def">${def}</div>
+        <div class="sb-term__body">${details}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 /* ── 维度渲染 ─────────────────────────────────────────── */
 function renderDim(node, key) {
+  // 术语释义走独立逻辑
+  if (key === 'terms') {
+    return termsHTML(node.terms || []);
+  }
+
   // 公式走独立逻辑
   if (key === 'formula') {
     const fs = node.formula || [];
@@ -237,6 +281,7 @@ export function openNode(id) {
   const hasSummary = !!node.summary?.trim();
   const hasAha = !!node.aha?.trim();
   const hasFigures = !!(node.figures && node.figures.length);
+  const hasTerms = !!(node.terms && node.terms.length);
 
   let dims;
   if (isDeep) {
@@ -245,6 +290,7 @@ export function openNode(id) {
     dims = DIMENSIONS.filter(d => {
       if (d.key === 'formula') return hasFormula;
       if (d.key === 'limitation') return hasLimitation;
+      if (d.key === 'terms') return hasTerms;
       return node.deepContent?.[d.key] && String(node.deepContent[d.key]).trim();
     });
     if (dims.length < 2) {
@@ -252,6 +298,7 @@ export function openNode(id) {
       if (hasSummary && !dims.find(d => d.key === 'history')) extra.push({ key: 'history', label: '📖 脉络' });
       if (hasAha && !dims.find(d => d.key === 'paradigm')) extra.push({ key: 'paradigm', label: '⛓ 范式' });
       if (hasFigures && !dims.find(d => d.key === 'figures')) extra.push({ key: 'figures', label: '👤 人物' });
+      if (hasTerms && !dims.find(d => d.key === 'terms')) extra.push({ key: 'terms', label: '🧩 术语' });
       dims = [...dims, ...extra];
     }
   }

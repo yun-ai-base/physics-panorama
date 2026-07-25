@@ -84,6 +84,29 @@ button{font-family:inherit; cursor:pointer;}
 .only-core{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2); cursor:pointer; user-select:none;}
 .only-core input{accent-color:var(--gold); width:15px; height:15px;}
 
+/* 尺度维度关联图导航条（仅 scale 视图显示） */
+.scale-map-bar{
+  display:none; flex:0 0 auto; align-items:center; justify-content:center;
+  padding:10px 18px; background:var(--bg-2);
+  border-bottom:1px solid rgba(42,38,32,.06); gap:12px;
+}
+body.view-scale .scale-map-bar{display:flex;}
+.scale-map-bar__chain{display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center;}
+.scale-map-bar__chip{
+  border:none; border-radius:999px; padding:5px 13px; font-size:13px; font-weight:700;
+  color:var(--tag); background:color-mix(in srgb, var(--tag) 12%, #fff);
+  border:1px solid color-mix(in srgb, var(--tag) 38%, #fff);
+  cursor:pointer; transition:.18s; letter-spacing:.5px;
+}
+.scale-map-bar__chip:hover{filter:brightness(.95); transform:translateY(-1px);}
+.scale-map-bar__arrow{
+  display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:700; color:var(--gold);
+  padding:3px 8px; border-radius:999px; background:rgba(184,137,59,.10); cursor:pointer; transition:.18s;
+}
+.scale-map-bar__arrow:hover{background:rgba(184,137,59,.18);}
+.scale-map-bar__arrow--loop{font-weight:800; color:#7A5BA6; background:rgba(107,78,140,.10);}
+.scale-map-bar__arrow--loop:hover{background:rgba(107,78,140,.18);}
+
 /* 主舞台 */
 .stage-wrap{flex:1 1 auto; display:flex; min-height:0; position:relative;}
 .stage{flex:1 1 auto; position:relative; overflow:hidden; background:

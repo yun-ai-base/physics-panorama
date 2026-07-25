@@ -48,6 +48,22 @@
       </label>
     </div>
 
+    <!-- 尺度维度关联图（仅在尺度视图显示） -->
+    <div class="scale-map-bar" id="scaleMapBar" hidden>
+      <div class="scale-map-bar__chain">
+        <button class="scale-map-bar__chip" data-scale="microscopic" style="--tag:#6B489E">微观</button>
+        <span class="scale-map-bar__arrow" data-scale="microscopic" data-rel="微观 → 宏观 · 涌现">涌现</span>
+        <button class="scale-map-bar__chip" data-scale="mesoscopic" style="--tag:#A07840">宏观</button>
+        <span class="scale-map-bar__arrow" data-scale="mesoscopic" data-rel="宏观 ↔ 宇观 · 引力桥梁">引力桥梁</span>
+        <button class="scale-map-bar__chip" data-scale="cosmic" style="--tag:#41518F">宇观</button>
+        <span class="scale-map-bar__arrow" data-scale="unified" data-rel="统一 → 宇观">统一</span>
+        <button class="scale-map-bar__chip" data-scale="unified" style="--tag:#28684E">统一</button>
+        <span class="scale-map-bar__arrow" data-scale="unified" data-rel="统一 → 反哺">技术回流</span>
+        <button class="scale-map-bar__chip" data-scale="feedback" style="--tag:#6B4E8C">反哺</button>
+        <span class="scale-map-bar__arrow scale-map-bar__arrow--loop" data-scale="feedback" data-rel="反哺 ← 微观">↺ 闭环</span>
+      </div>
+    </div>
+
     <!-- 主舞台 -->
     <main class="stage-wrap">
       <div class="stage" id="stage">
