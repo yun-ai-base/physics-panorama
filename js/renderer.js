@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { el, esc, edgePath, bezierMidpoint } from './utils.js';
-import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS } from './config.js';
+import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
 
 const EDGE_LABELS = {
   inherit: '继承',
@@ -107,10 +107,23 @@ function drawScaleBands(layer) {
 
     el('text', {
       x: globalMinX + 18, y: minY + 28,
-      class: 'scale-band__label',
+      class: 'scale-band__label' + (state.activeScale === scale ? ' is-active-scale' : ''),
       text: SCALE_LABEL[scale],
       fill: cfg.raw,
+      'data-scale': scale,
+      style: 'cursor:pointer;',
     }, layer);
+
+    // 标签下加一行概念解析小字
+    const desc = SCALE_DESC[scale];
+    if (desc && desc.tag) {
+      el('text', {
+        x: globalMinX + 20, y: minY + 46,
+        class: 'scale-band__tag',
+        text: desc.tag,
+        fill: cfg.raw,
+      }, layer);
+    }
 
     // 淡淡的下边界分隔线
     el('line', {

@@ -3,7 +3,7 @@ import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState } from './renderer.js';
-import { initSidebar, openNode, openEra, closeSidebar, openPerson } from './sidebar.js';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople } from './people.js';
@@ -95,7 +95,7 @@ function wireUI() {
   });
 
   document.getElementById('onlyCore').addEventListener('change', e => { state.onlyCore = e.target.checked; applyState(); updateURL(); });
-  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; reflectEraActive(); applyState(); updateURL(); });
+  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null; reflectEraActive(); reflectScaleActive(); applyState(); updateURL(); });
 
   stage.addEventListener('click', e => {
     if (consumeDrag()) return;
@@ -103,6 +103,8 @@ function wireUI() {
     if (g) { selectNode(g.dataset.id); return; }
     const lbl = e.target.closest('.era-band__label');
     if (lbl) { toggleEraLabel(lbl.dataset.era); return; } // 时间线纪元大字：轻量激活（高亮 + 综述，不改筛选）
+    const sl = e.target.closest('.scale-band__label');
+    if (sl) { toggleScaleLabel(sl.dataset.scale); return; } // 尺度维度标签：点击展开概念解析面板
     const pf = e.target.closest('.preface');
     if (pf) { openEra(pf.dataset.era); }
   });
@@ -134,7 +136,7 @@ function wireUI() {
   });
 
   window.addEventListener('pp:esc', () => {
-    if (state.sidebarOpen) { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; reflectEraActive(); applyState(); updateURL(); }
+    if (state.sidebarOpen) { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null; reflectEraActive(); reflectScaleActive(); applyState(); updateURL(); }
   });
 
   document.getElementById('shareBtn').addEventListener('click', () => {
@@ -161,6 +163,18 @@ function toggleEraLabel(era) {
   else { state.activeEra = era; openEra(era); }
   document.querySelectorAll('.era-band__label').forEach(l => l.classList.toggle('is-active-era', l.dataset.era === state.activeEra));
   reflectEraActive(); updateURL();
+}
+// 尺度维度标签点击：展开概念解析面板；再次点击同尺度取消
+function toggleScaleLabel(scale) {
+  if (state.activeScale === scale) { state.activeScale = null; closeSidebar(); }
+  else { state.activeScale = scale; openScale(scale); }
+  document.querySelectorAll('.scale-band__label').forEach(l => l.classList.toggle('is-active-scale', l.dataset.scale === state.activeScale));
+  reflectScaleActive(); updateURL();
+}
+// 尺度激活态：统一反映尺度标签的高亮
+function reflectScaleActive() {
+  document.querySelectorAll('.scale-band__label').forEach(l =>
+    l.classList.toggle('is-active-scale', l.dataset.scale === state.activeScale));
 }
 
 // 统一视图切换（含人物索引覆盖层）

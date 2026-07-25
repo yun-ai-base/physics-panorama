@@ -79,6 +79,17 @@
   stroke-linejoin:round; opacity:.90;
 }
 .scale-band__line{pointer-events:none;}
+/* 标签下概念解析小字 */
+.scale-band__tag{
+  font-family:var(--font-sans); font-size:11px; font-weight:500;
+  letter-spacing:.5px; paint-order:stroke; stroke:rgba(247,243,234,.85); stroke-width:3px;
+  stroke-linejoin:round; opacity:.72; pointer-events:none;
+}
+/* 激活尺度：加粗放大 + 白描边底块，提示可点击展开 */
+.scale-band__label.is-active-scale{
+  font-size:25px; font-weight:900; letter-spacing:4px;
+  stroke:rgba(247,243,234,.96); stroke-width:6px; opacity:1;
+}
 
 /* 纪元序言卡 */
 /* preface 序言卡片已禁用 —— 视觉噪音 */

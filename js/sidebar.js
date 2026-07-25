@@ -1,11 +1,10 @@
 import { state } from './state.js';
 import { esc, chain } from './utils.js';
-import { ERAS, DIMENSIONS } from './config.js';
+import { ERAS, DIMENSIONS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
 import { avatarImg, bindAvatars } from './data/portraitMap.js';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();
-const SCALE_LABEL = { mesoscopic:'中观', cosmic:'宇观', microscopic:'微观', unified:'统一', feedback:'反哺' };
 const MATURITY_LABEL = { foundation:'🏛 地基型', established:'🔬 成熟型', speculative:'🔮 探索型' };
 
 export function initSidebar(nodes, summaries) {
@@ -48,9 +47,9 @@ function parseContent(raw) {
       continue;
     }
 
-    // 检测含密集年份数据 → 时间线索引
-    if (/（?\d{3,4}[-—–]\d{3,4}年?|（\d{3,4}年/.test(block) && block.length > 80) {
-      const items = splitTimelineItems(block);
+    // 检测是否为时间线索引格式（严格条件：≥3组年份数据 + 每项>25字）
+    if (looksLikeTimeline(block)) {
+      const items = splitTimelineItemsSafe(block);
       if (items.length >= 2) {
         html.push(`<div class="sb-tl">${items.map(it =>
           `<div class="sb-tl__item">${it.year ? `<span class="sb-tl__year">${esc(it.year)}</span>` : ''}<div class="sb-tl__text">${inlineBoldToTag(it.text)}</div></div>`
@@ -72,18 +71,35 @@ function inlineBoldToTag(text) {
              .replace(/\*(.+?)\*/g, '<em>$1</em>');
 }
 
-/** 尝试按人名+年份模式拆分时间线索引项 */
-function splitTimelineItems(block) {
-  // 按 "姓名（年份" 或 "姓名（year—year" 拆分
+/**
+ * 检测一段文本是否为"时间线索引格式"。
+ * 条件严格：必须包含 ≥3 组「人名类前缀 + （年份数据」模式，
+ * 且每组拆分后文本长度 > 25 字符。防止把普通传记/论述误判为时间线。
+ */
+function looksLikeTimeline(block) {
+  // 至少有 3 个 （xxxx 年份标记
+  const yearMarks = (block.match(/（\d{3,4}[-—–]?\d{0,4}年?/g) || []);
+  if (yearMarks.length < 3) return false;
+  // 尝试按「中文字符+（数字」模式拆分
+  const parts = block.split(/(?<=[^）\d\s])(?=[^，。；\n]*[^\s]（\d{3,4})/);
+  const validParts = parts.map(s => s.trim()).filter(s => s.length > 25);
+  return validParts.length >= 3;
+}
+
+/**
+ * 安全的时间线拆分——只在 looksLikeTimeline 通过后调用。
+ * 按「非括号字符+（年份数据」边界拆分。
+ */
+function splitTimelineItemsSafe(block) {
   const items = [];
-  const parts = block.split(/(?=[^，。；\n]*（\d{3,4})/);
+  // 用更保守的模式：每个项以中文/字母开头、含（年份数据
+  const parts = block.split(/(?<=[^）\d\n])(?=\s*[^\s（]+（\d{3,4}))/);
   for (const p of parts) {
     const t = p.trim();
-    if (!t) continue;
-    const ym = t.match(/（(\d{3,4}[-—–]?\d{0,4}年?)/);
+    if (!t || t.length < 15) continue;  // 太短的碎片丢弃
+    const ym = t.match(/（(\d{3,4}[-—���]?\d{0,4}年?)/);
     items.push({ year: ym ? ym[1] : '', text: t });
   }
-  // 如果拆出来太少或太碎，回退为整体
   if (items.length < 2) return [{ year: '', text: block }];
   return items;
 }
@@ -240,7 +256,29 @@ export function openEra(era) {
   state.sidebarOpen = true;
 }
 
-/* ── 关闭侧边栏 ───────────────────────────────────────── */
+/* ── 打开尺度维度概念解析 ─────────────────────────────── */
+export function openScale(scale) {
+  const d = SCALE_DESC[scale]; if (!d) return;
+  const cfg = SCALE_COLORS[scale];
+  const sb = document.getElementById('sidebar'); const body = document.getElementById('sidebarBody');
+  const count = NODES.filter(n => n.scale === scale).length;
+  const names = NODES.filter(n => n.scale === scale).map(n => n.name).join('、');
+  body.innerHTML = `
+    <div class="sb-head">
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${cfg.raw}"></span>${SCALE_LABEL[scale]} · 尺度维度</div>
+      <div class="sb-head__title">${esc(SCALE_LABEL[scale])}<small>概念解析与延伸</small></div>
+      <div class="sb-head__quote">${esc(d.tag || '')}</div>
+    </div>
+    <div class="sb-panel">
+      <div class="sb-sec-label">概念解析</div>
+      <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(d.concept || '')}</div>
+      <div class="sb-sec-label">延伸</div>
+      <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(d.extend || '')}</div>
+      <div class="sb-stats">本尺度收录 <b>${count}</b> 个学说 / 事件：${esc(names)}</div>
+    </div>`;
+  sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
+  state.sidebarOpen = true;
+}
 export function closeSidebar() {
   const sb = document.getElementById('sidebar');
   sb.classList.remove('is-open'); sb.setAttribute('aria-hidden', 'true');

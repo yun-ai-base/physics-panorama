@@ -35,8 +35,8 @@
 .sb-fig__name{font-weight:600;}
 
 /* ── 标签栏 (sb-tabs) ──────────────────────────── */
-.sb-tabs{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid rgba(42,38,32,.06);}
-.sb-tab{border:1px solid rgba(42,38,32,.10); background:#fff; color:var(--ink-2); font-size:12px; padding:5px 12px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500;}
+.sb-tabs{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(42,38,32,.06);}
+.sb-tab{border:1px solid rgba(42,38,32,.10); background:#fff; color:var(--ink-2); font-size:11px; padding:4px 10px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500; white-space:nowrap;}
 .sb-tab:hover{border-color:var(--gold); color:var(--gold);}
 .sb-tab.is-active{background:var(--gold); color:#fff; border-color:var(--gold); font-weight:700;}
 
@@ -79,6 +79,10 @@
 /* ── 纪元统计 (sb-stats) ───────────────────────── */
 .sb-stats{margin-top:14px; padding:12px 15px; background:var(--bg-2); border:1px solid rgba(42,38,32,.06); border-radius:10px; font-size:12.5px; color:var(--ink-2); line-height:1.65;}
 .sb-stats b{color:var(--gold); font-weight:700;}
+
+/* ── 段落小标题 (sb-sec-label) ─────────────────── */
+.sb-sec-label{margin:16px 0 2px; font-family:var(--font-sans); font-size:12px; font-weight:700; letter-spacing:1px; color:var(--gold); border-left:3px solid var(--gold); padding-left:9px;}
+.sb-sec-label:first-child{margin-top:4px;}
 
 /* ── 人物索引 ───────────────────────────────────── */
 .sb-person{display:flex; align-items:center; gap:12px;}
