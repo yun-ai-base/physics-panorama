@@ -176,18 +176,61 @@ function wireUI() {
 
   const si = document.getElementById('searchInput');
   const sr = document.getElementById('searchResults');
+  // 全文检索：在「名称/人名/脉络/范式」之外，额外覆盖 deep 节点的
+  // 历史/分支/著作/影响/工具/实验/争论/局限/未来 正文、术语释义与公式
+  const DIM_KEY_MAP = { '历史':'history','分支':'branches','著作':'works','影响':'impact','工具':'tools','实验':'experiments','争论':'debate','局限':'limits','未来':'future' };
+  const EXTRA_TAGS = new Set(['历史','分支','著作','影响','工具','实验','争论','局限','未来','术语','公式']);
+  let lastQ = '';
+  function searchNode(n, q) {
+    const fields = [
+      ['名称', (n.name || '') + ' ' + (n.nameEn || '')],
+      ['人物', (n.figures || []).join(' ')],
+      ['脉络', n.summary || ''],
+      ['范式', n.aha || ''],
+      ['历史', n.deepContent?.history || ''],
+      ['分支', n.deepContent?.branches || ''],
+      ['著作', n.deepContent?.works || ''],
+      ['影响', n.deepContent?.impact || ''],
+      ['工具', n.deepContent?.tools || ''],
+      ['实验', n.deepContent?.experiments || ''],
+      ['争论', n.deepContent?.debate || ''],
+      ['局限', n.deepContent?.limits || ''],
+      ['未来', n.deepContent?.future || ''],
+      ['术语', (n.terms || []).map(t => (t.name || '') + ' ' + (t.definition || '')).join(' ')],
+      ['公式', (n.formula || []).map(f => (f.latex || '') + ' ' + (f.plain || '') + ' ' + (f.name || '')).join(' ')],
+    ];
+    const tags = [];
+    for (const [key, text] of fields) {
+      if (text && text.toLowerCase().includes(q)) tags.push(key);
+    }
+    return tags;
+  }
   si.addEventListener('input', () => {
     const q = si.value.trim().toLowerCase();
+    lastQ = q;
     if (!q) { sr.hidden = true; sr.innerHTML = ''; clearSearchGlow(); return; }
-    const hits = NODES.filter(n => (n.name + (n.nameEn || '') + (n.figures || []).join('') + (n.summary || '') + (n.aha || '')).toLowerCase().includes(q));
+    const hits = NODES.map(n => ({ n, tags: searchNode(n, q) })).filter(x => x.tags.length);
     sr.hidden = false;
-    sr.innerHTML = hits.slice(0, 24).map(n => `<button data-id="${n.id}">${esc(n.name)} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span></button>`).join('') || '<div style="padding:10px;color:var(--ink-3)">无匹配</div>';
+    sr.innerHTML = hits.slice(0, 40).map(({ n, tags }) => {
+      const extra = tags.filter(t => EXTRA_TAGS.has(t));
+      return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(n.name)} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">命中：${esc(extra.join('/'))}</span>` : ''}</button>`;
+    }).join('') || '<div style="padding:10px;color:var(--ink-3)">无匹配</div>';
     clearSearchGlow();
-    hits.forEach(h => nodeEl(h.id)?.classList.add('is-search'));
+    hits.forEach(({ n }) => nodeEl(n.id)?.classList.add('is-search'));
   });
   sr.addEventListener('click', e => {
     const b = e.target.closest('button[data-id]'); if (!b) return;
-    si.value = ''; sr.hidden = true; clearSearchGlow(); selectNode(b.dataset.id);
+    const id = b.dataset.id;
+    const tags = (b.dataset.tags || '').split(',').filter(Boolean);
+    si.value = ''; sr.hidden = true; clearSearchGlow();
+    if (tags.includes('术语')) {
+      // 命中术语：跳到该节点术语释义锚点（复用既有 pp:gotoTerm 通道）
+      const term = (byId.get(id)?.terms || []).find(t => (t.name || '').toLowerCase().includes(lastQ));
+      if (term) { window.dispatchEvent(new CustomEvent('pp:gotoTerm', { detail: { nodeId: id, termName: term.name } })); return; }
+    }
+    selectNode(id);
+    const dimZh = tags.find(t => DIM_KEY_MAP[t]);
+    if (dimZh) openSidebarTab(DIM_KEY_MAP[dimZh]);
   });
 
   window.addEventListener('pp:esc', () => {
