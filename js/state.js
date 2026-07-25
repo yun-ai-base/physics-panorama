@@ -13,4 +13,6 @@ export const state = {
   view: 'timeline',        // 当前视图
   tour: null,              // 漫游模式
   sidebarOpen: false,
+  sidebarTab: null,        // 当前打开的侧边栏标签
+  termFocus: null,         // 当前高亮定位的术语名
 };

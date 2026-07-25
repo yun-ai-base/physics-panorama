@@ -5,11 +5,16 @@ import { avatarImg, bindAvatars } from './data/portraitMap.js';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();
+const termIndex = new Map(); // 术语名 -> { nodeId, termName }
 const MATURITY_LABEL = { foundation:'🏛 地基型', established:'🔬 成熟型', speculative:'🔮 探索型' };
 
 export function initSidebar(nodes, summaries) {
   NODES = nodes; SUMMARIES = summaries || {};
   byId.clear(); nodes.forEach(n => byId.set(n.id, n));
+  termIndex.clear();
+  nodes.forEach(n => (n.terms || []).forEach(t => {
+    if (t.name && !termIndex.has(t.name)) termIndex.set(t.name, { nodeId: n.id, termName: t.name });
+  }));
 }
 
 /* ─��� 人物行 ─────────────────────────────────────────── */
@@ -18,6 +23,57 @@ function figuresHTML(n) {
   return `<div class="sb-figures">${n.figures.map(f =>
     `<div class="sb-fig">${avatarImg(f)}<span class="sb-fig__name">${esc(f)}</span></div>`
   ).join('')}</div>`;
+}
+
+/* ── 术语自动链接 ───────────────────────────────────── */
+
+function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+/**
+ * 把正文中的术语名自动变成跳转到术语释义锚点的链接。
+ * 只在文本节点中替换，不会破坏已有 <a> 标签或 LaTeX/Math 结构。
+ */
+function linkTerms(html) {
+  if (!html || typeof html !== 'string') return html;
+  const names = [...termIndex.keys()].sort((a, b) => b.length - a.length);
+  if (!names.length) return html;
+  const re = new RegExp('(' + names.map(escapeRegExp).join('|') + ')', 'g');
+
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const textNodes = [];
+  const walker = document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT, null, false);
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+  for (const node of textNodes) {
+    const parent = node.parentElement;
+    const text = node.textContent;
+    re.lastIndex = 0;
+    if (!re.test(text)) continue;
+    re.lastIndex = 0;
+
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+      const info = termIndex.get(m[1]);
+      if (parent && (parent.closest('a') || parent.closest(`.sb-term[data-term="${info.termName}"]`))) {
+        // 跳过已有链接或术语自身卡片内的同名文本
+        continue;
+      }
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const a = document.createElement('a');
+      a.className = 'sb-term-link';
+      a.dataset.node = info.nodeId;
+      a.dataset.term = info.termName;
+      a.href = `?node=${encodeURIComponent(info.nodeId)}&tab=terms&term=${encodeURIComponent(info.termName)}`;
+      a.textContent = m[1];
+      frag.appendChild(a);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    if (frag.childNodes.length) node.parentNode.replaceChild(frag, node);
+  }
+  return tmp.innerHTML;
 }
 
 /* ── 智能内容解析器 ─────────────────────────────────── */
@@ -188,6 +244,59 @@ function splitBySentences(block) {
 }
 
 /**
+ * 规则2.5：隐式分类自动提取。
+ * 检测"在XX领域/方面/学科/界/学中，"等隐式分类标记，
+ * 将纯散文自动提升为 .sb-section 分区卡（与 **标题** 格式视觉一致）。
+ *
+ * 匹配模式：在（2~12字中文领域名）（领域|方面|学科|界|学中）（[，,：:]）
+ * 要求 ≥2 个分类才激活（避免误判）。
+ */
+function splitImplicitCategories(block) {
+  // 领域后缀词列表
+  const suffixes = ['领域', '方面', '学科', '界', '学中'];
+  const puncts = '[，,：:;；]';
+  const re = new RegExp(
+    '在([\\u4e00-\\u9fff]{2,12})(' + suffixes.join('|') + ')(' + puncts + ')',
+    'g'
+  );
+
+  const matches = [];
+  let m;
+  while ((m = re.exec(block)) !== null) {
+    matches.push({
+      full: m[0],       // 完整匹配如 "在数学领域，"
+      title: m[1] + m[2], // 分类名如 "数学领域"
+      index: m.index     // 在原文中的位置
+    });
+  }
+
+  // 至少需要 2 个隐式分类才启用此规则
+  if (matches.length < 2) return null;
+
+  const sections = [];
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].index + matches[i].full.length;
+    const end = (i + 1 < matches.length) ? matches[i + 1].index : block.length;
+    let body = block.slice(start, end).trim();
+    // 去掉可能的句首连接词
+    body = body.replace(/^[，,；;\s]+/, '');
+    if (body.length > 8) {
+      sections.push({ title: matches[i].title, body });
+    }
+  }
+
+  // 处理开头引导语（第一个分类之前的文字）
+  if (sections.length > 0 && matches[0].index > 10) {
+    const preamble = block.slice(0, matches[0].index).trim();
+    if (preamble.length > 6) {
+      sections.unshift({ title: '概述', body: preamble });
+    }
+  }
+
+  return sections.length >= 2 ? sections : null;
+}
+
+/**
  * 核心解析器：将原始长文转为结构化 HTML。
  *
  * 解析规则（按优先级）：
@@ -221,6 +330,16 @@ function parseContent(raw) {
       let body = block.slice(headingMatch[0].length).trim();
       body = inlineBoldToTag(body);
       html.push(`<div class="sb-section"><div class="sb-section__title">${esc(title)}</div><div class="sb-section__body">${body}</div></div>`);
+      continue;
+    }
+
+    // 规则2.5：隐式分类自动提取（"在XX领域/方面/学科/界/学中，"模式）
+    // 将纯散文中的隐式分类提升为 .sb-section 分区卡，与 **标题** 格式视觉一致
+    const implicitSections = splitImplicitCategories(block);
+    if (implicitSections) {
+      html.push(`<div class="sb-section sb-section--implicit">${implicitSections.map(sec =>
+        `<div class="sb-section" style="margin:8px 0;"><div class="sb-section__title">${esc(sec.title)}</div><div class="sb-section__body">${inlineBoldToTag(sec.body)}</div></div>`
+      ).join('')}</div>`);
       continue;
     }
 
@@ -264,7 +383,7 @@ function parseContent(raw) {
     html.push(`<div class="sb-para">${inlineBoldToTag(block)}</div>`);
   }
 
-  return html.join('') || '<p class="sb-empty">暂无内容</p>';
+  return linkTerms(html.join('')) || '<p class="sb-empty">暂无内容</p>';
 }
 
 /* ── 术语卡片 ─────────────────────────────────────────── */
@@ -284,7 +403,7 @@ function termsHTML(terms) {
       jump = `<span class="sb-term__jump">↗ 跳转至 ${esc(tName)}</span>`;
     }
     return `
-      <div class="sb-term${linkCls}"${targetId ? ` data-target="${esc(targetId)}"` : ''}>
+      <div class="sb-term${linkCls}" data-term="${name}"${targetId ? ` data-target="${esc(targetId)}"` : ''}>
         <div class="sb-term__head">
           <span class="sb-term__icon">${icon}</span>
           <span class="sb-term__name">${name}</span>
@@ -420,6 +539,10 @@ export function openNode(id) {
   }
 
   const defaultTab = dims[0]?.key || 'history';
+  const back = history.state?.ppBack;
+  const backBtn = back
+    ? `<button class="sb-back" type="button" data-action="back"><span>←</span> 返回</button>`
+    : '';
 
   body.innerHTML = `
     <div class="sb-head">
@@ -433,12 +556,15 @@ export function openNode(id) {
       </div>
       ${figuresHTML(node)}
     </div>
+    ${backBtn}
     <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${d.label}</button>`).join('')}</div>
     <div class="sb-panel" id="tabBody"></div>
     ${pathCtxHTML(node)}
   `;
 
   bindAvatars(body);
+  // 绑定返回按钮
+  body.querySelector('[data-action="back"]')?.addEventListener('click', () => history.back());
   // 绑定"继承自/影响至"跳转链接
   body.querySelectorAll('.sb-path__link').forEach(b => b.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: b.dataset.id }));
@@ -446,8 +572,11 @@ export function openNode(id) {
   const tabs = body.querySelectorAll('.sb-tab');
   const tabBody = body.querySelector('#tabBody');
   const show = key => {
+    state.sidebarTab = key;
+    state.termFocus = null;
     tabBody.innerHTML = renderDim(node, key);
     tabs.forEach(t => t.classList.toggle('is-active', t.dataset.key === key));
+    window.dispatchEvent(new CustomEvent('pp:updateURL'));
     // 绑定公式“应用拓展”展开/收起
     tabBody.querySelectorAll('.sb-fm__app-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -464,6 +593,15 @@ export function openNode(id) {
       card.addEventListener('click', () => {
         const id = card.dataset.target;
         if (id) window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: id }));
+      });
+    });
+    // 绑定正文内术语链接：跳转到术语释义锚点
+    tabBody.querySelectorAll('.sb-term-link').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('pp:gotoTerm', {
+          detail: { nodeId: a.dataset.node, termName: a.dataset.term }
+        }));
       });
     });
   };
@@ -568,4 +706,27 @@ export function openPerson(name, nodeIds) {
   }));
   sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
   state.sidebarOpen = true;
+}
+
+/* ── 侧边栏公共控制接口 ───────────────────────────────── */
+
+export function openSidebarTab(tabKey) {
+  const btn = document.querySelector(`.sb-tab[data-key="${tabKey.replace(/"/g, '\\"')}"]`);
+  if (btn) btn.click();
+}
+
+export function focusTerm(termName) {
+  const name = String(termName || '').trim();
+  if (!name) return;
+  openSidebarTab('terms');
+  state.termFocus = name;
+  window.dispatchEvent(new CustomEvent('pp:updateURL'));
+  requestAnimationFrame(() => {
+    const cards = document.querySelectorAll('.sb-term');
+    const target = [...cards].find(c => c.querySelector('.sb-term__name')?.textContent.trim() === name);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.add('is-flash');
+    setTimeout(() => target.classList.remove('is-flash'), 1400);
+  });
 }

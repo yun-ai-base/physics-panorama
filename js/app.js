@@ -3,7 +3,7 @@ import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState } from './renderer.js';
-import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson } from './sidebar.js';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople } from './people.js';
@@ -37,8 +37,14 @@ async function boot() {
   wireUI();
 
   const node = readURL();
+  const restoreTab = state.sidebarTab;
+  const restoreTerm = state.termFocus;
   setView(state.view); // 统一走视图切换逻辑（激活 tab、body class、尺度关联条显隐等）
-  if (node && byId.has(node)) selectNode(node);
+  if (node && byId.has(node)) {
+    selectNode(node);
+    if (restoreTab) openSidebarTab(restoreTab);
+    if (restoreTerm) focusTerm(restoreTerm);
+  }
 }
 
 function renderCurrent() {
@@ -104,7 +110,8 @@ function wireUI() {
   });
 
   document.getElementById('onlyCore').addEventListener('change', e => { state.onlyCore = e.target.checked; applyState(); updateURL(); });
-  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null; reflectEraActive(); reflectScaleActive(); applyState(); updateURL(); });
+  // 关闭侧栏只收起面板，保留选中节点与关联高亮——关掉后应能在画布上看到关联节点（移动端侧栏全屏遮挡，尤为关键）
+  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); });
 
   stage.addEventListener('click', e => {
     if (consumeDrag()) return;
@@ -160,7 +167,14 @@ function wireUI() {
   });
 
   window.addEventListener('pp:esc', () => {
-    if (state.sidebarOpen) { closeSidebar(); state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null; reflectEraActive(); reflectScaleActive(); applyState(); updateURL(); }
+    if (state.sidebarOpen) {
+      // 第一下 Esc：只收起侧栏，保留选中与关联高亮，方便在画布上查看关联节点
+      closeSidebar();
+    } else if (state.selected || state.activeEra || state.activeScale) {
+      // 侧栏已收起：再次 Esc 才彻底退出聚焦态
+      state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null;
+      reflectEraActive(); reflectScaleActive(); applyState(); updateURL();
+    }
   });
 
   document.getElementById('shareBtn').addEventListener('click', () => {
@@ -169,6 +183,41 @@ function wireUI() {
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
   window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });
+
+  // 术语链接：跳转到术语释义锚点，并记录回退位置
+  window.addEventListener('pp:gotoTerm', e => {
+    const { nodeId, termName } = e.detail || {};
+    if (!nodeId || !byId.has(nodeId) || !termName) return;
+    const back = { node: state.selected, tab: state.sidebarTab };
+    const url = new URL(location.href);
+    url.searchParams.set('node', nodeId);
+    url.searchParams.set('tab', 'terms');
+    url.searchParams.set('term', termName);
+    history.pushState({ ppBack: back }, '', url.toString());
+    selectNode(nodeId);
+    focusTerm(termName);
+  });
+
+  // 浏览器回退：恢复跳转前的节点与标签
+  window.addEventListener('popstate', e => {
+    const back = e.state?.ppBack;
+    if (!back) return;
+    state.termFocus = null;
+    if (!back.node || !byId.has(back.node)) {
+      closeSidebar();
+      state.selected = null;
+      state.highlight = new Set();
+      applyState();
+      updateURL();
+      return;
+    }
+    selectNode(back.node);
+    if (back.tab) openSidebarTab(back.tab);
+  });
+
+  // 侧边栏内部状态变化时同步 URL
+  window.addEventListener('pp:updateURL', updateURL);
+
   window.addEventListener('resize', fit);
 }
 
@@ -241,13 +290,20 @@ function updateURL() {
   if (state.filterEra) p.set('era', state.filterEra);
   if (!state.onlyCore) p.set('core', '0');
   if (state.selected) p.set('node', state.selected);
-  history.replaceState(null, '', '?' + p.toString());
+  if (state.sidebarTab) p.set('tab', state.sidebarTab);
+  if (state.termFocus) p.set('term', state.termFocus);
+  const qs = p.toString();
+  const targetQS = qs ? '?' + qs : '';
+  if (location.search === targetQS) return;
+  history.replaceState(history.state, '', targetQS || location.pathname);
 }
 function readURL() {
   const p = new URLSearchParams(location.search);
   if (p.get('view')) state.view = p.get('view');
   if (p.get('era')) state.filterEra = p.get('era');
   if (p.get('core') === '0') state.onlyCore = false;
+  if (p.get('tab')) state.sidebarTab = p.get('tab');
+  if (p.get('term')) state.termFocus = p.get('term');
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === state.view));
   state.activeEra = state.filterEra; // 激活态随筛选态恢复（刷新后保留高亮 + 综述）
   reflectEraActive();

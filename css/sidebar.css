@@ -35,8 +35,9 @@
 .sb-fig__name{font-weight:600;}
 
 /* ── 标签栏 (sb-tabs) ──────────────────────────── */
-.sb-tabs{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(42,38,32,.06);}
-.sb-tab{border:1px solid rgba(42,38,32,.10); background:#fff; color:var(--ink-2); font-size:11px; padding:4px 10px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500; white-space:nowrap;}
+.sb-tabs{display:flex; flex-wrap:nowrap; gap:5px; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(42,38,32,.06); overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none; -webkit-overflow-scrolling:touch;}
+.sb-tabs::-webkit-scrollbar{display:none;}
+.sb-tab{flex:0 0 auto; border:1px solid rgba(42,38,32,.10); background:#fff; color:var(--ink-2); font-size:11px; padding:4px 10px; border-radius:999px; transition:.18s; cursor:pointer; font-weight:500; white-space:nowrap;}
 .sb-tab:hover{border-color:var(--gold); color:var(--gold);}
 .sb-tab.is-active{background:var(--gold); color:#fff; border-color:var(--gold); font-weight:700;}
 
@@ -89,6 +90,9 @@
 .sb-prose__body{font-size:13.5px; line-height:1.82; color:var(--ink);}
 .sb-prose > .sb-prose__body{padding:6px 2px;} /* 无标题的首段/尾段 */
 
+/* ── 隐式分类自动提取容器 ─────────────────────── */
+.sb-section--implicit{border:none; background:transparent; box-shadow:none; padding:0;}
+
 /* ── 空状态 ─────────────────────────────────────── */
 .sb-empty{color:var(--ink-3); font-style:italic; font-size:13px; padding:12px 0;}
 
@@ -129,6 +133,18 @@
 .sb-term--link:hover{box-shadow:0 4px 16px rgba(184,137,59,.18); border-left-color:var(--gold-dark,#8B6914); transform:translateY(-1px);}
 .sb-term__jump{margin-left:auto; font-size:11px; font-weight:600; color:var(--accent,#2C6EBD); opacity:.5; transition:opacity .18s; white-space:nowrap;}
 .sb-term--link:hover .sb-term__jump{opacity:1;}
+
+/* 正文内术语链接 */
+.sb-term-link{color:var(--gold); text-decoration:underline; text-decoration-style:dotted; text-underline-offset:3px; cursor:pointer; transition:.18s; border-radius:4px; padding:0 2px; margin:0 -2px;}
+.sb-term-link:hover{color:var(--ink); background:rgba(184,137,59,.14); text-decoration:none;}
+
+/* 术语跳转高亮闪烁 */
+.sb-term.is-flash{animation:termFlash 1.4s ease;}
+@keyframes termFlash{0%{background:rgba(184,137,59,.22); box-shadow:0 0 0 4px rgba(184,137,59,.22);}100%{background:#fff; box-shadow:0 1px 4px rgba(42,38,32,.05);}}
+
+/* 返回上一页按钮 */
+.sb-back{display:inline-flex; align-items:center; gap:6px; margin:4px 0 10px; padding:5px 12px; border:1px solid var(--gold); background:transparent; color:var(--gold); border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; transition:.18s;}
+.sb-back:hover{background:var(--gold); color:#fff;}
 
 /* ── 路径上下文 (sb-path) ──────────────────────── */
 .sb-path{margin-top:18px; padding-top:14px; border-top:1px dashed rgba(42,38,32,.14); font-size:12px; display:flex; flex-wrap:wrap; gap:4px 10px; align-items:baseline; line-height:1.7;}
