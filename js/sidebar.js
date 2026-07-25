@@ -544,7 +544,6 @@ export function openScale(scale, focusRel) {
 
 /* ── 关闭侧边栏 ───────────────────────────────────────── */
 export function closeSidebar() {
-  console.log('[DBG] CLOSE_SIDEBAR');
   const sb = document.getElementById('sidebar');
   sb.classList.remove('is-open'); sb.setAttribute('aria-hidden', 'true');
   state.sidebarOpen = false;
