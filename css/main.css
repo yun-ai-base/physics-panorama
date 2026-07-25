@@ -91,6 +91,7 @@ button{font-family:inherit; cursor:pointer;}
   border-bottom:1px solid rgba(42,38,32,.06); gap:12px;
 }
 body.view-scale .scale-map-bar{display:flex;}
+body.view-scale .era-nav{display:none;}
 .scale-map-bar__chain{display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:center;}
 .scale-map-bar__chip{
   border:none; border-radius:999px; padding:5px 13px; font-size:13px; font-weight:700;
