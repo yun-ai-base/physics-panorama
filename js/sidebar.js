@@ -18,10 +18,19 @@ export function initSidebar(nodes, summaries) {
 }
 
 /* ─��� 人物行 ─────────────────────────────────────────── */
+function figureNodeIds(name) {
+  const ids = [];
+  for (const n of NODES) {
+    const fs = n.figures || [];
+    if (fs.some(f => (typeof f === 'string' ? f : f?.name) === name)) ids.push(n.id);
+  }
+  return ids;
+}
+
 function figuresHTML(n) {
   if (!n.figures || !n.figures.length) return '';
   return `<div class="sb-figures">${n.figures.map(f =>
-    `<div class="sb-fig">${avatarImg(f)}<span class="sb-fig__name">${esc(f)}</span></div>`
+    `<button class="sb-fig sb-fig--link" type="button" data-name="${esc(f)}">${avatarImg(f)}<span class="sb-fig__name">${esc(f)}</span></button>`
   ).join('')}</div>`;
 }
 
@@ -633,6 +642,10 @@ export function openNode(id) {
   `;
 
   bindAvatars(body);
+  // 绑定人物头像/名字点击 → 打开人物索引视点
+  body.querySelectorAll('.sb-fig--link').forEach(btn => {
+    btn.addEventListener('click', () => openPerson(btn.dataset.name, figureNodeIds(btn.dataset.name)));
+  });
   // 绑定返回按钮
   body.querySelector('[data-action="back"]')?.addEventListener('click', () => history.back());
   // 绑定"继承自/影响至"跳转链接

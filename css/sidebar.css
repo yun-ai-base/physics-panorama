@@ -29,7 +29,10 @@
 
 /* 人物行 */
 .sb-figures{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
-.sb-fig{display:inline-flex; align-items:center; gap:7px; background:var(--bg-2); border:1px solid rgba(42,38,32,.07); border-radius:999px; padding:4px 12px 4px 5px; font-size:12px; color:var(--ink);}
+.sb-fig{display:inline-flex; align-items:center; gap:7px; background:var(--bg-2); border:1px solid rgba(42,38,32,.07); border-radius:999px; padding:4px 12px 4px 5px; font-size:12px; color:var(--ink); font:inherit;}
+.sb-fig--link{cursor:pointer; transition:background .18s, border-color .18s, transform .12s;}
+.sb-fig--link:hover{background:rgba(184,137,59,.12); border-color:rgba(184,137,59,.28);}
+.sb-fig--link:active{transform:scale(.97);}
 .sb-fig .avatar{width:26px; height:26px; border-radius:50%; object-fit:cover; border:1px solid rgba(42,38,32,.10); flex:0 0 auto; background:var(--gold-tint);}
 .sb-fig .avatar--fallback{display:inline-flex; align-items:center; justify-content:center; font-family:var(--font-serif); font-size:12px; color:var(--gold); background:var(--gold-tint); font-weight:700; border-radius:50%;}
 .sb-fig__name{font-weight:600;}
