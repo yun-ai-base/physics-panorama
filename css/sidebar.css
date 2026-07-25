@@ -45,9 +45,21 @@
 
 /* ── 分区卡片 (sb-section) ──────────────────────── */
 .sb-section{background:#fff; border:1px solid rgba(42,38,32,.07); border-radius:10px; padding:14px 16px; margin:10px 0; box-shadow:0 1px 3px rgba(42,38,32,.04);}
+.sb-section--ref{border:none; background:transparent; box-shadow:none; padding:14px 0;}
+.sb-section--ref .sb-section__body{padding:0;}
 .sb-section__title{font-size:13.5px; font-weight:700; color:var(--gold-dark,#8B6914); margin-bottom:6px; display:flex; align-items:center; gap:6px;}
 .sb-section__title::before{content:''; width:3px; height:14px; background:var(--gold); border-radius:2px; flex-shrink:0;}
+.sb-section__title--h4{font-size:12px; color:var(--ink-2); letter-spacing:.4px;}
+.sb-section__title--h4::before{display:none;}
 .sb-section__body{font-size:13px; line-height:1.75; color:var(--ink);}
+
+/* ── 参考文献列表 (sb-ref-list) ─────────────────── */
+.sb-ref-list{margin:6px 0 10px;}
+.sb-ref-list__cat{font-size:12.5px; font-weight:700; color:var(--ink); margin:14px 0 6px; padding-bottom:4px; border-bottom:1px dashed rgba(184,137,59,.25);}
+.sb-ref-list__cat:first-child{margin-top:4px;}
+.sb-ref-list__item{font-size:12px; line-height:1.72; color:var(--ink-2); padding:5px 0 5px 16px; position:relative; word-break:break-word;}
+.sb-ref-list__item::before{content:'·'; position:absolute; left:4px; color:var(--gold); font-weight:700; font-size:14px;}
+.sb-ref-list__item em{font-style:italic; color:var(--ink-2);}
 
 /* ── 时间线索引 (sb-tl) ────────────────────────── */
 .sb-tl{margin:10px 0;}

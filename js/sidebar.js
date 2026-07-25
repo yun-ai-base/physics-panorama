@@ -1,11 +1,10 @@
 import { state } from './state.js';
 import { esc, chain } from './utils.js';
-import { ERAS, DIMENSIONS } from './config.js';
+import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
 import { avatarImg, bindAvatars } from './data/portraitMap.js';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();
-const SCALE_LABEL = { mesoscopic:'中观', cosmic:'宇观', microscopic:'微观', unified:'统一', feedback:'反哺' };
 const MATURITY_LABEL = { foundation:'🏛 地基型', established:'🔬 成熟型', speculative:'🔮 探索型' };
 
 export function initSidebar(nodes, summaries) {
@@ -67,9 +66,11 @@ function splitTimelineItemsSafe(block) {
  * 核心解析器：将原始长文转为结构化 HTML。
  *
  * 解析规则（按优先级）：
- *   1. **加粗标题** 开头 → .sb-section 分区卡片
- *   2. looksLikeTimeline() 通过 → .sb-tl 时间线索引
- *   3. 其他 → .sb-para 普通段落
+ *   1. #### / ### / ##  markdown 标题 → .sb-section 分区卡片
+ *   2. **加粗标题** 开头（:/: ：）→ .sb-section 分区卡片
+ *   3. looksLikeTimeline() 通过 → .sb-tl 时间线索引
+ *   4. - 开头的列表（≥2项）→ .sb-ref-list 参考文献列表
+ *   5. 其他 → .sb-para 普通段落
  */
 function parseContent(raw) {
   if (!raw || typeof raw !== 'string' || !raw.trim()) return '<p class="sb-empty">暂无内容</p>';
@@ -78,7 +79,16 @@ function parseContent(raw) {
   const html = [];
 
   for (const block of blocks) {
-    // 规则1：**标题** 开头 → 分区卡
+    // 规则1：markdown # 标题 → 分区卡标题
+    const mdHeading = block.match(/^\s*(#{1,4})\s+(.+?)\s*$/);
+    if (mdHeading) {
+      const level = mdHeading[1].length;
+      const title = mdHeading[2].replace(/^\*\*(.+?)\*\*$/, '$1'); // 去掉可能的包裹 **
+      html.push(`<div class="sb-section sb-section--ref"><div class="sb-section__title sb-section__title--h${level}">${esc(title)}</div><div class="sb-section__body"></div></div>`);
+      continue;
+    }
+
+    // 规则2：**标题** 开头 → 分区卡
     const headingMatch = block.match(/^\s*\*\*(.+?)\*\*(?:[\s：:])/);
     if (headingMatch) {
       const title = headingMatch[1];
@@ -88,7 +98,7 @@ function parseContent(raw) {
       continue;
     }
 
-    // 规则2：严格时间线检测
+    // 规则3：严格时间线检测
     if (looksLikeTimeline(block)) {
       const items = splitTimelineItemsSafe(block);
       if (items.length >= 2) {
@@ -99,7 +109,21 @@ function parseContent(raw) {
       }
     }
 
-    // 规则3：普通段落
+    // 规则4：- 开头的列表（≥2项）→ 参考文献列表
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    const listItems = lines.filter(l => /^[-*·]\s/.test(l));
+    if (listItems.length >= 2 && listItems.length === lines.length) {
+      html.push(`<div class="sb-ref-list">${listItems.map(li => {
+        const text = li.replace(/^[-*·]\s+/, '');
+        // 检测 **分类名：** 前缀作为子标题
+        const catMatch = text.match(/^\*\*(.+?)\*\*[：:]\s*$/);
+        if (catMatch) return `<div class="sb-ref-list__cat">${esc(catMatch[1])}</div>`;
+        return `<div class="sb-ref-list__item">${inlineBoldToTag(text)}</div>`;
+      }).join('')}</div>`);
+      continue;
+    }
+
+    // 规则5：普通段落
     html.push(`<div class="sb-para">${inlineBoldToTag(block)}</div>`);
   }
 
@@ -253,6 +277,30 @@ export function openEra(era) {
     <div class="sb-panel">
       <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(txt || '')}</div>
       <div class="sb-stats">本纪元收录 <b>${count}</b> 个学说 / 事件${events ? `，含 <b>${events}</b> 个里程碑` : ''}。点击时间线节点深入探索。</div>
+    </div>`;
+  sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
+  state.sidebarOpen = true;
+}
+
+/* ── 打开尺度维度概念解析 ─────────────────────────────── */
+export function openScale(scale) {
+  const d = SCALE_DESC[scale]; if (!d) return;
+  const cfg = SCALE_COLORS[scale];
+  const sb = document.getElementById('sidebar'); const body = document.getElementById('sidebarBody');
+  const count = NODES.filter(n => n.scale === scale).length;
+  const names = NODES.filter(n => n.scale === scale).map(n => n.name).join('、');
+  body.innerHTML = `
+    <div class="sb-head">
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${cfg.raw}"></span>${SCALE_LABEL[scale]} · 尺度维度</div>
+      <div class="sb-head__title">${esc(SCALE_LABEL[scale])}<small>概念解析与延伸</small></div>
+      <div class="sb-head__quote">${esc(d.tag || '')}</div>
+    </div>
+    <div class="sb-panel">
+      <div class="sb-sec-label">概念解析</div>
+      <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(d.concept || '')}</div>
+      <div class="sb-sec-label">延伸</div>
+      <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(d.extend || '')}</div>
+      <div class="sb-stats">本尺度收录 <b>${count}</b> 个学说 / 事件：${esc(names)}</div>
     </div>`;
   sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
   state.sidebarOpen = true;
