@@ -97,6 +97,38 @@
 }
 .mindmap-reset:hover { background: var(--gold-tint, rgba(184, 137, 59, .12)); }
 
+/* ── 全屏按钮 ── */
+.mindmap-fullscreen {
+  border: 1px solid rgba(184, 137, 59, .4);
+  background: #fff;
+  color: var(--gold-dark, #8B6914);
+  padding: 5px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12.5px;
+  transition: background .2s;
+}
+.mindmap-fullscreen:hover { background: var(--gold-tint, rgba(184, 137, 59, .12)); }
+
+/* ── 全屏模式 ── */
+/* 当 body 带 mm-fs 类时，隐藏顶栏、让思维导图撑满整个视口 */
+body.mm-fs .topbar { display: none !important; }
+body.mm-fs #app { height: 100vh; }
+body.mm-fs .stage-wrap,
+body.mm-fs .stage { position: static; }
+/* void-view 从 absolute inset:0 变成撑满 stage（stage 现在就是整个视口） */
+body.mm-fs .void-view {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+/* 全屏时子选项栏和工具栏保留，SVG 撑满剩余空间 */
+body.mm-fs .void-mindmap {
+  height: 100vh;
+}
+/* 全屏按钮文字切换 */
+body.mm-fs .mindmap-fullscreen::after { content: ' 退出全屏'; }
+
 .mindmap-svg {
   flex: 1 1 auto;
   width: 100%;
