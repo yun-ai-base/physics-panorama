@@ -7,7 +7,7 @@ import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, op
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
-import { initMindmap, renderMindmap, resetMindmap, setExpandAll } from './mindmap.js';
+import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode } from './mindmap.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -439,6 +439,11 @@ function wireUI() {
     }
     selectNode(id);
     if (!window.matchMedia('(max-width:768px)').matches) focusNode(id);
+    // 联动思维导图：自动切到思维导图、展开该学说维度、高亮其分支路径并缩放定位（按图索骥）
+    if (state.view !== 'void') setView('void');
+    voidTab = 'mindmap';
+    activateVoidTab('mindmap');
+    focusMindmapNode(id);
     const dimZh = tags.find(t => DIM_KEY_MAP[t]);
     if (dimZh) openSidebarTab(DIM_KEY_MAP[dimZh]);
   });
