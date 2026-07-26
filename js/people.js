@@ -1,7 +1,13 @@
 // 人物索引视图：从节点列表提取唯一人物，渲染为卡片网格
 import { esc } from './utils.js';
-import { ERAS } from './config.js';
+import { ERAS, UI_LABELS } from './config.js';
+import { state } from './state.js';
 import { avatarImg, bindAvatars, portraitName } from './data/portraitMap.js';
+
+function t(key, ...args) {
+  const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];
+  return typeof v === 'function' ? v(...args) : v ?? key;
+}
 
 // 从节点列表提取唯一人物及其关联学说（按关联数降序）。
 // 同一人物的不同称呼（如"阿尔伯特·爱因斯坦（预言）"）按肖像别名归一合并为一张卡，避免重复。
@@ -35,17 +41,17 @@ export function buildPeople(nodes) {
 // 渲染人物网格到 container；onPick(name) 回调
 export function renderPeople(container, people, onPick) {
   if (!people || !people.length) {
-    container.innerHTML = '<div class="people-empty">暂无人物的数据</div>';
+    container.innerHTML = `<div class="people-empty">${t('peopleEmpty')}</div>`;
     return;
   }
   container.innerHTML = people.map(p => {
     const sw = p.eras
       .map(e => `<i class="swatch" style="background:${ERAS[e] ? ERAS[e].raw : 'var(--ink-3)'}"></i>`)
       .join(' ');
-    return `<button class="person-card" data-name="${esc(p.name)}" title="${esc(p.name)}" aria-label="${esc(p.name)}，关联 ${p.nodeIds.length} 个理论节点">
+    return `<button class="person-card" data-name="${esc(p.name)}" title="${esc(p.name)}" aria-label="${esc(p.name)}, ${t('peopleRelated', p.nodeIds.length)}">
       <span class="person-card__avatar">${avatarImg(p.name)}</span>
       <span class="person-card__name">${esc(p.name)}</span>
-      <span class="person-card__meta">${sw}<span>${p.nodeIds.length} 个关联</span></span>
+      <span class="person-card__meta">${sw}<span>${t('peopleRelated', p.nodeIds.length)}</span></span>
     </button>`;
   }).join('');
   bindAvatars(container);
@@ -67,5 +73,5 @@ export function filterPeopleGrid(query) {
     if (hit) shown++;
   });
   const cnt = document.getElementById('peopleCount');
-  if (cnt) cnt.textContent = q ? `匹配 ${shown} / ${grid.children.length} 位` : `共 ${grid.children.length} 位`;
+  if (cnt) cnt.textContent = q ? t('peopleCountMatch', shown, grid.children.length) : t('peopleCountTotal', grid.children.length);
 }

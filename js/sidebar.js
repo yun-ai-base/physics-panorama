@@ -795,18 +795,19 @@ export function openScale(scale, focusRel) {
     </div>`;
   }).join('');
 
+  const scaleName = state.lang === 'en' ? (SCALE_LABEL_EN[scale] || scale) : SCALE_LABEL[scale];
   body.innerHTML = `
     <div class="sb-head">
-      <div class="sb-head__era"><span class="sb-swatch" style="background:${cfg.raw}"></span>${SCALE_LABEL[scale]} · 尺度维度</div>
-      <div class="sb-head__title">${esc(SCALE_LABEL[scale])}<small>概念解析与延伸</small></div>
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${cfg.raw}"></span>${scaleName} · ${t('scaleDimension')}</div>
+      <div class="sb-head__title">${esc(scaleName)}<small>${t('scaleAnalysis')}</small></div>
       <div class="sb-head__quote">${esc(d.tag || '')}</div>
     </div>
     <div class="sb-panel">
-      <div class="sb-sec-label">概念解析</div>
+      <div class="sb-sec-label">${t('scaleConcept')}</div>
       ${defRow}${scaleRow}${theoryRow}${phenoRow}
-      <div class="sb-sec-label">尺度间渗透</div>
+      <div class="sb-sec-label">${t('scalePenetration')}</div>
       <div class="sb-rel-list">${relItems}</div>
-      <div class="sb-stats">本尺度收录 <b>${count}</b> 个学说 / 事件：${esc(names)}</div>
+      <div class="sb-stats">${t('scaleStatsPrefix', count)}${esc(names)}</div>
     </div>`;
 
   // 若从「尺度关联图」箭头定位而来，滚动并高亮对应渗透说明
@@ -858,19 +859,21 @@ export function openPerson(name, nodeIds) {
   const mainBio = bios.reduce((best, cur) => cur.length > best.length ? cur : best, '');
 
   const bioHtml = mainBio
-    ? `<div class="sb-bio"><div class="sb-bio__title">人物简介</div><div class="sb-bio__body">${parseContent(mainBio)}</div></div>`
+    ? `<div class="sb-bio"><div class="sb-bio__title">${t('personBio')}</div><div class="sb-bio__body">${parseContent(mainBio)}</div></div>`
     : '';
 
   const cards = nodes.map(n => {
     const era = ERAS[n.era];
+    const eraName = state.lang === 'en' ? era.nameEn : era.name;
+    const nodeName = state.lang === 'en' ? (n.nameEn || n.name) : n.name;
     const snippet = personSnippet(n, name);
     const cleanSnippet = esc(stripInlineBold(snippet)).replace(/\n/g, ' ');
     return `
       <button class="sb-node-card" data-id="${esc(n.id)}">
         <div class="sb-node-card__head">
-          <span class="sb-node-card__name">${esc(n.name)}</span>
+          <span class="sb-node-card__name">${esc(nodeName)}</span>
           <span class="sb-node-card__meta">
-            <span class="sb-chip" style="background:${era.raw}18;color:${era.raw};border-color:${era.raw}40">${esc(era.name)}</span>
+            <span class="sb-chip" style="background:${era.raw}18;color:${era.raw};border-color:${era.raw}40">${esc(eraName)}</span>
             <span class="sb-chip">${esc(String(n.year))}</span>
           </span>
         </div>
@@ -880,17 +883,17 @@ export function openPerson(name, nodeIds) {
 
   body.innerHTML = `
     <div class="sb-head sb-head--person">
-      <div class="sb-head__era">人物索引</div>
+      <div class="sb-head__era">${t('peopleIndex')}</div>
       <div class="sb-person-head">
         <span class="sb-person-head__avatar">${avatarImg(name)}</span>
         <div class="sb-person-head__text">
           <div class="sb-person-head__name">${esc(name)}</div>
-          <div class="sb-person-head__meta">关联 ${ids.length} 个学说 / 事件${eraLabel}</div>
+          <div class="sb-person-head__meta">${t('relatedCount', ids.length)}${eraLabel}</div>
         </div>
       </div>
     </div>
     ${bioHtml}
-    <div class="sb-sec-label">关联学说 / 事件</div>
+    <div class="sb-sec-label">${t('relatedTheoryEvents')}</div>
     <div class="sb-node-list">${cards}</div>`;
 
   bindAvatars(body);

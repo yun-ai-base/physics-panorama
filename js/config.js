@@ -228,6 +228,13 @@ export const UI_LABELS = {
     scaleConcept: '概念解析',
     scalePenetration: '尺度间渗透',
     scaleStatsPrefix: (n) => `本尺度收录 <b>${n}</b> 个学说 / 事件：`,
+    personBio: '人物简介',
+    relatedTheoryEvents: '关联学说 / 事件',
+    relatedCount: (n) => `关联 <b>${n}</b> 个学说 / 事件`,
+    peopleEmpty: '暂无人物的数据',
+    peopleRelated: (n) => `${n} 个关联`,
+    peopleCountTotal: (n) => `共 ${n} 位`,
+    peopleCountMatch: (shown, total) => `匹配 ${shown} / ${total} 位`,
   },
   en: {
     viewTimeline: 'Timeline',
@@ -290,5 +297,12 @@ export const UI_LABELS = {
     scaleConcept: 'Concept',
     scalePenetration: 'Cross-scale Penetration',
     scaleStatsPrefix: (n) => `<b>${n}</b> theories / events in this scale: `,
+    personBio: 'Biography',
+    relatedTheoryEvents: 'Related Theories & Events',
+    relatedCount: (n) => `Related to <b>${n}</b> theories & events`,
+    peopleEmpty: 'No figure data',
+    peopleRelated: (n) => `${n} related`,
+    peopleCountTotal: (n) => `${n} figures`,
+    peopleCountMatch: (shown, total) => `Match ${shown} / ${total}`,
   }
 };
