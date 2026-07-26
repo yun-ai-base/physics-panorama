@@ -19,7 +19,7 @@
   .search input{width:100%; max-width:300px;}
   .era-nav{flex-wrap:wrap; gap:8px; height:auto; padding:8px 14px;}
   .hint{display:block; bottom:10px; font-size:0; color:transparent; white-space:nowrap;}
-  .hint::after{content:"单指拖拽平移 · 双指捏合缩放 · 点击节点"; font-size:11px; color:var(--ink-3); letter-spacing:.5px;}
+  .hint::after{content:var(--hint-mobile, "单指拖拽平移 · 双指捏合缩放 · 点击节点"); font-size:11px; color:var(--ink-3); letter-spacing:.5px;}
   .people-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; padding:0 4px;}
 
   /* 手机端 SVG 节点优化 */

@@ -127,18 +127,18 @@ body.mm-fs .void-view {
 body.mm-fs .mindmap-toolbar {
   flex-wrap: nowrap;
 }
-/* 全屏：画布铺满整个视口宽度。
-   用 absolute inset:0 脱离 flex column 容器，避免 <svg> 作为替换元素（replaced
-   element）在 cross-axis 上不自动横向 stretch，而导致画布宽度被压成工具栏那一行
-   内容宽度（左右露一大截空白）。 */
+/* 全屏：画布占满整个视口宽。
+   基于 d317846d 已验证「可见」的状态（.void-mindmap 仍是 #voidView 的普通
+   flex 子、height:100vh、布局流不变，工具栏正常在顶部），只额外给画布
+   一个明确的视口宽度，避免 <svg> 作为替换元素在 flex 子项上横向不自动
+   stretch 而被压成工具栏那一行宽。
+   不用 absolute（会让容器脱离 flex 流、包含块高度塌缩，导致整块消失）。 */
 body.mm-fs .void-mindmap {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  width: auto; height: auto;
-  display: flex; flex-direction: column;
+  height: 100vh;
+  width: 100vw;
 }
 body.mm-fs .mindmap-svg {
-  width: 100% !important;
+  width: 100vw !important;
 }
 
 .mindmap-svg {

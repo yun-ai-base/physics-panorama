@@ -850,12 +850,12 @@ export function openScale(scale, focusRel) {
   const names = NODES.filter(n => n.scale === scale).map(n => state.lang === 'en' ? (n.nameEn || n.name) : n.name).join(', ');
 
   const chips = arr => (arr || []).map(t => `<span class="sb-tag" style="--tag:${cfg.raw}">${esc(t)}</span>`).join('');
-  const defRow = c.def ? `<div class="sb-dl"><dt>定义</dt><dd>${esc(c.def)}</dd></div>` : '';
-  const scaleRow = c.scale ? `<div class="sb-dl"><dt>特征尺度</dt><dd>${esc(c.scale)}</dd></div>` : '';
+  const defRow = c.def ? `<div class="sb-dl"><dt>${t('scaleDefLabel')}</dt><dd>${esc(c.def)}</dd></div>` : '';
+  const scaleRow = c.scale ? `<div class="sb-dl"><dt>${t('scaleScaleLabel')}</dt><dd>${esc(c.scale)}</dd></div>` : '';
   const theoryRow = (c.theories && c.theories.length)
-    ? `<div class="sb-dl"><dt>代表理论</dt><dd><div class="sb-tags">${chips(c.theories)}</div></dd></div>` : '';
+    ? `<div class="sb-dl"><dt>${t('scaleTheoryLabel')}</dt><dd><div class="sb-tags">${chips(c.theories)}</div></dd></div>` : '';
   const phenoRow = (c.phenomena && c.phenomena.length)
-    ? `<div class="sb-dl"><dt>典型现象</dt><dd><div class="sb-tags">${chips(c.phenomena)}</div></dd></div>` : '';
+    ? `<div class="sb-dl"><dt>${t('scalePhenoLabel')}</dt><dd><div class="sb-tags">${chips(c.phenomena)}</div></dd></div>` : '';
 
   const relItems = (d.extend || []).map((e, i) => {
     const isFocus = focusRel && e.rel === focusRel;
@@ -921,7 +921,7 @@ export function openPerson(name, nodeIds) {
   const ids = (nodeIds || []).filter(id => byId.has(id));
   const nodes = ids.map(id => byId.get(id));
 
-  const eras = [...new Set(nodes.map(n => n.era))].map(e => ERAS[e]?.name).filter(Boolean);
+  const eras = [...new Set(nodes.map(n => n.era))].map(e => state.lang === 'en' ? (ERAS[e]?.nameEn || ERAS[e]?.name) : ERAS[e]?.name).filter(Boolean);
   const eraLabel = eras.length ? ` · ${eras.join(' / ')}` : '';
 
   // 聚合人物简介：取最长一段（优先 figures_detail/biography，其次 summary）

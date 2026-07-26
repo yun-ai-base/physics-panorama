@@ -228,6 +228,10 @@ function applyUILanguage() {
 
   // 手机端 <480px 竖排卡片列表：同步语言（仅超小屏生效）
   if (typeof syncMobile === 'function' && window.matchMedia('(max-width:480px)').matches) syncMobile();
+
+  // 移动端 ::after 提示文案（CSS 变量驱动）
+  const hintMobile = en ? 'Drag · Pinch to zoom · Tap node' : '单指拖拽平移 · 双指捏合缩放 · 点击节点';
+  document.documentElement.style.setProperty('--hint-mobile', `"${hintMobile}"`);
 }
 
 // 纪元顶栏标签（随语言切换重建；点击监听在 wireUI 用事件委托一次绑定）
@@ -249,6 +253,13 @@ function applyLang() {
   buildEraTabs();
   applyUILanguage();
   if (state.selected) openNode(state.selected);
+  // 切语言时重渲染思维导图（mindmap.js 内部按 state.lang 取 nameEn/labelEn/nameEn）
+  if (state.view === 'void') renderMindmap();
+  // 切语言时重渲染人物索引（people.js 内部按 state.lang 取 personNameEn）
+  if (state.view === 'people') {
+    const pg = document.getElementById('peopleGrid');
+    if (pg) renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
+  }
   updateURL();
 }
 
@@ -259,7 +270,8 @@ function showEraPreface(era) {
   const d = PREFACES[era];
   const info = ERAS[era];
   const tag = document.getElementById('epTag');
-  tag.textContent = (info ? info.name : era) + (d.range ? ' · ' + d.range : '');
+  const eraName = state.lang === 'en' ? (info?.nameEn || info?.name || era) : (info?.name || era);
+  tag.textContent = eraName + (d.range ? ' · ' + d.range : '');
   tag.style.color = info ? info.raw : 'var(--gold)';
   document.getElementById('epTitle').textContent = d.title || (info ? info.name : era);
   document.getElementById('epLead').textContent = d.lead || '';

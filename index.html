@@ -54,7 +54,7 @@
 
     <!-- 尺度维度关联图（仅在尺度视图显示） -->
       <div class="scale-map-bar" id="scaleMapBar" hidden>
-        <span class="scale-map-bar__hint">尺度筛选</span>
+        <span class="scale-map-bar__hint" data-i18n="scaleFilterHint">尺度筛选</span>
         <div class="scale-map-bar__chain">
           <button class="scale-map-bar__chip" data-scale="microscopic" style="--tag:#6B489E" title="尺度维度筛选（非视图切换）：点击查看「微观」尺度的概念解析">微观</button>
           <span class="scale-map-bar__arrow" data-scale="microscopic" data-rel="微观 → 宏观 · 涌现">涌现</span>
@@ -171,15 +171,15 @@
         <!-- 选项二：思维导图 -->
         <div class="void-mindmap" id="voidMindmap" hidden>
         <div class="mindmap-toolbar">
-          <span class="mindmap-caption">物理史 · 全景总览</span>
+          <span class="mindmap-caption" data-i18n="mmCaption">物理史 · 全景总览</span>
           <span class="mindmap-legend">
-              <span class="lg"><i style="border-top-color:#C0392B;border-top-style:dashed"></i>范式革命</span>
-              <span class="lg"><i style="border-top-color:#E67E22;border-top-style:dashed"></i>理论冲突</span>
-              <span class="lg"><i style="border-top-color:#C9A24E"></i>继承脉络</span>
-              <span class="lg"><i style="border-top-color:#2E8B57"></i>统一 / 分支</span>
+              <span class="lg" data-i18n="mmLegendRevolution"><i style="border-top-color:#C0392B;border-top-style:dashed"></i>范式革命</span>
+              <span class="lg" data-i18n="mmLegendConflict"><i style="border-top-color:#E67E22;border-top-style:dashed"></i>理论冲突</span>
+              <span class="lg" data-i18n="mmLegendInherit"><i style="border-top-color:#C9A24E"></i>继承脉络</span>
+              <span class="lg" data-i18n="mmLegendUnify"><i style="border-top-color:#2E8B57"></i>统一 / 分支</span>
             </span>
-            <label class="mindmap-toggle"><input type="checkbox" id="mmExpandAll" /> 展开全部维度</label>
-            <button class="mindmap-reset" id="mmReset" type="button">重置视图</button>
+            <label class="mindmap-toggle"><input type="checkbox" id="mmExpandAll" /> <span data-i18n="mmExpandAll">展开全部维度</span></label>
+            <button class="mindmap-reset" id="mmReset" type="button" data-i18n="mmReset">重置视图</button>
             <button class="mindmap-fullscreen" id="mmFullscreen" type="button" title="全屏模式">⛶ 全屏</button>
           </div>
           <svg class="mindmap-svg" id="mindmapSvg" xmlns="http://www.w3.org/2000/svg">

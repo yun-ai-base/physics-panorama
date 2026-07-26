@@ -7,6 +7,12 @@
 
 import { state } from './state.js';
 import { closeSidebar, focusTerm } from './sidebar.js';
+import { UI_LABELS } from './config.js';
+
+function t(key, ...args) {
+  const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];
+  return typeof v === 'function' ? v(...args) : v ?? key;
+}
 
 /* ── 复用既有的「聚焦节点」通道（零侵入） ─────────────── */
 function gotoNode(id) {
@@ -261,20 +267,20 @@ function render() {
   const steps = cur.steps;
   const i = cur.idx;
   const s = steps[i];
-  const kicker = cur.kind === '3min' ? '3 分钟概览' : '10 分钟全览';
+  const kicker = t(cur.kind === '3min' ? 'tour3min' : 'tour10min');
 
   // 先执行本步导航（同步触发既有通道）
   if (s.onEnter) s.onEnter();
 
   card.innerHTML = `
-    <div class="pp-tour-card__kicker">${kicker} · 第 ${i + 1} / ${steps.length} 步</div>
+    <div class="pp-tour-card__kicker">${kicker} · ${t('tourStep', i + 1, steps.length)}</div>
     <h3 class="pp-tour-card__title">${s.title}</h3>
     <div class="pp-tour-card__body">${s.text}</div>
     <div class="pp-tour-card__foot">
-      <button class="pp-tour-btn pp-tour-btn--ghost" data-act="skip" type="button">跳过</button>
+      <button class="pp-tour-btn pp-tour-btn--ghost" data-act="skip" type="button">${t('tourSkip')}</button>
       <div class="pp-tour-card__nav">
-        ${i > 0 ? '<button class="pp-tour-btn pp-tour-btn--ghost" data-act="prev" type="button">上一步</button>' : ''}
-        <button class="pp-tour-btn pp-tour-btn--primary" data-act="next" type="button">${i < steps.length - 1 ? '下一步' : '完成'}</button>
+        ${i > 0 ? `<button class="pp-tour-btn pp-tour-btn--ghost" data-act="prev" type="button">${state.lang === 'en' ? 'Prev' : '上一步'}</button>` : ''}
+        <button class="pp-tour-btn pp-tour-btn--primary" data-act="next" type="button">${i < steps.length - 1 ? t('tourNext') : t('tourFinish')}</button>
       </div>
     </div>`;
 

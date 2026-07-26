@@ -11,9 +11,13 @@
 //     高亮其分支路径（根 → 纪元 → 学说）并缩放定位，实现「按图索骥」。
 // ════════════════════════════════════════════════════════════════
 
-import { ERAS, ERA_ORDER, DIMENSIONS } from './config.js';
+import { ERAS, ERA_ORDER, DIMENSIONS, UI_LABELS } from './config.js';
 import { esc } from './utils.js';
 import { state } from './state.js';
+
+function t(key) {
+  return UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key] ?? key;
+}
 
 // ── 布局常量（画布坐标，单位 px，最终由 transform 缩放适配视口） ──
 const X_ROOT = 150;
@@ -276,36 +280,48 @@ function render() {
 }
 
 function drawRoot(p, parent) {
-  const g = mk('g', { class: 'mm-node mm-root', 'data-kind': 'root', tabindex: '0', role: 'button', 'aria-label': '物理学全景 · 根节点' }, parent);
+  const rootLabel = state.lang === 'en' ? 'Physics Panorama' : '物理学全景';
+  const rootAria = state.lang === 'en' ? 'Physics Panorama · Root' : '物理学全景 · 根节点';
+  const g = mk('g', { class: 'mm-node mm-root', 'data-kind': 'root', tabindex: '0', role: 'button', 'aria-label': rootAria }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 14, class: 'mm-rect mm-rect--root' }, g);
-  mk('text', { x: p.x, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--root' }, g).textContent = '物理学全景';
+  mk('text', { x: p.x, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--root' }, g).textContent = rootLabel;
 }
 function drawEra(p, parent) {
-  const g = mk('g', { class: 'mm-node mm-era', 'data-kind': 'era', 'data-era': p.era, tabindex: '0', role: 'button', 'aria-label': ERAS[p.era].name + ' 纪元' }, parent);
+  const eraName = state.lang === 'en' ? (ERAS[p.era].nameEn || ERAS[p.era].name) : ERAS[p.era].name;
+  const eraSuffix = state.lang === 'en' ? ' Era' : ' 纪元';
+  const g = mk('g', { class: 'mm-node mm-era', 'data-kind': 'era', 'data-era': p.era, tabindex: '0', role: 'button', 'aria-label': eraName + eraSuffix }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 12, class: 'mm-rect mm-rect--era', style: `fill:${ERAS[p.era].raw}` }, g);
-  mk('text', { x: p.x, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--era' }, g).textContent = ERAS[p.era].name;
+  mk('text', { x: p.x, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--era' }, g).textContent = eraName;
 }
 function drawNode(p, parent) {
   const n = p.node;
   const isCore = n.tier === 'core';
   const hasDims = nodeDims(n).length > 0;
+  const dispName = state.lang === 'en' ? (n.nameEn || n.name) : n.name;
+  const a11yLabel = state.lang === 'en'
+    ? (dispName + (hasDims ? ' — press Enter to expand dimensions' : ''))
+    : (n.name + (hasDims ? ' 理论节点，回车展开维度' : ' 理论节点'));
   const a11y = { class: 'mm-node mm-theory' + (isCore ? ' is-core' : ''), 'data-kind': 'node', 'data-id': n.id, tabindex: '0', role: 'button' };
-  a11y['aria-label'] = n.name + (hasDims ? ' 理论节点，回车展开维度' : ' 理论节点');
+  a11y['aria-label'] = a11yLabel;
   if (hasDims && !expandAll) a11y['aria-expanded'] = String(expanded.has(n.id));
   const g = mk('g', a11y, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 9, class: 'mm-rect mm-rect--node' + (isCore ? ' mm-rect--core' : '') }, g);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: 5, height: p.h, rx: 2, class: 'mm-bar', style: `fill:${ERAS[p.era].raw}` }, g);
-  mk('text', { x: p.x - p.w / 2 + 15, y: p.y + 5, class: 'mm-text mm-text--node' }, g).textContent = truncate(n.name, 13);
+  mk('text', { x: p.x - p.w / 2 + 15, y: p.y + 5, class: 'mm-text mm-text--node' }, g).textContent = truncate(dispName, 13);
   if (!expandAll && hasDims) {
     const open = expanded.has(n.id);
     mk('text', { x: p.x + p.w / 2 - 13, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--toggle' }, g).textContent = open ? '−' : '+';
   }
 }
 function drawDim(p, parent) {
-  const label = (p.nodeName || '该节点') + ' 的 ' + p.dimLabel + ' 维度';
-  const g = mk('g', { class: 'mm-node mm-dim', 'data-kind': 'dim', 'data-id': p.nodeId, 'data-dim': p.dimKey, tabindex: '0', role: 'button', 'aria-label': '打开 ' + label }, parent);
+  const dimDef = DIMENSIONS.find(d => d.key === p.dimKey);
+  const dimLabel = dimDef ? (state.lang === 'en' ? (dimDef.labelEn || dimDef.label) : dimDef.label) : (p.dimLabel || '');
+  const nodeName = p.nodeName ? (state.lang === 'en' ? ((byIdMM?.get(p.nodeName)?.nameEn) || p.nodeName) : p.nodeName) : (state.lang === 'en' ? 'Node' : '该节点');
+  const label = nodeName + (state.lang === 'en' ? ' · ' : ' 的 ') + dimLabel;
+  const ariaOpen = state.lang === 'en' ? 'Open ' : '打开 ';
+  const g = mk('g', { class: 'mm-node mm-dim', 'data-kind': 'dim', 'data-id': p.nodeId, 'data-dim': p.dimKey, tabindex: '0', role: 'button', 'aria-label': ariaOpen + label }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 7, class: 'mm-rect mm-rect--dim' }, g);
-  mk('text', { x: p.x - p.w / 2 + 12, y: p.y + 4, class: 'mm-text mm-text--dim' }, g).textContent = p.dimLabel;
+  mk('text', { x: p.x - p.w / 2 + 12, y: p.y + 4, class: 'mm-text mm-text--dim' }, g).textContent = dimLabel;
 }
 
 // ── 交互：缩放 / 拖拽 / 点击（Pointer Events，兼容鼠标 + 触屏 + 双指缩放） ──
