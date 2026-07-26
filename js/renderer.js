@@ -325,5 +325,7 @@ export function applyState() {
 
 // 供侧栏缩略图读取当前画布坐标（F 项依赖）
 export function getPOS() { return POS; }
+// 供播放模式读取节点原始数据（含 year / era），用于按年份推进镜头
+export function getNodes() { return NODES; }
 // 注册 applyState 之后的钩子（用于刷新缩略图红点等）
 export function onApplyState(fn) { _applyHook = fn; }
