@@ -241,27 +241,27 @@ body.view-people .hint{display:none;}
 .void-view__sub{display:block; margin-top:34px; font-size:14px; color:var(--ink-3); letter-spacing:.2em;}
 @keyframes voidIn{from{transform:translateY(18px); opacity:0;} to{transform:none; opacity:1;}}
 
-/* 虚无-图景 · 意境页 左右淡墨水印诗文 */
+/* 虚无-图景 · 意境页 左右淡墨水印诗文（交替显示：每边一次只显 1 首） */
 .void-view__wm{
   position:absolute; top:50%; transform:translateY(-50%);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  max-width:22vw; overflow:visible;
+  max-width:34vw; overflow:visible;
   pointer-events:none; z-index:0;
 }
-.void-view__wm--left{ left:1vw; }
-.void-view__wm--right{ right:1vw; }
+.void-view__wm--left{ left:3vw; }
+.void-view__wm--right{ right:3vw; }
 
 .void-view__wm-line{
   font-family:var(--font-serif);
-  font-size:clamp(13px, 1.55vw, 19px);
-  line-height:1.45; letter-spacing:.08em; text-align:center;
+  font-size:clamp(16px, 2vw, 26px);
+  line-height:1.6; letter-spacing:.1em; text-align:center;
   color:rgba(42, 38, 32, .28);                 /* 淡墨水印（提高可见度） */
   text-shadow:0 1px 0 rgba(255, 255, 255, .5), 0 0 22px rgba(184, 137, 59, .1);
-  opacity:.96; padding:7px 4px; white-space:normal; word-break:break-word;
+  opacity:.96; padding:10px 8px; white-space:normal; word-break:break-word;
   transition:color .9s ease, text-shadow .9s ease, opacity .9s ease, font-weight .9s ease;
 }
 .void-view__wm-line[hidden]{ display:none !important; }
-.void-view__wm-line.is-hot{                      /* 出现瞬间高亮加黑 */
+.void-view__wm-line.is-hot{                      /* 出现瞬间高亮加黑（全文） */
   color:var(--ink, #2A2620);
   font-weight:700; opacity:1;
   text-shadow:0 2px 18px rgba(184, 137, 59, .22);
