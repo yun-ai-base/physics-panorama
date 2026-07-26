@@ -8,7 +8,6 @@ import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll } from './mindmap.js';
-import { initPlayMode } from './playmode.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -86,9 +85,6 @@ async function boot() {
     if (restoreTab) openSidebarTab(restoreTab);
     if (restoreTerm) focusTerm(restoreTerm);
   }
-
-  // 时间线播放模式（纯增量，内部自行判断数据是否充足）
-  initPlayMode();
 
   // 若 URL 带 ?lang=en，启动即进入英文界面
   if (state.lang === 'en') applyLang();
