@@ -53,20 +53,21 @@
     </div>
 
     <!-- 尺度维度关联图（仅在尺度视图显示） -->
-    <div class="scale-map-bar" id="scaleMapBar" hidden>
-      <div class="scale-map-bar__chain">
-        <button class="scale-map-bar__chip" data-scale="microscopic" style="--tag:#6B489E">微观</button>
-        <span class="scale-map-bar__arrow" data-scale="microscopic" data-rel="微观 → 宏观 · 涌现">涌现</span>
-        <button class="scale-map-bar__chip" data-scale="mesoscopic" style="--tag:#A07840">宏观</button>
-        <span class="scale-map-bar__arrow" data-scale="mesoscopic" data-rel="宏观 ↔ 宇观 · 引力桥梁">引力桥梁</span>
-        <button class="scale-map-bar__chip" data-scale="cosmic" style="--tag:#41518F">宇观</button>
-        <span class="scale-map-bar__arrow" data-scale="unified" data-rel="统一 → 宇观">大统一</span>
-        <button class="scale-map-bar__chip" data-scale="unified" style="--tag:#28684E">统一</button>
-        <span class="scale-map-bar__arrow" data-scale="unified" data-rel="统一 → 反哺">技术回流</span>
-        <button class="scale-map-bar__chip" data-scale="feedback" style="--tag:#6B4E8C">反哺</button>
-        <span class="scale-map-bar__arrow scale-map-bar__arrow--loop" data-scale="feedback" data-rel="反哺 ← 微观">↺ 闭环</span>
+      <div class="scale-map-bar" id="scaleMapBar" hidden>
+        <span class="scale-map-bar__hint">尺度筛选</span>
+        <div class="scale-map-bar__chain">
+          <button class="scale-map-bar__chip" data-scale="microscopic" style="--tag:#6B489E" title="尺度维度筛选（非视图切换）：点击查看「微观」尺度的概念解析">微观</button>
+          <span class="scale-map-bar__arrow" data-scale="microscopic" data-rel="微观 → 宏观 · 涌现">涌现</span>
+          <button class="scale-map-bar__chip" data-scale="mesoscopic" style="--tag:#A07840" title="尺度维度筛选（非视图切换）：点击查看「宏观」尺度的概念解析">宏观</button>
+          <span class="scale-map-bar__arrow" data-scale="mesoscopic" data-rel="宏观 ↔ 宇观 · 引力桥梁">引力桥梁</span>
+          <button class="scale-map-bar__chip" data-scale="cosmic" style="--tag:#41518F" title="尺度维度筛选（非视图切换）：点击查看「宇观」尺度的概念解析">宇观</button>
+          <span class="scale-map-bar__arrow" data-scale="unified" data-rel="统一 → 宇观">大统一</span>
+          <button class="scale-map-bar__chip" data-scale="unified" style="--tag:#28684E" title="尺度维度筛选（非视图切换）：点击查看「统一」尺度的概念解析">统一</button>
+          <span class="scale-map-bar__arrow" data-scale="unified" data-rel="统一 → 反哺">技术回流</span>
+          <button class="scale-map-bar__chip" data-scale="feedback" style="--tag:#6B4E8C" title="尺度维度筛选（非视图切换）：点击查看「反哺」尺度的概念解析">反哺</button>
+          <span class="scale-map-bar__arrow scale-map-bar__arrow--loop" data-scale="feedback" data-rel="反哺 ← 微观">↺ 闭环</span>
+        </div>
       </div>
-    </div>
 
     <!-- 主舞台 -->
     <main class="stage-wrap">
@@ -169,8 +170,9 @@
 
         <!-- 选项二：思维导图 -->
         <div class="void-mindmap" id="voidMindmap" hidden>
-          <div class="mindmap-toolbar">
-            <span class="mindmap-legend">
+        <div class="mindmap-toolbar">
+          <span class="mindmap-caption">物理史 · 全景总览</span>
+          <span class="mindmap-legend">
               <span class="lg"><i style="border-top-color:#C0392B;border-top-style:dashed"></i>范式革命</span>
               <span class="lg"><i style="border-top-color:#E67E22;border-top-style:dashed"></i>理论冲突</span>
               <span class="lg"><i style="border-top-color:#C9A24E"></i>继承脉络</span>

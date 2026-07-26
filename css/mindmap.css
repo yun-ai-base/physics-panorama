@@ -219,3 +219,17 @@ body.mm-fs .void-mindmap {
 }
 .mm-preview__en { font-size: 11px; color: var(--ink-3, #9A8F7E); margin-bottom: 7px; }
 .mm-preview__sum { line-height: 1.6; color: var(--ink-2, #6B6253); }
+
+/* ── 思维导图工具栏标题：明确它是「宏观 · 物理史全景总览」（非切换、无对应微观视图） ── */
+.mindmap-caption {
+  font-family: var(--font-serif, serif);
+  font-size: 13.5px; font-weight: 700; letter-spacing: .06em;
+  color: var(--gold-dark, #8B6914); white-space: nowrap; user-select: none;
+}
+
+/* ── 尺度关联图：「尺度筛选」引导标签（澄清「微观/宏观/宇观…」只是尺度过滤，非视图切换） ── */
+.scale-map-bar__hint {
+  font-family: var(--font-serif, serif);
+  font-size: 12.5px; color: var(--ink-3, #9A8F7E);
+  margin-right: 4px; white-space: nowrap; user-select: none;
+}
