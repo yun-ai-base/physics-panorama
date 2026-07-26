@@ -53,7 +53,7 @@ async function boot() {
     NODES.forEach(n => byId.set(n.id, n));
   } catch (err) {
     console.error('[boot] 数据加载失败：', err);
-    toast('数据加载失败，请检查网络后刷新重试');
+    toast(t('dataLoadFailed'));
     return;
   }
 
@@ -89,6 +89,9 @@ async function boot() {
 
   // 时间线播放模式（纯增量，内部自行判断数据是否充足）
   initPlayMode();
+
+  // 若 URL 带 ?lang=en，启动即进入英文界面
+  if (state.lang === 'en') applyLang();
 }
 
 function renderCurrent() {
@@ -232,9 +235,22 @@ function applyUILanguage() {
   const clHead = document.querySelector('#changelog .changelog__head > span');
   if (clHead) clHead.textContent = t('changelogTitle');
 
+  // 虚无-图景子选项
+  document.querySelectorAll('#voidSubtabs .void-subtab').forEach(btn => {
+    const map = { poem: 'voidPoem', mindmap: 'voidMindmap' };
+    const k = map[btn.dataset.void];
+    if (k) btn.textContent = t(k);
+  });
+
+  // 思维导图全屏按钮
+  const mmFs = document.getElementById('mmFullscreen');
+  if (mmFs) mmFs.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
+
   // 若收藏/路径面板正在打开，重刷内容以同步语言
   if (document.getElementById('favPanel')?.hidden === false) renderFavList();
   if (document.getElementById('pathPanel')?.hidden === false) renderPathList();
+  // 手机端 <480px 竖排卡片列表：同步语言（仅超小屏生效）
+  if (typeof syncMobile === 'function' && window.matchMedia('(max-width:480px)').matches) syncMobile();
 }
 
 // 纪元顶栏标签（随语言切换重建；点击监听在 wireUI 用事件委托一次绑定）
@@ -448,26 +464,27 @@ function wireUI() {
   const sr = document.getElementById('searchResults');
   // 全文检索：在「名称/人名/脉络/范式」之外，额外覆盖 deep 节点的
   // 历史/分支/著作/影响/工具/实验/争论/局限/未来 正文、术语释义与公式
-  const DIM_KEY_MAP = { '历史':'history','分支':'branches','著作':'works','影响':'impact','工具':'tools','实验':'experiments','争论':'debate','局限':'limits','未来':'future' };
-  const EXTRA_TAGS = new Set(['历史','分支','著作','影响','工具','实验','争论','局限','未来','术语','公式']);
+  const DIM_KEY_MAP = { history:'history', branches:'branches', works:'works', impact:'impact', tools:'tools', experiments:'experiments', debate:'debate', limits:'limits', future:'future' };
+  const EXTRA_TAGS = new Set(['history','branches','works','impact','tools','experiments','debate','limits','future','terms','formula']);
+  const FIELD_LABEL = { name:'searchFieldName', figures:'searchFieldFigures', summary:'searchFieldSummary', aha:'searchFieldAha', history:'searchFieldHistory', branches:'searchFieldBranches', works:'searchFieldWorks', impact:'searchFieldImpact', tools:'searchFieldTools', experiments:'searchFieldExperiments', debate:'searchFieldDebate', limits:'searchFieldLimits', future:'searchFieldFuture', terms:'searchFieldTerms', formula:'searchFieldFormula' };
   let lastQ = '';
   function searchNode(n, q) {
     const fields = [
-      ['名称', (n.name || '') + ' ' + (n.nameEn || '')],
-      ['人物', (n.figures || []).join(' ')],
-      ['脉络', n.summary || ''],
-      ['范式', n.aha || ''],
-      ['历史', n.deepContent?.history || ''],
-      ['分支', n.deepContent?.branches || ''],
-      ['著作', n.deepContent?.works || ''],
-      ['影响', n.deepContent?.impact || ''],
-      ['工具', n.deepContent?.tools || ''],
-      ['实验', n.deepContent?.experiments || ''],
-      ['争论', n.deepContent?.debate || ''],
-      ['局限', n.deepContent?.limits || ''],
-      ['未来', n.deepContent?.future || ''],
-      ['术语', (n.terms || []).map(t => (t.name || '') + ' ' + (t.definition || '')).join(' ')],
-      ['公式', (n.formula || []).map(f => (f.latex || '') + ' ' + (f.plain || '') + ' ' + (f.name || '')).join(' ')],
+      ['name', (n.name || '') + ' ' + (n.nameEn || '')],
+      ['figures', (n.figures || []).join(' ')],
+      ['summary', n.summary || ''],
+      ['aha', n.aha || ''],
+      ['history', n.deepContent?.history || ''],
+      ['branches', n.deepContent?.branches || ''],
+      ['works', n.deepContent?.works || ''],
+      ['impact', n.deepContent?.impact || ''],
+      ['tools', n.deepContent?.tools || ''],
+      ['experiments', n.deepContent?.experiments || ''],
+      ['debate', n.deepContent?.debate || ''],
+      ['limits', n.deepContent?.limits || ''],
+      ['future', n.deepContent?.future || ''],
+      ['terms', (n.terms || []).map(t => (t.name || '') + ' ' + (t.definition || '')).join(' ')],
+      ['formula', (n.formula || []).map(f => (f.latex || '') + ' ' + (f.plain || '') + ' ' + (f.name || '')).join(' ')],
     ];
     const tags = [];
     for (const [key, text] of fields) {
@@ -482,8 +499,8 @@ function wireUI() {
     const hits = NODES.map(n => ({ n, tags: searchNode(n, q) })).filter(x => x.tags.length);
     sr.hidden = false;
     sr.innerHTML = hits.slice(0, 40).map(({ n, tags }) => {
-      const extra = tags.filter(t => EXTRA_TAGS.has(t));
-      return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(langName(n))} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">命中：${esc(extra.join('/'))}</span>` : ''}</button>`;
+      const extra = tags.filter(t => EXTRA_TAGS.has(t)).map(t => t('FIELD_LABEL'[t] || t));
+      return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(langName(n))} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">${t('searchHit')}${esc(extra.join('/'))}</span>` : ''}</button>`;
     }).join('') || `<div style="padding:10px;color:var(--ink-3)">${t('searchNoMatch')}</div>`;
     clearSearchGlow();
     hits.forEach(({ n }) => nodeEl(n.id)?.classList.add('is-search'));
@@ -493,7 +510,7 @@ function wireUI() {
     const id = b.dataset.id;
     const tags = (b.dataset.tags || '').split(',').filter(Boolean);
     si.value = ''; sr.hidden = true; clearSearchGlow();
-    if (tags.includes('术语')) {
+    if (tags.includes('terms')) {
       // 命中术语：跳到该节点术语释义锚点（复用既有 pp:gotoTerm 通道）
       const term = (byId.get(id)?.terms || []).find(t => (t.name || '').toLowerCase().includes(lastQ));
       if (term) { window.dispatchEvent(new CustomEvent('pp:gotoTerm', { detail: { nodeId: id, termName: term.name } })); return; }
@@ -516,7 +533,7 @@ function wireUI() {
   });
 
   document.getElementById('shareBtn').addEventListener('click', () => {
-    updateURL(); navigator.clipboard?.writeText(location.href); toast('当前视图链接已复制');
+    updateURL(); navigator.clipboard?.writeText(location.href); toast(t('linkCopied'));
   });
   const expandAllBtn = document.getElementById('expandAllBtn');
   if (expandAllBtn) expandAllBtn.textContent = state.expandAll ? t('collapseAll') : t('expandAll');
@@ -610,14 +627,18 @@ function wireUI() {
     if (!mobileList) return;
     mobileList.innerHTML = ERA_ORDER.map(era => {
       const e = ERAS[era];
-      const cards = NODES.filter(n => n.era === era).map(n => `
+      const eraName = state.lang === 'en' ? e.nameEn : e.name;
+      const cards = NODES.filter(n => n.era === era).map(n => {
+        const nm = state.lang === 'en' ? (n.nameEn || n.name) : n.name;
+        return `
         <button class="ml-card" data-id="${esc(n.id)}">
           <span class="ml-card__tag" style="background:${e.raw}"></span>
-          <span class="ml-card__name">${esc(n.name)}</span>
+          <span class="ml-card__name">${esc(nm)}</span>
           <span class="ml-card__year">${esc(String(n.year))}</span>
           <span class="ml-card__aha">${esc(n.aha || '')}</span>
-        </button>`).join('');
-      return `<div class="ml-group"><div class="ml-group__title" style="color:${e.raw}">${e.name}</div>${cards}</div>`;
+        </button>`;
+      }).join('');
+      return `<div class="ml-group"><div class="ml-group__title" style="color:${e.raw}">${eraName}</div>${cards}</div>`;
     }).join('');
     mobileList.querySelectorAll('.ml-card').forEach(btn => {
       btn.addEventListener('click', () => { selectNode(btn.dataset.id); openNode(btn.dataset.id); });
@@ -680,7 +701,7 @@ function toggleMindmapFullscreen() {
   document.body.classList.toggle('mm-fs', mindmapFs);
   // 切换按钮文字
   const btn = document.getElementById('mmFullscreen');
-  if (btn) btn.textContent = mindmapFs ? '✕ 退出全屏' : '⛶ 全屏';
+  if (btn) btn.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
   // 全屏切换后等布局稳定再重排
   requestAnimationFrame(() => { renderMindmap(); });
 }
@@ -744,6 +765,7 @@ function updateURL() {
 }
 function readURL() {
   const p = new URLSearchParams(location.search);
+  if (p.get('lang') === 'en') state.lang = 'en';
   if (p.get('view')) state.view = p.get('view');
   if (p.get('vtab')) voidTab = p.get('vtab');
   if (p.get('era')) state.filterEra = p.get('era');

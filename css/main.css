@@ -312,7 +312,12 @@ body.view-people .hint{display:none;}
   padding: 12px 14px; border-bottom: 1px solid #F0E7D2; font-weight: 700; color: #3A332A;
 }
 .fav-panel__close, .path-panel__close {
-  border: none; background: transparent; font-size: 20px; line-height: 1; cursor: pointer; color: #9A8C76;
+  border: none; background: transparent; font-size: 20px; line-height: 1;
+  cursor: pointer; color: #9A8C76; padding: 4px 10px; border-radius: 8px;
+  transition: color .15s, background .15s;
+}
+.fav-panel__close:hover, .path-panel__close:hover {
+  color: var(--gold, #B8893B); background: var(--gold-tint, rgba(184,137,59,.12));
 }
 .fav-panel__list, .path-panel__list { padding: 10px; overflow-y: auto; }
 .fav-empty { padding: 18px 8px; color: #9A8C76; font-size: 13px; line-height: 1.6; }
