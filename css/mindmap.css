@@ -139,35 +139,28 @@ body.mm-fs .mm-exit-fs { display: block; }      /* 全屏时显示 */
   box-shadow: 0 4px 16px rgba(0, 0, 0, .22);
 }
 
-/* ── 全屏模式 ── */
-/* 当 body 带 mm-fs 类时，隐藏顶栏+子选项栏、让思维导图撑满整个视口 */
+/* ── 全屏模式 ──
+   核心方案：.void-mindmap 用 position:fixed; inset:0 直接锚定视口。
+   fixed 的包含块是初始视口（viewport），尺寸永远确定、不会塌缩。
+   这绕开了 #app(flex column) → .stage-wrap → .stage → .void-view 整条父链
+   对宽高的所有限制（包括 bottombar 占用空间导致高度不足）。 */
 body.mm-fs .topbar { display: none !important; }
 body.mm-fs .void-subtabs { display: none !important; }
-body.mm-fs #app { height: 100vh; }
-body.mm-fs .stage-wrap,
-body.mm-fs .stage { position: static; }
-/* void-view 从 absolute inset:0 变成撑满 stage（stage 现在就是整个视口） */
-body.mm-fs .void-view {
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
+body.mm-fs .bottombar { display: none !important; }
+/* void-mindmap 脱离父级流，直接铺满视口 */
+body.mm-fs .void-mindmap {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 100;
 }
-/* 全屏时工具栏不换行（按钮并排），SVG 撑满剩余空间 */
+/* SVG 撑满 fixed 容器 */
+body.mm-fs .mindmap-svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+/* 全屏时工具栏不换行 */
 body.mm-fs .mindmap-toolbar {
   flex-wrap: nowrap;
-}
-/* 全屏：画布占满整个视口宽。
-   基于 d317846d 已验证「可见」的状态（.void-mindmap 仍是 #voidView 的普通
-   flex 子、height:100vh、布局流不变，工具栏正常在顶部），只额外给画布
-   一个明确的视口宽度，避免 <svg> 作为替换元素在 flex 子项上横向不自动
-   stretch 而被压成工具栏那一行宽。
-   不用 absolute（会让容器脱离 flex 流、包含块高度塌缩，导致整块消失）。 */
-body.mm-fs .void-mindmap {
-  height: 100vh;
-  width: 100vw;
-}
-body.mm-fs .mindmap-svg {
-  width: 100vw !important;
 }
 
 .mindmap-svg {
