@@ -225,6 +225,9 @@ function applyUILanguage() {
   // 思维导图全屏按钮
   const mmFs = document.getElementById('mmFullscreen');
   if (mmFs) mmFs.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
+  // 全屏浮动退出按钮（仅全屏时可见，但语言切换时也要更新）
+  const mmExitFs = document.getElementById('mmExitFs');
+  if (mmExitFs) mmExitFs.textContent = t('exitFullscreen') || '✕ 退出全屏';
 
   // 手机端 <480px 竖排卡片列表：同步语言（仅超小屏生效）
   if (typeof syncMobile === 'function' && window.matchMedia('(max-width:480px)').matches) syncMobile();
@@ -320,6 +323,9 @@ function wireUI() {
   // 全屏模式切换
   const mmFsBtn = document.getElementById('mmFullscreen');
   if (mmFsBtn) mmFsBtn.addEventListener('click', () => toggleMindmapFullscreen());
+  // 全屏浮动退出按钮（右上角固定）
+  const mmExitFsBtn = document.getElementById('mmExitFs');
+  if (mmExitFsBtn) mmExitFsBtn.addEventListener('click', () => toggleMindmapFullscreen());
 
   const eraTabs = document.getElementById('eraTabs');
   buildEraTabs();
@@ -624,6 +630,9 @@ function toggleMindmapFullscreen() {
   // 切换按钮文字
   const btn = document.getElementById('mmFullscreen');
   if (btn) btn.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
+  // 浮动退出按钮双语
+  const exitBtn = document.getElementById('mmExitFs');
+  if (exitBtn) exitBtn.textContent = mindmapFs ? (t('exitFullscreen') || '✕ 退出全屏') : '✕ 退出全屏';
   // 全屏切换后等布局稳定再重排
   requestAnimationFrame(() => { renderMindmap(); });
 }
