@@ -3,6 +3,7 @@ export const state = {
   scale: 1,
   tx: 0,
   ty: 0,
+  lang: 'zh',               // 界面语言：'zh' 中文 / 'en' 英文（仅 UI 文案，正文综述/术语保持中文）
   selected: null,          // 选中节点 id
   highlight: new Set(),    // 路径高亮节点集合
   expandAll: false,        // 是否展开全链路

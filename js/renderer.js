@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { el, esc, edgePath, bezierMidpoint } from './utils.js';
-import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
+import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC } from './config.js';
 
 const EDGE_LABELS = {
   inherit: '继承',
@@ -9,8 +9,17 @@ const EDGE_LABELS = {
   unify: '统一',
   conflict: '冲突',
 };
+// 关系边英文标签（界面双语切换用，仅 UI 文案）
+const EDGE_LABELS_EN = {
+  inherit: 'Inherit',
+  branch: 'Branch',
+  revolution: 'Revolution',
+  unify: 'Unify',
+  conflict: 'Conflict',
+};
 
 let NODES = [], EDGES = [], SUMMARIES = {}, POS = {};
+let _applyHook = null;
 const byId = new Map();
 let nodeEls = new Map();
 let edgeEls = [];
@@ -79,7 +88,7 @@ function drawEraBands(layer) {
         fill: ERAS[era].raw, 'fill-opacity': 0.20 }, layer);
     }
     el('text', { x: minX + 16, y: globalMinY + 30, class: 'era-band__label' + (active ? ' is-active-era' : ''),
-      text: ERAS[era].name, fill: active ? '#2A2620' : ERAS[era].raw, 'data-era': era }, layer);
+      text: state.lang === 'en' ? (ERAS[era].nameEn || ERAS[era].name) : ERAS[era].name, fill: active ? '#2A2620' : ERAS[era].raw, 'data-era': era }, layer);
     el('text', { x: minX + 16, y: globalMinY + 50, class: 'era-band__range',
       text: ERAS[era].range, fill: active ? '#2A2620' : ERAS[era].raw }, layer);
   }
@@ -112,7 +121,7 @@ function drawScaleBands(layer, labelLayer) {
     el('text', {
       x: globalMinX + 18, y: minY + 32,
       class: 'scale-band__label' + (state.activeScale === scale ? ' is-active-scale' : ''),
-      text: SCALE_LABEL[scale],
+      text: state.lang === 'en' ? (SCALE_LABEL_EN[scale] || SCALE_LABEL[scale]) : SCALE_LABEL[scale],
       fill: cfg.raw,
       'data-scale': scale,
       style: 'cursor:pointer;',
@@ -220,7 +229,7 @@ function drawEdges(layer) {
       el('path', { d, class: 'edge edge--inherit-flow' }, layer);
     }
     const m = isScale ? scaleLabelMid(a, b) : bezierMidpoint(a, b);
-    const text = EDGE_LABELS[e.type] || e.type;
+    const text = (state.lang === 'en' ? EDGE_LABELS_EN : EDGE_LABELS)[e.type] || e.type;
     const lw = labelW(text, 10) + 10;
     el('rect', {
       class: 'edge__label-bg',
@@ -242,7 +251,7 @@ function drawNodes(layer) {
     if (!p) continue;
     let r = 18;
     if (n.type === 'event') r = 14;
-    else if (n.tier === 'core') r = 26;
+    else     if (n.tier === 'core') r = 26;
     else if (n.tier === 'hub') r = 22;
     const g = el('g', {
       class: 'node', 'data-id': n.id, 'data-era': n.era,
@@ -250,18 +259,19 @@ function drawNodes(layer) {
       transform: `translate(${p.x},${p.y})`,
     }, layer);
     el('circle', { class: 'node__circle', r, cx: 0, cy: 0 }, g);
-    // 标签策略：大节点(core/hub)名字写在圆圈内部底部，小节点写在外面下方
+    // 标签策略 + 界面双语：EN 模式节点名取 nameEn（无则回退中文）
+    const nameText = state.lang === 'en' ? (n.nameEn || n.name) : n.name;
     const isLarge = n.tier === 'core' || n.tier === 'hub';
     if (isLarge) {
       // 圆圈内：名字居中偏下，年份在更下面
-      el('text', { class: 'node__label node__label--inner', x: 0, y: r * 0.28, text: n.name }, g);
+      el('text', { class: 'node__label node__label--inner', x: 0, y: r * 0.28, text: nameText }, g);
       if (typeof n.year === 'number') {
         el('text', { class: 'node__year node__year--inner', x: 0, y: r * 0.62, text: String(n.year) }, g);
       }
     } else {
       // 圆圈外：名字和年份在正下方
       const nameY = r + 20;
-      el('text', { class: 'node__label', x: 0, y: nameY, text: n.name }, g);
+      el('text', { class: 'node__label', x: 0, y: nameY, text: nameText }, g);
       if (typeof n.year === 'number') {
         const yearY = r + 36;
         el('text', { class: 'node__year', x: 0, y: yearY, text: String(n.year) }, g);
@@ -310,4 +320,10 @@ export function applyState() {
       e.label.classList.toggle('is-dim', dim);
     }
   }
+  if (_applyHook) _applyHook();
 }
+
+// 供侧栏缩略图读取当前画布坐标（F 项依赖）
+export function getPOS() { return POS; }
+// 注册 applyState 之后的钩子（用于刷新缩略图红点等）
+export function onApplyState(fn) { _applyHook = fn; }

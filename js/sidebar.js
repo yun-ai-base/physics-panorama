@@ -1,7 +1,8 @@
 import { state } from './state.js';
-import { esc, chain } from './utils.js';
+import { esc, chain, getFavorites, isFavorite, toggleFavorite, getNote, setNote } from './utils.js';
 import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
 import { avatarImg, bindAvatars } from './data/portraitMap.js';
+import { getPOS } from './renderer.js';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();
@@ -639,10 +640,14 @@ export function openNode(id) {
     ? `<button class="sb-back" type="button" data-action="back"><span>←</span> 返回</button>`
     : '';
 
+  const favOn = isFavorite(node.id);
+  const titleName = state.lang === 'en' ? (node.nameEn || node.name) : node.name;
+  const titleSmall = state.lang === 'en' ? node.name : (node.nameEn || '');
   body.innerHTML = `
     <div class="sb-head">
-      <div class="sb-head__era"><span class="sb-swatch" style="background:${era.raw}"></span>${era.name} · ${era.range}</div>
-      <div class="sb-head__title">${esc(node.name)}<small>${esc(node.nameEn || '')}</small></div>
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${era.raw}"></span>${state.lang === 'en' ? era.nameEn : era.name} · ${era.range}</div>
+      <div class="sb-head__title">${esc(titleName)}<small>${esc(titleSmall)}</small></div>
+      <button class="sb-fav ${favOn ? 'is-on' : ''}" id="sbFavBtn" type="button" data-id="${node.id}">${favOn ? '★ 已收藏' : '☆ 收藏'}</button>
       <div class="sb-head__quote">${esc(node.aha || '')}</div>
       <div class="sb-head__meta">
         <span class="sb-chip">${scaleLabel}</span>
@@ -651,8 +656,12 @@ export function openNode(id) {
       </div>
       ${figuresHTML(node)}
     </div>
+    <div class="sb-note">
+      <label class="sb-note__label">📝 我的笔记（仅存于本机浏览器）</label>
+      <textarea class="sb-note__area" id="sbNote" data-id="${node.id}" placeholder="写下你对这个节点的理解…">${esc(getNote(node.id))}</textarea>
+    </div>
     ${backBtn}
-    <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${d.label}</button>`).join('')}</div>
+    <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${state.lang === 'en' ? d.labelEn : d.label}</button>`).join('')}</div>
     <div class="sb-mobile-tip">✦ 已高亮画布上的关联节点，关闭侧栏即可查看</div>
     <div class="sb-panel" id="tabBody"></div>
     ${pathCtxHTML(node)}
@@ -666,6 +675,18 @@ export function openNode(id) {
   });
   // 绑定返回按钮
   body.querySelector('[data-action="back"]')?.addEventListener('click', () => history.back());
+  // 绑定「收藏 / 取消收藏」星标
+  const favBtn = body.querySelector('#sbFavBtn');
+  if (favBtn) favBtn.addEventListener('click', () => {
+    const id = favBtn.dataset.id;
+    const on = toggleFavorite(id);
+    favBtn.classList.toggle('is-on', on);
+    favBtn.textContent = on ? '★ 已收藏' : '☆ 收藏';
+    window.dispatchEvent(new CustomEvent('pp:favChange'));
+  });
+  // 绑定「我的笔记」输入框（实时写入 localStorage）
+  const noteArea = body.querySelector('#sbNote');
+  if (noteArea) noteArea.addEventListener('input', () => setNote(noteArea.dataset.id, noteArea.value));
   // 绑定"继承自/影响至"跳转链接
   body.querySelectorAll('.sb-path__link').forEach(b => b.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: b.dataset.id }));
@@ -876,6 +897,47 @@ export function openPerson(name, nodeIds) {
 export function openSidebarTab(tabKey) {
   const btn = document.querySelector(`.sb-tab[data-key="${tabKey.replace(/"/g, '\\"')}"]`);
   if (btn) btn.click();
+}
+
+// ── 侧栏迷你全景缩略图 + 选中红点（F 项；依赖 renderer.getPOS） ──
+export function updateMiniMap() {
+  const box = document.getElementById('minimap');
+  if (!box) return;
+  const pos = getPOS();
+  const ids = Object.keys(pos);
+  if (!ids.length) { box.hidden = true; return; }
+  box.hidden = false;
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const id of ids) {
+    const p = pos[id]; if (!p) continue;
+    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+  }
+  const W = 248, H = 132, pad = 10;
+  const sx = (W - 2 * pad) / (maxX - minX || 1);
+  const sy = (H - 2 * pad) / (maxY - minY || 1);
+  const s = Math.min(sx, sy);
+  const ox = pad + ((W - 2 * pad) - (maxX - minX) * s) / 2;
+  const oy = pad + ((H - 2 * pad) - (maxY - minY) * s) / 2;
+  const tx = p => ({ x: ox + (p.x - minX) * s, y: oy + (p.y - minY) * s });
+  let svg = `<svg viewBox="0 0 ${W} ${H}" class="mm-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">`;
+  for (const id of ids) {
+    const p = pos[id]; if (!p) continue;
+    const t = tx(p);
+    const n = byId.get(id);
+    const c = n ? (ERAS[n.era] ? ERAS[n.era].raw : '#9A8C76') : '#9A8C76';
+    svg += `<circle class="mm-dot" data-id="${esc(id)}" cx="${t.x.toFixed(1)}" cy="${t.y.toFixed(1)}" r="2.4" fill="${c}"><title>${esc(n ? (n.nameEn || n.name) : id)}</title></circle>`;
+  }
+  if (state.selected && pos[state.selected]) {
+    const t = tx(pos[state.selected]);
+    svg += `<circle class="mm-red" cx="${t.x.toFixed(1)}" cy="${t.y.toFixed(1)}" r="4" fill="#E23B3B" stroke="#FFFFFF" stroke-width="1"><title>当前选中</title></circle>`;
+  }
+  svg += '</svg>';
+  box.innerHTML = svg;
+  box.querySelectorAll('.mm-dot').forEach(d => d.addEventListener('click', () => {
+    const id = d.getAttribute('data-id');
+    if (id) window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: id }));
+  }));
 }
 
 export function focusTerm(termName) {

@@ -1,10 +1,10 @@
 // 站点配置：纪元、视图、关系类型、维度标签、布局排名
 export const ERAS = {
-  'classical':       { id:'classical',       name:'经典物理',   range:'1600–1899',  raw:'#C29A4E' },
-  'relativity':      { id:'relativity',      name:'相对论革命', range:'1900–1915',  raw:'#41518F' },
-  'quantum':         { id:'quantum',         name:'量子革命',   range:'1900–1930',  raw:'#7A5BA6' },
-  'standard-model':  { id:'standard-model',  name:'标准模型',   range:'1940s–1970s',raw:'#357A5E' },
-  'frontier':        { id:'frontier',        name:'前沿探索',   range:'1980s–至今', raw:'#6B4E8C' },
+  'classical':       { id:'classical',       name:'经典物理',   nameEn:'Classical Physics',     range:'1600–1899',  raw:'#C29A4E' },
+  'relativity':      { id:'relativity',      name:'相对论革命', nameEn:'Relativity Revolution', range:'1900–1915',  raw:'#41518F' },
+  'quantum':         { id:'quantum',         name:'量子革命',   nameEn:'Quantum Revolution',    range:'1900–1930',  raw:'#7A5BA6' },
+  'standard-model':  { id:'standard-model',  name:'标准模型',   nameEn:'Standard Model Era',    range:'1940s–1970s',raw:'#357A5E' },
+  'frontier':        { id:'frontier',        name:'前沿探索',   nameEn:'Frontier Exploration',  range:'1980s–至今', raw:'#6B4E8C' },
 };
 export const ERA_ORDER = ['classical','relativity','quantum','standard-model','frontier'];
 
@@ -27,20 +27,20 @@ export const UNIFY_NODES = new Set(['electroweak','standard-model']);
 
 // 14 维度标签（顺序即侧边栏标签顺序）；formula 取自节点级，figures 合并 biography
 export const DIMENSIONS = [
-  { key:'summary',     label:'📌 综述' },
-  { key:'history',     label:'📖 脉络' },
-  { key:'figures',     label:'👤 人物' },
-  { key:'branches',    label:'🔬 分支' },
-  { key:'works',       label:'📚 作品' },
-  { key:'impact',      label:'🌐 溢出' },
-  { key:'paradigm',    label:'⛓ 范式' },
-  { key:'tools',       label:'🔧 工具' },
-  { key:'experiments', label:'🧪 实验' },
-  { key:'debate',      label:'⚔ 交锋' },
-  { key:'limits',      label:'⚠ 局限' },
-  { key:'future',      label:'🔮 猜想' },
-  { key:'formula',     label:'📐 公式' },
-  { key:'terms',       label:'🧩 术语' },
+  { key:'summary',     label:'📌 综述',   labelEn:'📌 Summary' },
+  { key:'history',     label:'📖 脉络',   labelEn:'📖 History' },
+  { key:'figures',    label:'👤 人物',   labelEn:'👤 Figures' },
+  { key:'branches',    label:'🔬 分支',   labelEn:'🔬 Branches' },
+  { key:'works',       label:'📚 作品',   labelEn:'📚 Works' },
+  { key:'impact',      label:'🌐 溢出',   labelEn:'🌐 Impact' },
+  { key:'paradigm',    label:'⛓ 范式',   labelEn:'⛓ Paradigm' },
+  { key:'tools',       label:'🔧 工具',   labelEn:'🔧 Tools' },
+  { key:'experiments', label:'🧪 实验',   labelEn:'🧪 Experiments' },
+  { key:'debate',      label:'⚔ 交锋',   labelEn:'⚔ Debate' },
+  { key:'limits',      label:'⚠ 局限',   labelEn:'⚠ Limits' },
+  { key:'future',      label:'🔮 猜想',   labelEn:'🔮 Outlook' },
+  { key:'formula',     label:'📐 公式',   labelEn:'📐 Formula' },
+  { key:'terms',       label:'🧩 术语',   labelEn:'🧩 Terms' },
 ];
 
 // 浅色视图布局用的排名
@@ -49,6 +49,10 @@ export const SCALE_RANK = { microscopic:0, mesoscopic:1, cosmic:2, unified:3, fe
 export const SCALE_ORDER = ['microscopic','mesoscopic','cosmic','unified','feedback'];
 export const SCALE_LABEL = {
   mesoscopic:'宏观', cosmic:'宇观', microscopic:'微观', unified:'统一', feedback:'反哺',
+};
+// 尺度维度英文标签（界面双语切换用，前端 UI 文案，非节点正文）
+export const SCALE_LABEL_EN = {
+  mesoscopic:'Macroscopic', cosmic:'Cosmic', microscopic:'Microscopic', unified:'Unified', feedback:'Feedback',
 };
 export const SCALE_COLORS = {
   mesoscopic:  { raw:'#A07840', name:'宏观' },   // 经典棕
@@ -133,3 +137,29 @@ export const SCALE_DESC = {
     ],
   },
 };
+
+// 预设学习路径（节点序列引用 nodes.json 的 id；点击高亮整条 + 可逐节点跳转）
+// 仅作导航编排，正文内容复用各节点既有中文深度资料，不另造译文。
+export const LEARNING_PATHS = [
+  {
+    id: 'entry',
+    name: '入门脉络',
+    nameEn: 'Entry Lineage',
+    desc: '从经典力学到标准模型的主干演化，适合第一次建立整体框架。',
+    nodes: ['newton-mechanics','maxwell-em','special-relativity','general-relativity','quantum-mechanics','standard-model'],
+  },
+  {
+    id: 'review',
+    name: '全局速览',
+    nameEn: 'Broad Review',
+    desc: '跨五个纪元的代表性节点，适合复习与查漏补缺。',
+    nodes: ['newton-mechanics','maxwell-em','michelson-morley','special-relativity','quantum-mechanics','solvay-conference','electroweak','standard-model','ligo','quantum-computing','string-theory'],
+  },
+  {
+    id: 'frontier',
+    name: '前沿探索',
+    nameEn: 'Frontier Quest',
+    desc: '从标准模型走向统一与量子引力，串起当代物理的开放问题。',
+    nodes: ['standard-model','electroweak','yang-mills','higgs','dark-matter-energy','quantum-computing','ligo','string-theory','loop-quantum-gravity','quantum-gravity-test','grand-unification'],
+  },
+];
