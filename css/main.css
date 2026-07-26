@@ -300,37 +300,5 @@ body.view-people .hint{display:none;}
 }
 .lang-toggle:hover { background: #FBF3E2; }
 
-/* ── 收藏浮层（与更新日记同级定位） ── */
-.fav-panel {
-  position: fixed; right: 18px; bottom: 64px; width: 320px; max-height: 72vh;
-  background: #FFFDF7; border: 1px solid #EADFC4; border-radius: 14px;
-  box-shadow: 0 12px 40px rgba(60,45,20,.18); z-index: 60;
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.fav-panel__head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px; border-bottom: 1px solid #F0E7D2; font-weight: 700; color: #3A332A;
-}
-.fav-panel__close {
-  border: none; background: transparent; font-size: 20px; line-height: 1;
-  cursor: pointer; color: #9A8C76; padding: 4px 10px; border-radius: 8px;
-  transition: color .15s, background .15s;
-}
-.fav-panel__close:hover {
-  color: var(--gold, #B8893B); background: var(--gold-tint, rgba(184,137,59,.12));
-}
-.fav-panel__list { padding: 10px; overflow-y: auto; }
-.fav-empty { padding: 18px 8px; color: #9A8C76; font-size: 13px; line-height: 1.6; }
-.fav-item {
-  display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 10px; margin-bottom: 6px;
-  border: 1px solid #F0E7D2; border-radius: 10px; background: #FFFEFA; cursor: pointer; text-align: left;
-}
-.fav-item:hover { background: #FBF3E2; }
-.fav-item__sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-.fav-item__name { font-weight: 600; color: #3A332A; }
-.fav-item__en { color: #9A8C76; font-size: 12px; margin-left: auto; }
-.badge {
-  display: inline-block; min-width: 16px; padding: 0 5px; margin-left: 2px;
-  background: #B8893B; color: #fff; border-radius: 999px; font-size: 11px; text-align: center;
-}
+
 

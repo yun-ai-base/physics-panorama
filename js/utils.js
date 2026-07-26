@@ -1,33 +1,5 @@
 import { REVOLUTION_SET, UNIFY_NODES, EDGE_CLASS } from './config.js';
 
-// ── 本地收藏 / 笔记（localStorage，纯前端，不触网） ──
-const FAV_KEY = 'pp:favorites';   // 收藏节点 id 数组
-const NOTE_KEY = 'pp:notes';       // { [nodeId]: 笔记文本 }
-
-export function getFavorites() {
-  try { const v = JSON.parse(localStorage.getItem(FAV_KEY)); return Array.isArray(v) ? v : []; }
-  catch { return []; }
-}
-export function isFavorite(id) { return getFavorites().includes(id); }
-export function toggleFavorite(id) {
-  const s = new Set(getFavorites());
-  const on = s.has(id);
-  if (on) s.delete(id); else s.add(id);
-  localStorage.setItem(FAV_KEY, JSON.stringify([...s]));
-  return !on; // 返回切换后的状态（true=已收藏）
-}
-export function getNotes() {
-  try { const v = JSON.parse(localStorage.getItem(NOTE_KEY)); return v && typeof v === 'object' ? v : {}; }
-  catch { return {}; }
-}
-export function getNote(id) { return getNotes()[id] || ''; }
-export function setNote(id, text) {
-  const m = getNotes();
-  if (text && String(text).trim()) m[id] = text;
-  else delete m[id];
-  localStorage.setItem(NOTE_KEY, JSON.stringify(m));
-}
-
 export const SVGNS = 'http://www.w3.org/2000/svg';
 
 export function el(tag, attrs = {}, parent) {

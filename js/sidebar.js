@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { esc, chain, getFavorites, isFavorite, toggleFavorite, getNote, setNote } from './utils.js';
+import { esc, chain } from './utils.js';
 import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC, UI_LABELS } from './config.js';
 import { avatarImg, bindAvatars } from './data/portraitMap.js';
 
@@ -648,14 +648,12 @@ export function openNode(id) {
     ? `<button class="sb-back" type="button" data-action="back"><span>←</span> ${t('back')}</button>`
     : '';
 
-  const favOn = isFavorite(node.id);
   const titleName = state.lang === 'en' ? (node.nameEn || node.name) : node.name;
   const titleSmall = state.lang === 'en' ? node.name : (node.nameEn || '');
   body.innerHTML = `
     <div class="sb-head">
       <div class="sb-head__era"><span class="sb-swatch" style="background:${era.raw}"></span>${state.lang === 'en' ? era.nameEn : era.name} · ${era.range}</div>
       <div class="sb-head__title">${esc(titleName)}<small>${esc(titleSmall)}</small></div>
-      <button class="sb-fav ${favOn ? 'is-on' : ''}" id="sbFavBtn" type="button" data-id="${node.id}">${favOn ? t('addedFavorite') : t('addFavorite')}</button>
       <div class="sb-head__quote">${esc(node.aha || '')}</div>
       <div class="sb-head__meta">
         <span class="sb-chip">${scaleLabel}</span>
@@ -663,10 +661,6 @@ export function openNode(id) {
         <span class="sb-chip">${esc(String(node.year))}</span>
       </div>
       ${figuresHTML(node)}
-    </div>
-    <div class="sb-note">
-      <label class="sb-note__label">${t('myNoteLabel')}</label>
-      <textarea class="sb-note__area" id="sbNote" data-id="${node.id}" placeholder="${t('notePlaceholder')}">${esc(getNote(node.id))}</textarea>
     </div>
     ${backBtn}
     <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${state.lang === 'en' ? d.labelEn : d.label}</button>`).join('')}</div>
@@ -683,18 +677,6 @@ export function openNode(id) {
   });
   // 绑定返回按钮
   body.querySelector('[data-action="back"]')?.addEventListener('click', () => history.back());
-  // 绑定「收藏 / 取消收藏」星标
-  const favBtn = body.querySelector('#sbFavBtn');
-  if (favBtn) favBtn.addEventListener('click', () => {
-    const id = favBtn.dataset.id;
-    const on = toggleFavorite(id);
-    favBtn.classList.toggle('is-on', on);
-    favBtn.textContent = on ? t('addedFavorite') : t('addFavorite');
-    window.dispatchEvent(new CustomEvent('pp:favChange'));
-  });
-  // 绑定「我的笔记」输入框（实时写入 localStorage）
-  const noteArea = body.querySelector('#sbNote');
-  if (noteArea) noteArea.addEventListener('input', () => setNote(noteArea.dataset.id, noteArea.value));
   // 绑定"继承自/影响至"跳转链接
   body.querySelectorAll('.sb-path__link').forEach(b => b.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: b.dataset.id }));

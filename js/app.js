@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { esc, buildEdges, relatedSet, getFavorites, isFavorite } from './utils.js';
+import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER, UI_LABELS } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState } from './renderer.js';
@@ -61,7 +61,6 @@ async function boot() {
   initInteraction();
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
-  updateFavCount();
 
   // 思维导图模块初始化（仅缓存数据与绑定事件，渲染推迟到首次进入 void→思维导图）
   try {
@@ -163,12 +162,6 @@ function applyUILanguage() {
   if (expandAllBtn) expandAllBtn.textContent = state.expandAll ? t('collapseAll') : t('expandAll');
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) resetBtn.textContent = t('resetView');
-  const favBtn = document.getElementById('favBtn');
-  if (favBtn) {
-    const badge = favBtn.querySelector('.badge');
-    favBtn.textContent = t('favorites');
-    if (badge) favBtn.appendChild(badge);
-  }
 
   // 提示条
   const hint = document.getElementById('zoomHint');
@@ -212,9 +205,6 @@ function applyUILanguage() {
   if (peopleSearch) peopleSearch.placeholder = t('peopleSearchPlaceholder');
 
   // 面板标题
-  const favHead = document.querySelector('#favPanel .fav-panel__head > span');
-  if (favHead) favHead.textContent = t('myFavorites');
-
   // 导览按钮
   const tour3 = document.getElementById('tour3');
   if (tour3) tour3.textContent = t('tour3min');
@@ -236,8 +226,6 @@ function applyUILanguage() {
   const mmFs = document.getElementById('mmFullscreen');
   if (mmFs) mmFs.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
 
-  // 若收藏面板正在打开，重刷内容以同步语言
-  if (document.getElementById('favPanel')?.hidden === false) renderFavList();
   // 手机端 <480px 竖排卡片列表：同步语言（仅超小屏生效）
   if (typeof syncMobile === 'function' && window.matchMedia('(max-width:480px)').matches) syncMobile();
 }
@@ -262,31 +250,6 @@ function applyLang() {
   applyUILanguage();
   if (state.selected) openNode(state.selected);
   updateURL();
-}
-
-// ── 本地收藏面板（依赖 utils 的 localStorage 工具） ──
-function renderFavList() {
-  const list = document.getElementById('favList');
-  if (!list) return;
-  const ids = getFavorites();
-  if (!ids.length) { list.innerHTML = `<div class="fav-empty">${t('favEmpty')}</div>`; return; }
-  list.innerHTML = ids.map(id => {
-    const n = byId.get(id); if (!n) return '';
-    return `<button class="fav-item" data-id="${esc(id)}">
-      <span class="fav-item__sw" style="background:${ERAS[n.era].raw}"></span>
-      <span class="fav-item__name">${esc(langName(n))}</span>
-      <span class="fav-item__en">${esc(n.nameEn || '')}</span>
-    </button>`;
-  }).join('');
-  list.querySelectorAll('.fav-item').forEach(b => b.addEventListener('click', () => {
-    const id = b.dataset.id;
-    setView('timeline'); selectNode(id);
-    const fp = document.getElementById('favPanel'); if (fp) fp.hidden = true;
-  }));
-}
-function updateFavCount() {
-  const c = document.getElementById('favCount');
-  if (c) c.textContent = String(getFavorites().length);
 }
 
 // ===== 新增：纪元序言卡（纯增量，复用 PREFACES 数据与 ERAS 配色） =====
@@ -519,15 +482,6 @@ function wireUI() {
     state.lang = state.lang === 'en' ? 'zh' : 'en';
     applyLang();
   });
-  // 本地收藏面板
-  const favBtn = document.getElementById('favBtn');
-  const favPanel = document.getElementById('favPanel');
-  if (favBtn && favPanel) {
-    favBtn.addEventListener('click', () => { renderFavList(); updateFavCount(); favPanel.hidden = !favPanel.hidden; });
-    document.getElementById('favClose')?.addEventListener('click', () => { favPanel.hidden = true; });
-    favPanel.addEventListener('click', e => { if (e.target === favPanel) favPanel.hidden = true; });
-  }
-  window.addEventListener('pp:favChange', () => { renderFavList(); updateFavCount(); });
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
   window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });
