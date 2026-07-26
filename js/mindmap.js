@@ -172,10 +172,12 @@ function fit() {
   const isFS = typeof document !== 'undefined' && document.body.classList.contains('mm-fs');
   let k, tx, ty;
   if (isFS) {
-    // 全屏模式下按「宽度适配」：把层级树横向铺满宽屏，纵向可拖拽浏览
-    k = Math.min(cw / boxW, 2.0) * 0.96;
-    tx = (cw - boxW * k) / 2 - b.minX * k;
-    ty = 40 - b.minY * k; // 顶部对齐 40px，给工具栏留一点呼吸空间
+    // 全屏模式：画布宽度【正好等于】电脑屏幕宽度——内容左缘对齐屏幕左缘、右边距=0，
+    // 不再留 0.96 的边距、也不设 2.0 缩放上限（那会在宽屏上把树缩到中央、左右空一大截）。
+    // 纵向超出部分用既有拖拽/滚轮浏览。
+    k = cw / boxW;
+    tx = -b.minX * k;            // 内容左缘 → 屏幕左缘（右边距=0）
+    ty = 40 - b.minY * k;     // 顶部对齐 40px，给工具栏留呼吸空间
   } else {
     // 普通视图：默认完整看全树（contain），高度优先
     k = Math.min(cw / boxW, ch / boxH) * 0.92;
