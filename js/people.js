@@ -2,7 +2,7 @@
 import { esc } from './utils.js';
 import { ERAS, UI_LABELS } from './config.js';
 import { state } from './state.js';
-import { avatarImg, bindAvatars, portraitName } from './data/portraitMap.js';
+import { avatarImg, bindAvatars, portraitName, personNameEn } from './data/portraitMap.js';
 
 function t(key, ...args) {
   const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];
@@ -48,9 +48,10 @@ export function renderPeople(container, people, onPick) {
     const sw = p.eras
       .map(e => `<i class="swatch" style="background:${ERAS[e] ? ERAS[e].raw : 'var(--ink-3)'}"></i>`)
       .join(' ');
-    return `<button class="person-card" data-name="${esc(p.name)}" title="${esc(p.name)}" aria-label="${esc(p.name)}, ${t('peopleRelated', p.nodeIds.length)}">
+    const dispName = state.lang === 'en' ? personNameEn(p.name) : p.name;
+    return `<button class="person-card" data-name="${esc(p.name)}" title="${esc(dispName)}" aria-label="${esc(dispName)}, ${t('peopleRelated', p.nodeIds.length)}">
       <span class="person-card__avatar">${avatarImg(p.name)}</span>
-      <span class="person-card__name">${esc(p.name)}</span>
+      <span class="person-card__name">${esc(dispName)}</span>
       <span class="person-card__meta">${sw}<span>${t('peopleRelated', p.nodeIds.length)}</span></span>
     </button>`;
   }).join('');

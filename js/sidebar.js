@@ -1,12 +1,15 @@
 import { state } from './state.js';
 import { esc, chain } from './utils.js';
 import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC, UI_LABELS } from './config.js';
-import { avatarImg, bindAvatars } from './data/portraitMap.js';
+import { avatarImg, bindAvatars, personNameEn } from './data/portraitMap.js';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();
 const termIndex = new Map(); // 术语名 -> { nodeId, termName }
-const MATURITY_LABEL = { foundation:'🏛 地基型', established:'🔬 成熟型', speculative:'🔮 探索型' };
+const MATURITY_LABEL = {
+  zh: { foundation:'🏛 地基型', established:'🔬 成熟型', speculative:'🔮 探索型' },
+  en: { foundation:'🏛 Foundation', established:'🔬 Established', speculative:'🔮 Speculative' },
+};
 
 function t(key, ...args) {
   const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];
@@ -34,9 +37,10 @@ function figureNodeIds(name) {
 
 function figuresHTML(n) {
   if (!n.figures || !n.figures.length) return '';
-  return `<div class="sb-figures">${n.figures.map(f =>
-    `<button class="sb-fig sb-fig--link" type="button" data-name="${esc(f)}">${avatarImg(f)}<span class="sb-fig__name">${esc(f)}</span></button>`
-  ).join('')}</div>`;
+  return `<div class="sb-figures">${n.figures.map(f => {
+    const disp = state.lang === 'en' ? personNameEn(f) : f;
+    return `<button class="sb-fig sb-fig--link" type="button" data-name="${esc(f)}">${avatarImg(f)}<span class="sb-fig__name">${esc(disp)}</span></button>`;
+  }).join('')}</div>`;
 }
 
 /* ── 术语自动链接 ───────────────────────────────────── */
@@ -392,7 +396,7 @@ function splitBlockByHeadings(block) {
  *   6. 其他 → .sb-para 普通段落
  */
 function parseContent(raw) {
-  if (!raw || typeof raw !== 'string' || !raw.trim()) return '<p class="sb-empty">暂无内容</p>';
+  if (!raw || typeof raw !== 'string' || !raw.trim()) return `<p class="sb-empty">${t('emptyContent')}</p>`;
 
   const blocks = raw.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
   const html = [];
@@ -481,7 +485,7 @@ function parseContent(raw) {
 
 /* ── 粒子组成表格 ─────────────────────────────────────── */
 function particlesHTML(data) {
-  if (!data || !data.groups?.length) return '<p class="sb-empty">该节点暂无组成数据</p>';
+  if (!data || !data.groups?.length) return `<p class="sb-empty">${t('particlesEmpty')}</p>`;
   const en = state.lang === 'en';
   const title = en ? (data.titleEn || data.title) : data.title;
   const subtitle = data.subtitle || '';
@@ -560,10 +564,10 @@ function particlesHTML(data) {
 
 /* ── 术语卡片 ─────────────────────────────────────────── */
 function termsHTML(terms) {
-  if (!terms || !terms.length) return '<p class="sb-empty">该节点未提供术语释义</p>';
+  if (!terms || !terms.length) return `<p class="sb-empty">${t('termsEmpty')}</p>`;
   return terms.map((t, idx) => {
     const icon = esc(t.icon || '🧩');
-    const name = esc(t.name || `术语 ${idx + 1}`);
+    const name = esc(t.name || t(`termFallback`, idx + 1));
     const def = esc(t.definition || '');
     const details = parseContent(t.details || '');
     const img = t.image ? `<img class="sb-term__img" src="${esc(t.image)}" alt="${name}" loading="lazy">` : '';
@@ -572,7 +576,7 @@ function termsHTML(terms) {
     if (targetId) {
       const tName = byId.get(targetId)?.name || targetId;
       linkCls = ' sb-term--link';
-      jump = `<span class="sb-term__jump">↗ 跳转至 ${esc(tName)}</span>`;
+      jump = `<span class="sb-term__jump">↗ ${t('jumpTo')} ${esc(tName)}</span>`;
     }
     return `
       <div class="sb-term${linkCls}" data-term="${name}"${targetId ? ` data-target="${esc(targetId)}"` : ''}>
@@ -599,7 +603,7 @@ function renderDim(node, key) {
   // 公式走独立逻辑
   if (key === 'formula') {
     const fs = node.formula || [];
-    if (!fs.length) return '<p class="sb-empty">该节点未提供公式</p>';
+    if (!fs.length) return `<p class="sb-empty">${t('formulaEmpty')}</p>`;
     return fs.map((f, idx) => {
       let tex = '';
       try { tex = window.katex ? katex.renderToString(f.latex || '', { throwOnError: false, displayMode: false }) : esc(f.latex || ''); }
@@ -607,10 +611,10 @@ function renderDim(node, key) {
       const nameTag = f.name ? `<div class="sb-fm__name">${esc(f.name)}</div>` : '';
       const appText = (f.applications || '').trim();
       const appBtn = appText
-        ? `<button class="sb-fm__app-btn" type="button" data-fm="${node.id}-${idx}" title="应用拓展" aria-expanded="false"><span class="sb-fm__app-icon">✦</span><span class="sb-fm__app-label">应用拓展</span></button>`
+        ? `<button class="sb-fm__app-btn" type="button" data-fm="${node.id}-${idx}" title="${t('appExpand')}" aria-expanded="false"><span class="sb-fm__app-icon">✦</span><span class="sb-fm__app-label">${t('appExpand')}</span></button>`
         : '';
       const appPanel = appText
-        ? `<div class="sb-fm__app-panel" id="fm-app-${node.id}-${idx}" hidden><div class="sb-fm__app-title">实用场景与背后逻辑</div><div class="sb-fm__app-body">${parseContent(appText)}</div></div>`
+        ? `<div class="sb-fm__app-panel" id="fm-app-${node.id}-${idx}" hidden><div class="sb-fm__app-title">${t('appExpandTitle')}</div><div class="sb-fm__app-body">${parseContent(appText)}</div></div>`
         : '';
       return `<div class="sb-fm" data-fm-wrap="${node.id}-${idx}">${nameTag}<div class="sb-fm__row"><div class="sb-fm__tex">${tex}</div>${appBtn}</div><div class="sb-fm__plain">${esc(f.plain || '')}</div>${appPanel}</div>`;
     }).join('');
@@ -627,7 +631,7 @@ function renderDim(node, key) {
       const a = node.deepContent.figures_detail || '';
       const b = node.deepContent.biography || '';
       const val = (a ? a : '') + (b ? '\n\n' + b : '');
-      if (!val.trim()) return '<p class="sb-empty">暂无人物详情</p>';
+      if (!val.trim()) return `<p class="sb-empty">${t('figureEmpty')}</p>`;
       return parseContent(val);
     }
     return parseContent(node.deepContent?.[key] || '');
@@ -643,13 +647,13 @@ function renderDim(node, key) {
   };
   if (key in map) {
     if (key === 'figures') {
-      if (!node.figures?.length) return '<p class="sb-empty">暂无详情</p>';
-      return `<p class="sb-empty">代表人物见上方卡片。${node.summary ? parseContent(node.summary) : ''}</p>`;
+      if (!node.figures?.length) return `<p class="sb-empty">${t('detailEmpty')}</p>`;
+      return `<p class="sb-empty">${t('figuresHint')}${node.summary ? parseContent(node.summary) : ''}</p>`;
     }
     return parseContent(map[key]);
   }
 
-  return '<p class="sb-empty">该节点暂无此维度内容</p>';
+  return `<p class="sb-empty">${t('dimEmpty')}</p>`;
 }
 
 /* ── 路径上下文（可点击跳转） ───────────────────── */
@@ -689,8 +693,9 @@ export function openNode(id) {
   const body = document.getElementById('sidebarBody');
   const era = ERAS[node.era];
   const isDeep = node.depth === 'deep' && node.deepContent;
-  const scaleLabel = SCALE_LABEL[node.scale] || node.scale;
-  const maturityLabel = MATURITY_LABEL[node.maturity] || '';
+  const scaleLabel = state.lang === 'en' ? (SCALE_LABEL_EN[node.scale] || SCALE_LABEL[node.scale] || node.scale) : (SCALE_LABEL[node.scale] || node.scale);
+  const maturitySet = MATURITY_LABEL[state.lang] || MATURITY_LABEL.zh;
+  const maturityLabel = maturitySet[node.maturity] || '';
 
   // 智能标签过滤
   const hasFormula = node.formula && node.formula.length;

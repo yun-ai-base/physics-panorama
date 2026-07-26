@@ -170,12 +170,12 @@ function fit() {
   const b = bounds();
   const boxW = (b.maxX - b.minX) || 1, boxH = (b.maxY - b.minY) || 1;
   const isFS = typeof document !== 'undefined' && document.body.classList.contains('mm-fs');
+  // 全屏时用窗口内宽作为权威画布宽，确保画布【正好等于屏幕宽度】、左右零边距。
+  // 不依赖 SVG.clientWidth —— 替换元素在 flex 中的宽度计算在不同布局下并不可靠。
+  const fsW = (isFS && typeof window !== 'undefined' && window.innerWidth) ? window.innerWidth : cw;
   let k, tx, ty;
   if (isFS) {
-    // 全屏模式：画布宽度【正好等于】电脑屏幕宽度——内容左缘对齐屏幕左缘、右边距=0，
-    // 不再留 0.96 的边距、也不设 2.0 缩放上限（那会在宽屏上把树缩到中央、左右空一大截）。
-    // 纵向超出部分用既有拖拽/滚轮浏览。
-    k = cw / boxW;
+    k = fsW / boxW;
     tx = -b.minX * k;            // 内容左缘 → 屏幕左缘（右边距=0）
     ty = 40 - b.minY * k;     // 顶部对齐 40px，给工具栏留呼吸空间
   } else {

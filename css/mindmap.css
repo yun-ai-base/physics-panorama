@@ -127,8 +127,18 @@ body.mm-fs .void-view {
 body.mm-fs .mindmap-toolbar {
   flex-wrap: nowrap;
 }
+/* 全屏：画布铺满整个视口宽度。
+   用 absolute inset:0 脱离 flex column 容器，避免 <svg> 作为替换元素（replaced
+   element）在 cross-axis 上不自动横向 stretch，而导致画布宽度被压成工具栏那一行
+   内容宽度（左右露一大截空白）。 */
 body.mm-fs .void-mindmap {
-  height: 100vh;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: auto; height: auto;
+  display: flex; flex-direction: column;
+}
+body.mm-fs .mindmap-svg {
+  width: 100% !important;
 }
 
 .mindmap-svg {
