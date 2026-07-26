@@ -138,32 +138,6 @@ export const SCALE_DESC = {
   },
 };
 
-// 预设学习路径（节点序列引用 nodes.json 的 id；点击高亮整条 + 可逐节点跳转）
-// 仅作路径编排，正文内容复用各节点既有中文深度资料，不另造译文。
-export const LEARNING_PATHS = [
-  {
-    id: 'entry',
-    name: '入门脉络',
-    nameEn: 'Entry Lineage',
-    desc: '从经典力学到标准模型的主干演化，适合第一次建立整体框架。',
-    nodes: ['newton-mechanics','maxwell-em','special-relativity','general-relativity','quantum-mechanics','standard-model'],
-  },
-  {
-    id: 'review',
-    name: '全局速览',
-    nameEn: 'Broad Review',
-    desc: '跨五个纪元的代表性节点，适合复习与查漏补缺。',
-    nodes: ['newton-mechanics','maxwell-em','michelson-morley','special-relativity','quantum-mechanics','solvay-conference','electroweak','standard-model','ligo','quantum-computing','string-theory'],
-  },
-  {
-    id: 'frontier',
-    name: '前沿探索',
-    nameEn: 'Frontier Quest',
-    desc: '从标准模型走向统一与量子引力，串起当代物理的开放问题。',
-    nodes: ['standard-model','electroweak','yang-mills','higgs','dark-matter-energy','quantum-computing','ligo','string-theory','loop-quantum-gravity','quantum-gravity-test','grand-unification'],
-  },
-];
-
 // 界面双语文案表（仅 UI 文案，节点正文/术语/人物传记保持中文）
 export const UI_LABELS = {
   zh: {
@@ -187,9 +161,7 @@ export const UI_LABELS = {
     collapseAll: '收起关联',
     resetView: '回到全景',
     favorites: '收藏',
-    learningPaths: '学习路径',
     myFavorites: '★ 我的收藏',
-    presetPaths: '🧭 预设学习路径',
     onlyCore: '仅显示主干',
     hint: '拖拽/单指平移 · 滚轮/双指缩放 · 点击深入 · Esc 返回',
     searchPlaceholder: '搜索学说 / 人名 / 关键词…',
@@ -200,7 +172,6 @@ export const UI_LABELS = {
     searchNoMatch: '无匹配',
     addFavorite: '☆ 收藏',
     addedFavorite: '★ 已收藏',
-    highlightPath: '高亮此路径',
     scaleDimension: '尺度维度',
     peopleIndex: '人物索引',
     eraStats: (n, events) => `本纪元收录 <b>${n}</b> 个学说 / 事件${events ? `，含 <b>${events}</b> 个里程碑` : ''}。点击时间线节点深入探索。`,
@@ -279,9 +250,7 @@ export const UI_LABELS = {
     collapseAll: 'Collapse',
     resetView: 'Reset View',
     favorites: 'Favorites',
-    learningPaths: 'Paths',
     myFavorites: '★ My Favorites',
-    presetPaths: '🧭 Learning Paths',
     onlyCore: 'Core Only',
     hint: 'Drag to pan · Scroll to zoom · Click to dive · Esc back',
     searchPlaceholder: 'Search theory / figure / keyword…',
@@ -292,7 +261,6 @@ export const UI_LABELS = {
     searchNoMatch: 'No match',
     addFavorite: '☆ Favorite',
     addedFavorite: '★ Favorited',
-    highlightPath: 'Highlight Path',
     scaleDimension: 'Scale Dimension',
     peopleIndex: 'Figure Index',
     eraStats: (n, events) => `<b>${n}</b> theories / events in this era${events ? `, including <b>${events}</b> milestones` : ''}. Click timeline nodes to explore.`,

@@ -300,26 +300,26 @@ body.view-people .hint{display:none;}
 }
 .lang-toggle:hover { background: #FBF3E2; }
 
-/* ── 收藏 / 学习路径 浮层（与更新日记同级定位） ── */
-.fav-panel, .path-panel {
+/* ── 收藏浮层（与更新日记同级定位） ── */
+.fav-panel {
   position: fixed; right: 18px; bottom: 64px; width: 320px; max-height: 72vh;
   background: #FFFDF7; border: 1px solid #EADFC4; border-radius: 14px;
   box-shadow: 0 12px 40px rgba(60,45,20,.18); z-index: 60;
   display: flex; flex-direction: column; overflow: hidden;
 }
-.fav-panel__head, .path-panel__head {
+.fav-panel__head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px; border-bottom: 1px solid #F0E7D2; font-weight: 700; color: #3A332A;
 }
-.fav-panel__close, .path-panel__close {
+.fav-panel__close {
   border: none; background: transparent; font-size: 20px; line-height: 1;
   cursor: pointer; color: #9A8C76; padding: 4px 10px; border-radius: 8px;
   transition: color .15s, background .15s;
 }
-.fav-panel__close:hover, .path-panel__close:hover {
+.fav-panel__close:hover {
   color: var(--gold, #B8893B); background: var(--gold-tint, rgba(184,137,59,.12));
 }
-.fav-panel__list, .path-panel__list { padding: 10px; overflow-y: auto; }
+.fav-panel__list { padding: 10px; overflow-y: auto; }
 .fav-empty { padding: 18px 8px; color: #9A8C76; font-size: 13px; line-height: 1.6; }
 .fav-item {
   display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 10px; margin-bottom: 6px;
@@ -333,13 +333,4 @@ body.view-people .hint{display:none;}
   display: inline-block; min-width: 16px; padding: 0 5px; margin-left: 2px;
   background: #B8893B; color: #fff; border-radius: 999px; font-size: 11px; text-align: center;
 }
-.path-card { padding: 10px; margin-bottom: 10px; border: 1px solid #F0E7D2; border-radius: 12px; background: #FFFEFA; }
-.path-card__title { font-weight: 700; color: #3A332A; margin-bottom: 4px; }
-.path-card__desc { font-size: 12px; color: #7A6E58; line-height: 1.6; margin-bottom: 8px; }
-.path-card__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.path-chip {
-  padding: 4px 9px; border-radius: 999px; border: 1px solid var(--c, #ccc);
-  background: color-mix(in srgb, var(--c, #ccc) 12%, #fff); color: #3A332A; font-size: 12px; cursor: pointer;
-}
-.path-chip:hover { background: color-mix(in srgb, var(--c, #ccc) 26%, #fff); }
-.path-card__go { font-size: 12px; padding: 5px 12px; }
+

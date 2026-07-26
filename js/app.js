@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { esc, buildEdges, relatedSet, getFavorites, isFavorite } from './utils.js';
-import { ERAS, ERA_ORDER, LEARNING_PATHS, UI_LABELS } from './config.js';
+import { ERAS, ERA_ORDER, UI_LABELS } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState } from './renderer.js';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
@@ -169,8 +169,6 @@ function applyUILanguage() {
     favBtn.textContent = t('favorites');
     if (badge) favBtn.appendChild(badge);
   }
-  const pathBtn = document.getElementById('pathBtn');
-  if (pathBtn) pathBtn.textContent = t('learningPaths');
 
   // 提示条
   const hint = document.getElementById('zoomHint');
@@ -216,8 +214,6 @@ function applyUILanguage() {
   // 面板标题
   const favHead = document.querySelector('#favPanel .fav-panel__head > span');
   if (favHead) favHead.textContent = t('myFavorites');
-  const pathHead = document.querySelector('#pathPanel .path-panel__head > span');
-  if (pathHead) pathHead.textContent = t('presetPaths');
 
   // 导览按钮
   const tour3 = document.getElementById('tour3');
@@ -240,9 +236,8 @@ function applyUILanguage() {
   const mmFs = document.getElementById('mmFullscreen');
   if (mmFs) mmFs.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
 
-  // 若收藏/路径面板正在打开，重刷内容以同步语言
+  // 若收藏面板正在打开，重刷内容以同步语言
   if (document.getElementById('favPanel')?.hidden === false) renderFavList();
-  if (document.getElementById('pathPanel')?.hidden === false) renderPathList();
   // 手机端 <480px 竖排卡片列表：同步语言（仅超小屏生效）
   if (typeof syncMobile === 'function' && window.matchMedia('(max-width:480px)').matches) syncMobile();
 }
@@ -292,36 +287,6 @@ function renderFavList() {
 function updateFavCount() {
   const c = document.getElementById('favCount');
   if (c) c.textContent = String(getFavorites().length);
-}
-
-// ── 预设学习路径面板 ──
-function renderPathList() {
-  const list = document.getElementById('pathList');
-  if (!list) return;
-  const en = state.lang === 'en';
-  list.innerHTML = LEARNING_PATHS.map(p => {
-    const chips = p.nodes.map(id => {
-      const n = byId.get(id); if (!n) return '';
-      return `<button class="path-chip" data-id="${esc(id)}" style="--c:${ERAS[n.era].raw}">${esc(en ? (n.nameEn || n.name) : n.name)}</button>`;
-    }).join('');
-    return `<div class="path-card">
-      <div class="path-card__title">${esc(en ? p.nameEn : p.name)}</div>
-      <div class="path-card__desc">${esc(p.desc)}</div>
-      <div class="path-card__chips">${chips}</div>
-      <button class="path-card__go linkbtn" data-path="${esc(p.id)}" type="button">${t('highlightPath')}</button>
-    </div>`;
-  }).join('');
-  list.querySelectorAll('.path-chip').forEach(b => b.addEventListener('click', () => {
-    const id = b.dataset.id; setView('timeline'); selectNode(id);
-  }));
-  list.querySelectorAll('.path-card__go').forEach(b => b.addEventListener('click', () => {
-    const p = LEARNING_PATHS.find(x => x.id === b.dataset.path);
-    if (!p) return;
-    state.highlight = new Set(p.nodes);
-    state.filterEra = null; state.activeEra = null;
-    reflectEraActive(); applyState(); updateURL(); fit();
-    const pp = document.getElementById('pathPanel'); if (pp) pp.hidden = true;
-  }));
 }
 
 // ===== 新增：纪元序言卡（纯增量，复用 PREFACES 数据与 ERAS 配色） =====
@@ -563,14 +528,6 @@ function wireUI() {
     favPanel.addEventListener('click', e => { if (e.target === favPanel) favPanel.hidden = true; });
   }
   window.addEventListener('pp:favChange', () => { renderFavList(); updateFavCount(); });
-  // 预设学习路径面板
-  const pathBtn = document.getElementById('pathBtn');
-  const pathPanel = document.getElementById('pathPanel');
-  if (pathBtn && pathPanel) {
-    pathBtn.addEventListener('click', () => { renderPathList(); pathPanel.hidden = !pathPanel.hidden; });
-    document.getElementById('pathClose')?.addEventListener('click', () => { pathPanel.hidden = true; });
-    pathPanel.addEventListener('click', e => { if (e.target === pathPanel) pathPanel.hidden = true; });
-  }
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
   window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });
