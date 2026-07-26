@@ -225,9 +225,9 @@ function applyUILanguage() {
   // 思维导图全屏按钮
   const mmFs = document.getElementById('mmFullscreen');
   if (mmFs) mmFs.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
-  // 全屏浮动退出按钮（仅全屏时可见，但语言切换时也要更新）
+  // 全屏浮动退出按钮（始终带 ✕ 前缀）
   const mmExitFs = document.getElementById('mmExitFs');
-  if (mmExitFs) mmExitFs.textContent = t('exitFullscreen') || '✕ 退出全屏';
+  if (mmExitFs) mmExitFs.textContent = '✕ ' + (t('exitFullscreen') || '退出全屏');
 
   // 手机端 <480px 竖排卡片列表：同步语言（仅超小屏生效）
   if (typeof syncMobile === 'function' && window.matchMedia('(max-width:480px)').matches) syncMobile();
@@ -630,9 +630,12 @@ function toggleMindmapFullscreen() {
   // 切换按钮文字
   const btn = document.getElementById('mmFullscreen');
   if (btn) btn.textContent = mindmapFs ? t('exitFullscreen') : t('fullscreen');
-  // 浮动退出按钮双语
+  // 浮动退出按钮（始终带 ✕ 前缀，独立悬浮按钮需要图标标识）
   const exitBtn = document.getElementById('mmExitFs');
-  if (exitBtn) exitBtn.textContent = mindmapFs ? (t('exitFullscreen') || '✕ 退出全屏') : '✕ 退出全屏';
+  if (exitBtn) {
+    const fsLabel = mindmapFs ? (t('exitFullscreen') || '退出全屏') : '退出全屏';
+    exitBtn.textContent = '✕ ' + fsLabel;
+  }
   // 进入全屏时重置拖拽偏移（防止残留 tx/ty 导致内容偏移到看不见的位置）
   if (mindmapFs) {
     // 通过暴露在 window 上的函数重置（mindmap.js 的 resetMindmap 已做 tf={tx:0,ty:0,k:1} + fit()）

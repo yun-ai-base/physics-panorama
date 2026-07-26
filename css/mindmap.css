@@ -69,7 +69,7 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  padding: 8px 18px;
+  padding: 9px 18px 10px;
   border-bottom: 1px solid rgba(42, 38, 32, .07);
   background: rgba(255, 255, 255, .55);
   font-size: 12.5px;
@@ -98,7 +98,7 @@
 }
 .mindmap-reset:hover { background: var(--gold-tint, rgba(184, 137, 59, .12)); }
 
-/* ── 全屏按钮 ── */
+/* ── 全屏/退出全屏按钮（工具栏内，纯文字，与重置视图风格统一） ── */
 .mindmap-fullscreen {
   border: 1px solid rgba(184, 137, 59, .4);
   background: #fff;

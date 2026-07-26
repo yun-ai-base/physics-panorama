@@ -235,7 +235,7 @@ body.view-people .hint{display:none;}
 /* ── 虚无-图景占位视图 ── */
 .void-view{position:absolute; inset:0; z-index:31; background:var(--bg); overflow:auto; display:flex; align-items:center; justify-content:center; padding:40px 28px;}
 .void-view[hidden]{display:none;}
-.void-view__card{text-align:center; max-width:640px; animation:voidIn .8s ease both;}
+.void-view__card{position:relative; z-index:1; text-align:center; max-width:640px; animation:voidIn .8s ease both;}
 .void-view__verse{font-family:var(--font-serif); font-size:clamp(28px, 5vw, 52px); line-height:1.8; color:var(--ink); letter-spacing:.12em; margin:0; opacity:.92; text-shadow:0 2px 18px rgba(184,137,59,.12);}
 .void-view__verse + .void-view__verse{margin-top:.28em;}
 .void-view__sub{display:block; margin-top:34px; font-size:14px; color:var(--ink-3); letter-spacing:.2em;}
@@ -244,19 +244,20 @@ body.view-people .hint{display:none;}
 /* 虚无-图景 · 意境页 左右淡墨水印诗文 */
 .void-view__wm{
   position:absolute; top:50%; transform:translateY(-50%);
-  display:flex; flex-direction:column; align-items:center;
-  max-width:30vw; pointer-events:none; z-index:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  max-width:22vw; overflow:visible;
+  pointer-events:none; z-index:0;
 }
-.void-view__wm--left{ left:3.5vw; }
-.void-view__wm--right{ right:3.5vw; }
+.void-view__wm--left{ left:1vw; }
+.void-view__wm--right{ right:1vw; }
 
 .void-view__wm-line{
   font-family:var(--font-serif);
-  font-size:clamp(17px, 2.3vw, 29px);
-  line-height:1.7; letter-spacing:.1em; text-align:center;
+  font-size:clamp(14px, 1.7vw, 21px);
+  line-height:1.5; letter-spacing:.08em; text-align:center;
   color:rgba(42, 38, 32, .28);                 /* 淡墨水印（提高可见度） */
   text-shadow:0 1px 0 rgba(255, 255, 255, .5), 0 0 22px rgba(184, 137, 59, .1);
-  opacity:.96; padding:14px 6px;
+  opacity:.96; padding:8px 5px; white-space:normal; word-break:break-word;
   transition:color .9s ease, text-shadow .9s ease, opacity .9s ease, font-weight .9s ease;
 }
 .void-view__wm-line[hidden]{ display:none !important; }
