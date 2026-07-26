@@ -241,24 +241,29 @@ body.view-people .hint{display:none;}
 .void-view__sub{display:block; margin-top:34px; font-size:14px; color:var(--ink-3); letter-spacing:.2em;}
 @keyframes voidIn{from{transform:translateY(18px); opacity:0;} to{transform:none; opacity:1;}}
 
-/* 虚无-图景淡墨水印 */
-.void-view__watermark{
-  position:absolute; right:6vw; top:50%; transform:translateY(-50%);
-  display:flex; flex-direction:row; gap:22px; opacity:.18; pointer-events:none; z-index:0;
-  font-family:var(--font-serif); color:var(--ink-2); writing-mode:vertical-rl; text-orientation:upright;
+/* 虚无-图景 · 意境页 左右淡墨水印诗文 */
+.void-view__wm{
+  position:absolute; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; align-items:center;
+  max-width:30vw; pointer-events:none; z-index:0;
 }
-.void-view__watermark span{
-  font-size:clamp(24px, 3.6vw, 46px); letter-spacing:.22em; line-height:1.9;
-  text-shadow:0 1px 0 rgba(255,255,255,.6), 0 0 28px rgba(184,137,59,.08);
+.void-view__wm--left{ left:3.5vw; }
+.void-view__wm--right{ right:3.5vw; }
+
+.void-view__wm-line{
+  font-family:var(--font-serif);
+  font-size:clamp(17px, 2.3vw, 29px);
+  line-height:1.7; letter-spacing:.1em; text-align:center;
+  color:rgba(42, 38, 32, .10);                 /* 淡墨水印 */
+  text-shadow:0 1px 0 rgba(255, 255, 255, .5), 0 0 26px rgba(184, 137, 59, .06);
+  opacity:.92; padding:14px 6px;
+  transition:color .9s ease, text-shadow .9s ease, opacity .9s ease, font-weight .9s ease;
 }
-.void-view__watermark--left{
-  left:5vw; right:auto;
-  writing-mode:horizontal-tb; text-orientation:initial;
-  flex-direction:column; align-items:flex-start; gap:16px;
-  transform:translateY(-50%);
-}
-.void-view__watermark--left span{
-  font-size:clamp(20px, 2.8vw, 32px); letter-spacing:.14em; line-height:1.6;
+.void-view__wm-line[hidden]{ display:none !important; }
+.void-view__wm-line.is-hot{                      /* 出现瞬间高亮加黑 */
+  color:var(--ink, #2A2620);
+  font-weight:700; opacity:1;
+  text-shadow:0 2px 18px rgba(184, 137, 59, .22);
 }
 
 /* ── 纪元序言卡（纯新增覆盖层） ── */

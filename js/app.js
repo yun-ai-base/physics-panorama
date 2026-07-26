@@ -85,11 +85,6 @@ async function boot() {
 
   // 若 URL 带 ?lang=en，启动即进入英文界面
   if (state.lang === 'en') applyLang();
-  // [TEMP self-test only] 强制全屏并立刻渲染，自测用
-  document.body.classList.add('mm-fs');
-  const mmFsBtn = document.getElementById('mmFullscreen');
-  if (mmFsBtn) mmFsBtn.textContent = '✕ 退出全屏';
-  renderMindmap();
 }
 
 function renderCurrent() {

@@ -67,6 +67,7 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
   padding: 8px 18px;
   border-bottom: 1px solid rgba(42, 38, 32, .07);
@@ -109,6 +110,34 @@
   transition: background .2s;
 }
 .mindmap-fullscreen:hover { background: var(--gold-tint, rgba(184, 137, 59, .12)); }
+
+/* ── 全屏浮动退出按钮（右上角固定，始终可见） ── */
+.mm-exit-fs {
+  display: none;                               /* 默认隐藏 */
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 9999;
+  border: 1px solid rgba(184, 137, 59, .5);
+  background: rgba(255, 255, 255, .92);
+  color: var(--gold-dark, #8B6914);
+  padding: 6px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background .2s, box-shadow .2s;
+  white-space: nowrap;
+  user-select: none;
+}
+body.mm-fs .mm-exit-fs { display: block; }      /* 全屏时显示 */
+.mm-exit-fs:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .22);
+}
 
 /* ── 全屏模式 ── */
 /* 当 body 带 mm-fs 类时，隐藏顶栏+子选项栏、让思维导图撑满整个视口 */

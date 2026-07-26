@@ -149,15 +149,17 @@
 
         <!-- 选项一：意境（原诗意占位） -->
         <div class="void-poem" id="voidPoem">
-          <div class="void-view__watermark" aria-hidden="true">
-            <span>无极生太极</span>
-            <span>太极生两仪</span>
-            <span>两仪生四象</span>
-            <span>四象生八卦</span>
+          <div class="void-view__wm void-view__wm--left" id="poemWmLeft" aria-hidden="true">
+            <span class="void-view__wm-line" data-idx="0">你未看此花时，此花与汝心同归于寂。你来看此花时，则此花颜色一时明白起来。</span>
+            <span class="void-view__wm-line" data-idx="1">天地与我并生，而万物与我为一。</span>
+            <span class="void-view__wm-line" data-idx="2">宇宙最不可理解之处，就在于它居然是可以理解的。</span>
+            <span class="void-view__wm-line" data-idx="3">小径分叉的花园</span>
           </div>
-          <div class="void-view__watermark void-view__watermark--left" aria-hidden="true">
-            <span>小径分叉的花园</span>
-            <span>过去、现在、未来同存</span>
+          <div class="void-view__wm void-view__wm--right" id="poemWmRight" aria-hidden="true">
+            <span class="void-view__wm-line" data-idx="0">过去、现在和未来之间的区别只是一种顽固的幻觉。</span>
+            <span class="void-view__wm-line" data-idx="1">我们都是由星尘组成的。</span>
+            <span class="void-view__wm-line" data-idx="2">宇之表无极，宙之端无穷。</span>
+            <span class="void-view__wm-line" data-idx="3">无极生太极</span>
           </div>
           <div class="void-view__card">
             <p class="void-view__verse">一花一世界</p>
@@ -226,6 +228,7 @@
   </div>
 
   <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/poem.js"></script>
   <script defer src="js/changelog.js"></script>
 </body>
 </html>
