@@ -205,24 +205,23 @@ function splitByMarkers(block) {
     '其一', '其二', '其三', '其四', '其五'
   ];
   const re = new RegExp('(' + markers.join('|') + ')([：:,，。是、])', 'g');
-  const parts = [];
-  let lastEnd = 0;
+  const hits = [];
   let m;
   while ((m = re.exec(block)) !== null) {
-    const prefix = block.slice(lastEnd, m.index).trim();
-    if (prefix.length > 15) parts.push({ text: prefix, title: '' });
-    const marker = m[1].trim();
-    const after = block.slice(m.index + m[0].length);
-    const fsent = after.match(/[^。！？\n]{0,24}[。！？]?/);
-    const extra = fsent ? fsent[0].trim() : '';
-    const title = (extra && extra.length <= 16) ? marker + '…' + extra.slice(0, 12) : marker;
-    parts.push({ text: after.trim(), title });
-    lastEnd = m.index + m[0].length;
+    hits.push({ index: m.index, len: m[0].length, marker: m[1].trim() });
   }
-  const tail = block.slice(lastEnd).trim();
-  if (tail.length > 15) {
-    if (parts.length && !parts[parts.length - 1].title) parts[parts.length - 1].text += '\n' + tail;
-    else parts.push({ text: tail, title: '' });
+  if (hits.length < 3) return null;
+
+  const parts = [];
+  // 首个标记前的引导语
+  const head = block.slice(0, hits[0].index).trim();
+  if (head.length > 15) parts.push({ text: head, title: '' });
+  // 每个标记到下一个标记（或文末）之间的内容作为一段，避免段落重叠冗余
+  for (let i = 0; i < hits.length; i++) {
+    const start = hits[i].index + hits[i].len;
+    const end = (i + 1 < hits.length) ? hits[i + 1].index : block.length;
+    const body = block.slice(start, end).trim().replace(/^[，,；;\s]+/, '');
+    if (body.length > 15) parts.push({ text: body, title: hits[i].marker });
   }
   if (parts.length < 3) return null;
   return parts.filter(p => p.text.trim().length > 15);
@@ -550,7 +549,7 @@ function renderDim(node, key) {
     summary: node.summary || '',
     history: node.summary || '',
     paradigm: node.aha || '',
-    limitation: node.limitation || '',
+    limits: node.limitation || '',
     figures: '',
   };
   if (key in map) {
@@ -603,7 +602,7 @@ export function openNode(id) {
   } else {
     dims = DIMENSIONS.filter(d => {
       if (d.key === 'formula') return hasFormula;
-      if (d.key === 'limitation') return hasLimitation;
+      if (d.key === 'limits') return hasLimitation;
       if (d.key === 'terms') return hasTerms;
       if (d.key === 'summary') return !!node.summary?.trim();
       return node.deepContent?.[d.key] && String(node.deepContent[d.key]).trim();
@@ -614,6 +613,7 @@ export function openNode(id) {
       if (hasAha && !dims.find(d => d.key === 'paradigm')) extra.push({ key: 'paradigm', label: '⛓ 范式' });
       if (hasFigures && !dims.find(d => d.key === 'figures')) extra.push({ key: 'figures', label: '👤 人物' });
       if (hasTerms && !dims.find(d => d.key === 'terms')) extra.push({ key: 'terms', label: '🧩 术语' });
+      if (hasLimitation && !dims.find(d => d.key === 'limits')) extra.push({ key: 'limits', label: '⚠ 局限' });
       dims = [...dims, ...extra];
     }
   }

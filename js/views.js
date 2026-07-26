@@ -1,4 +1,4 @@
-import { ERA_RANK, SCALE_RANK } from './config.js';
+import { ERA_RANK, SCALE_RANK, SCALE_ORDER } from './config.js';
 
 const W = 2600; // 画布宽度
 const NODE_R = 32; // 节点碰撞半径（含标签）
@@ -32,7 +32,7 @@ export function computeLayout(nodes, view) {
  * 同行节点在同一 y 线上，避免 era 偏移带来的杂乱。
  */
 function computeScaleLayout(nodes) {
-  const scales = ['microscopic', 'mesoscopic', 'cosmic', 'unified', 'feedback'];
+  const scales = SCALE_ORDER;
   const ROW_H = 320;
   const START_Y = 140;
   const PAD_X = 220; // 左右留白加大，避免左侧 scale 标签被截断

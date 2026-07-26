@@ -101,7 +101,6 @@ function drawScaleBands(layer, labelLayer) {
     const maxY = Math.max(...xs.map(p => p.y)) + 70;
     scaleBandY[scale] = { minY, maxY, midY: (minY + maxY) / 2 };
     const cfg = SCALE_COLORS[scale];
-    const active = state.filterEra ? false : true; // 在 scale 视图下默认全部高亮
 
     // 背景带仍放在底层 layer，节点在其上方经过
     el('rect', {

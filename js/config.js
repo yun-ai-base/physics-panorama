@@ -25,7 +25,7 @@ export const REVOLUTION_SET = new Set([
 // 统一关系边（这些节点的所有入边为「统一」发光环线）
 export const UNIFY_NODES = new Set(['electroweak','standard-model']);
 
-// 12 维度标签（顺序即侧边栏标签顺序）；formula 取自节点级，figures 合并 biography
+// 14 维度标签（顺序即侧边栏标签顺序）；formula 取自节点级，figures 合并 biography
 export const DIMENSIONS = [
   { key:'summary',     label:'📌 综述' },
   { key:'history',     label:'📖 脉络' },
@@ -100,6 +100,7 @@ export const SCALE_DESC = {
     extend: [
       { rel: '宇观 ↔ 宏观 · 引力桥梁', text: '同一套广义相对论既描述苹果落地也解释星系旋转；牛顿引力在弱场极限下自然回归为宏观日常引力，使宇观与宏观共享同一座“引力之桥”。' },
       { rel: '宇观 ← 微观 · 统一', text: '宇宙极早期（普朗克时刻）所有尺度合一，引力与量子效应同等重要。理解宇宙起源与奇点必须依赖尚未完成的量子引力理论——这是宇观向微观发出的求援。' },
+      { rel: '宇观 → 统一 · 极早期求索', text: '宇观的尽头正是统一：宇宙极早期（普朗克时刻）引力与量子效应同等重要，理解大爆炸奇点与暴胀必须依赖尚未建成的量子引力理论；反过来，统一理论一旦完成，也将同时解释最小尺度与宇观起源。' },
       { rel: '宇观 → 反哺 · 观测驱动', text: '宇宙学观测（CMB、超新星、引力波）不断为微观理论设定边界条件（如中微子质量、暗能量状态方程），反向约束统一理论的参数空间。' },
     ],
   },
