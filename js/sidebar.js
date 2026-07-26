@@ -903,11 +903,43 @@ function stripInlineBold(s) {
 }
 
 /* 从节点 deepContent/summary/aha 中提取与该人物相关的段落 */
+// 从节点数据中提取关于指定人物的简介片段。
+// 防止会议参会名单（如索尔维会议 figures_detail 的29人排位表）被当作个人传记。
 function personSnippet(node, name) {
   const dc = node.deepContent || {};
   const text = dc.figures_detail || dc.biography || node.summary || node.aha || '';
   if (!text) return '';
+
+  // 检测会议/活动参会名单模式（含「后排/中排/前排（左起）」多排列表）
+  const isRoster = /(?:后排|中排|前排)[（(]\s*左起\s*[)）]/.test(text);
+
   const paragraphs = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+
+  if (isRoster) {
+    // 名单模式：只提取「**人名**：具体描述」这种有独立传记行的内容，
+    // 不把整份排位表当成某人的个人简介。
+    // 匹配时支持全名或名字中的关键部分（如「尼尔斯·玻尔」能匹配「玻尔」）
+    const parts = name.split(/[\s·．]+/).filter(Boolean);
+    // 排位标题关键词（如「**后排（左起）**：」这种行不是个人传记）
+    const rosterHeaders = /^(?:后排|中排|前排|核心|与会|出席|参加)[（(]/;
+    for (const p of paragraphs) {
+      const lines = p.split('\n');
+      const bioLine = lines.find(l => {
+        if (!/^(?:-\s*)?\*\*[^*]+\*\*\s*[：:]/.test(l)) return false;
+        // 排除排位标题行
+        const bold = (l.match(/\*\*(.+?)\*\*/)||[])[1] || '';
+        if (rosterHeaders.test(bold)) return false;
+        return parts.some(part => l.includes(part));
+      });
+      if (bioLine) {
+        const cleaned = bioLine.replace(/\s+/g, ' ').trim();
+        return cleaned.length > 220 ? cleaned.slice(0, 220) + '…' : cleaned;
+      }
+    }
+    // 名单里只是提到名字但没有独立传记行 → 跳过，不返回名单
+    return '';
+  }
+
   const target = paragraphs.find(p => p.startsWith(`**${name}**`) || p.startsWith(name) || p.includes(name));
   const snippet = target || paragraphs[0] || text;
   const oneLine = snippet.replace(/\s+/g, ' ').trim();
