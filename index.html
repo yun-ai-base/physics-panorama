@@ -94,6 +94,21 @@
         <div class="people-grid" id="peopleGrid"></div>
       </div>
 
+      <!-- 纪元序言卡（覆盖层，纯新增，不影响现有视图与交互） -->
+      <div class="era-preface" id="eraPreface" hidden>
+        <div class="era-preface__card">
+          <button class="era-preface__close" id="eraPrefaceClose" aria-label="关闭">×</button>
+          <div class="era-preface__tag" id="epTag"></div>
+          <h2 class="era-preface__title" id="epTitle"></h2>
+          <p class="era-preface__lead" id="epLead"></p>
+          <div class="era-preface__row"><span class="era-preface__label">核心难题</span><span class="era-preface__val" id="epPuzzle"></span></div>
+          <div class="era-preface__row"><span class="era-preface__label">代表人物</span><span class="era-preface__val" id="epFigs"></span></div>
+        </div>
+      </div>
+
+      <!-- 悬停节点迷你预览卡（纯新增，pointer-events:none 不干扰拖拽/点击） -->
+      <div class="node-preview" id="nodePreview" hidden></div>
+
       <!-- 虚无-图景占位视图 -->
       <div class="void-view" id="voidView" hidden>
         <div class="void-view__watermark" aria-hidden="true">

@@ -8,7 +8,7 @@ import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople } from './people.js';
 
-let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map();
+let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
 let PEOPLE_MAP = new Map();
 
@@ -47,6 +47,7 @@ async function boot() {
     NODES = nodeRes;
     EDGES = buildEdges(NODES, metaRes.conflicts || []);
     SUMMARIES = metaRes.summaries || {};
+    PREFACES = metaRes.prefaces || {};
     NODES.forEach(n => byId.set(n.id, n));
   } catch (err) {
     console.error('[boot] 数据加载失败：', err);
@@ -113,6 +114,41 @@ function focusNode(id) {
 function nodeEl(id) { return document.querySelector(`.node[data-id="${id}"]`); }
 function clearSearchGlow() { document.querySelectorAll('.node.is-search').forEach(n => n.classList.remove('is-search')); }
 
+// ===== 新增：纪元序言卡（纯增量，复用 PREFACES 数据与 ERAS 配色） =====
+function showEraPreface(era) {
+  const ep = document.getElementById('eraPreface');
+  if (!ep || !PREFACES[era]) { if (ep) ep.hidden = true; return; }
+  const d = PREFACES[era];
+  const info = ERAS[era];
+  const tag = document.getElementById('epTag');
+  tag.textContent = (info ? info.name : era) + (d.range ? ' · ' + d.range : '');
+  tag.style.color = info ? info.raw : 'var(--gold)';
+  document.getElementById('epTitle').textContent = d.title || (info ? info.name : era);
+  document.getElementById('epLead').textContent = d.lead || '';
+  document.getElementById('epPuzzle').textContent = d.puzzle || '';
+  document.getElementById('epFigs').textContent = (d.figures || []).join('、');
+  ep.hidden = false;
+}
+
+// ===== 新增：悬停节点迷你预览卡（pointer-events:none，不干扰拖拽/点击） =====
+function showNodePreview(n, x, y) {
+  const pv = document.getElementById('nodePreview');
+  if (!pv) return;
+  const sum = n.summary || (n.deepContent && n.deepContent.summary) || '—';
+  pv.innerHTML =
+    `<div class="node-preview__name">${esc(n.name || '')}</div>` +
+    (n.nameEn ? `<div class="node-preview__en">${esc(n.nameEn)}</div>` : '') +
+    `<div class="node-preview__sum">${esc(sum)}</div>`;
+  pv.hidden = false;
+  const pad = 14, r = pv.getBoundingClientRect();
+  let px = x + 16, py = y + 16;
+  if (px + r.width > window.innerWidth - pad) px = x - r.width - 16;
+  if (py + r.height > window.innerHeight - pad) py = y - r.height - 16;
+  pv.style.left = Math.max(pad, px) + 'px';
+  pv.style.top = Math.max(pad, py) + 'px';
+}
+function hideNodePreview() { const pv = document.getElementById('nodePreview'); if (pv) pv.hidden = true; }
+
 function wireUI() {
   document.getElementById('viewTabs').addEventListener('click', e => {
     const b = e.target.closest('.view-tab'); if (!b) return;
@@ -128,7 +164,7 @@ function wireUI() {
     if (a === 'all') {
       state.filterEra = null; state.activeEra = null; closeSidebar();
     } else {
-      state.filterEra = a; state.activeEra = a; openEra(a); // 激活纪元：聚焦筛选 + 高亮 + 综述
+      state.filterEra = a; state.activeEra = a; openEra(a); showEraPreface(a); // 激活纪元：聚焦筛选 + 高亮 + 综述 + 序言卡
     }
     reflectEraActive(); applyState(); updateURL();
   });
@@ -146,13 +182,32 @@ function wireUI() {
     const sl = e.target.closest('.scale-band__label');
     if (sl) { toggleScaleLabel(sl.dataset.scale); return; } // 尺度维度标签：点击展开概念解析面板
     const pf = e.target.closest('.preface');
-    if (pf) { openEra(pf.dataset.era); return; }
+    if (pf) { openEra(pf.dataset.era); showEraPreface(pf.dataset.era); return; }
     // 点击画布空白（非节点/非标签/非前言）：退出聚焦态，清除选中与关联高亮
     if (state.selected || state.activeEra || state.activeScale) {
       state.selected = null; state.highlight = new Set(); state.activeEra = null; state.activeScale = null;
       reflectEraActive(); reflectScaleActive(); applyState(); updateURL();
     }
   });
+
+  // 悬停节点迷你预览卡（纯新增，不影响点击/拖拽/缩放）
+  stage.addEventListener('mouseover', e => {
+    const g = e.target.closest('.node');
+    if (!g) return;
+    const n = byId.get(g.dataset.id);
+    if (!n) return;
+    showNodePreview(n, e.clientX, e.clientY);
+  });
+  stage.addEventListener('mouseout', e => {
+    if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.node')) return;
+    hideNodePreview();
+  });
+  document.addEventListener('mousedown', hideNodePreview);
+  // 纪元序言卡关闭交互
+  const epEl = document.getElementById('eraPreface');
+  const epClose = document.getElementById('eraPrefaceClose');
+  if (epClose) epClose.addEventListener('click', () => { if (epEl) epEl.hidden = true; });
+  if (epEl) epEl.addEventListener('click', e => { if (e.target === epEl) epEl.hidden = true; });
 
   // 顶部尺度维度关联图：chip 打开概念解析面板，arrow 打开目标尺度的「尺度间渗透」说明
   const scaleMapBar = document.getElementById('scaleMapBar');
@@ -300,7 +355,7 @@ function reflectEraActive() {
 // 时间线纪元大字点击：轻量激活（高亮 + 综述，不改筛选）；再次点击同纪元取消
 function toggleEraLabel(era) {
   if (state.activeEra === era) { state.activeEra = null; closeSidebar(); }
-  else { state.activeEra = era; openEra(era); }
+  else { state.activeEra = era; openEra(era); showEraPreface(era); }
   document.querySelectorAll('.era-band__label').forEach(l => l.classList.toggle('is-active-era', l.dataset.era === state.activeEra));
   reflectEraActive(); updateURL();
 }

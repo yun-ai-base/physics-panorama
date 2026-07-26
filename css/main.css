@@ -249,3 +249,26 @@ body.view-people .hint{display:none;}
 .void-view__watermark--left span{
   font-size:clamp(20px, 2.8vw, 32px); letter-spacing:.14em; line-height:1.6;
 }
+
+/* ── 纪元序言卡（纯新增覆盖层） ── */
+.era-preface{position:absolute; inset:0; z-index:34; background:rgba(244,240,232,.72); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; padding:32px 24px; animation:epFade .26s ease both;}
+.era-preface[hidden]{display:none;}
+.era-preface__card{position:relative; width:min(560px, 92vw); background:var(--panel,#fff); border:1px solid rgba(184,137,59,.28); border-radius:16px; padding:30px 32px 26px; box-shadow:0 18px 48px rgba(42,38,32,.16); animation:epPop .32s cubic-bezier(.2,.8,.25,1) both;}
+.era-preface__close{position:absolute; top:12px; right:14px; width:28px; height:28px; border:none; background:none; font-size:20px; line-height:1; color:var(--ink-3); cursor:pointer; border-radius:50%; padding:0; transition:background .2s,color .2s;}
+.era-preface__close:hover{color:var(--gold); background:var(--gold-tint,rgba(184,137,59,.12));}
+.era-preface__tag{font-size:12px; font-weight:700; letter-spacing:.42em; margin-bottom:10px;}
+.era-preface__title{font-family:var(--font-serif); font-size:clamp(22px,3.4vw,30px); color:var(--ink); margin:0 0 14px; letter-spacing:.05em;}
+.era-preface__lead{font-size:15px; line-height:1.85; color:var(--ink-2); margin:0 0 18px;}
+.era-preface__row{display:flex; gap:12px; padding:10px 0; border-top:1px dashed rgba(42,38,32,.1); font-size:13.5px; line-height:1.7;}
+.era-preface__label{flex:0 0 auto; color:var(--gold); font-weight:700; letter-spacing:.16em; padding-top:1px;}
+.era-preface__val{color:var(--ink-2);}
+@keyframes epFade{from{opacity:0;} to{opacity:1;}}
+@keyframes epPop{from{transform:translateY(14px) scale(.98); opacity:0;} to{transform:none; opacity:1;}}
+
+/* ── 悬停节点迷你预览卡（纯新增，pointer-events:none 不干扰拖拽/点击） ── */
+.node-preview{position:fixed; z-index:40; max-width:280px; padding:12px 14px; background:rgba(255,253,249,.97); border:1px solid rgba(184,137,59,.3); border-radius:12px; box-shadow:0 10px 26px rgba(42,38,32,.18); pointer-events:none; animation:npIn .14s ease both;}
+.node-preview[hidden]{display:none;}
+.node-preview__name{font-family:var(--font-serif); font-size:16px; font-weight:700; color:var(--ink); line-height:1.3;}
+.node-preview__en{font-size:11px; color:var(--ink-3); letter-spacing:.04em; margin-top:1px;}
+.node-preview__sum{font-size:12.5px; line-height:1.6; color:var(--ink-2); margin-top:7px;}
+@keyframes npIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
