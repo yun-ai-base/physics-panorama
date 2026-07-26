@@ -39,6 +39,7 @@
           <input id="searchInput" type="search" placeholder="搜索学说 / 人名 / 关键词…" autocomplete="off" />
           <div class="search__results" id="searchResults" hidden></div>
         </div>
+        <button class="lang-toggle" id="langBtn" type="button">EN</button>
       </div>
     </header>
 
@@ -117,7 +118,7 @@
           <p class="people-view__sub">物理学三百年的代表人物 · 点击查看其关联的学说与事件</p>
           <div class="people-tools">
             <input id="peopleSearch" class="people-search" type="search" placeholder="搜索人物姓名…" aria-label="搜索人物">
-            <span class="people-count" id="peopleCount"></span>
+            <span class="people-count" id="peopleCount" aria-live="polite" role="status"></span>
           </div>
         </div>
         <div class="people-grid" id="peopleGrid"></div>
@@ -187,6 +188,7 @@
       <!-- 详情侧边栏 -->
       <aside class="sidebar" id="sidebar" aria-hidden="true">
         <button class="sidebar__close" id="sidebarClose" aria-label="关闭">×</button>
+        <div class="sidebar__minimap" id="minimap" hidden></div>
         <div class="sidebar__body" id="sidebarBody"></div>
       </aside>
     </main>
@@ -197,7 +199,9 @@
         <button class="linkbtn" id="shareBtn">分享当前视图</button>
         <button class="linkbtn" id="expandAllBtn">展开全部关联</button>
         <button class="linkbtn" id="resetBtn">回到全景</button>
-      </div>
+          <button class="linkbtn" id="favBtn">★ 收藏 <span id="favCount" class="badge">0</span></button>
+          <button class="linkbtn" id="pathBtn">🧭 学习路径</button>
+        </div>
       <div class="bottombar__tour">
         <button class="tour-btn" id="tour3">3 分钟概览</button>
         <button class="tour-btn" id="tour10">10 分钟全览</button>
@@ -216,6 +220,16 @@
         </div>
         <div class="changelog__list" id="clList"></div>
       </div>
+    </div>
+    <!-- 我的收藏（仅本机 localStorage，不上网） -->
+    <div class="fav-panel" id="favPanel" hidden>
+      <div class="fav-panel__head"><span>★ 我的收藏</span><button class="fav-panel__close" id="favClose" type="button" aria-label="收起">×</button></div>
+      <div class="fav-panel__list" id="favList"></div>
+    </div>
+    <!-- 预设学习路径 -->
+    <div class="path-panel" id="pathPanel" hidden>
+      <div class="path-panel__head"><span>🧭 预设学习路径</span><button class="path-panel__close" id="pathClose" type="button" aria-label="收起">×</button></div>
+      <div class="path-panel__list" id="pathList"></div>
     </div>
   </div>
 

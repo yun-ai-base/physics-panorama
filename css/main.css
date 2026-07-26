@@ -291,3 +291,50 @@ body.view-people .hint{display:none;}
 .sb-explore__item{display:block; font-size:13.5px; line-height:1.5; color:var(--ink,#2A2620); text-decoration:none; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,.7); border:1px solid rgba(184,137,59,.18); transition:background .2s, border-color .2s, transform .15s;}
 .sb-explore__item:hover{background:#fff; border-color:var(--gold,#B8893B); transform:translateX(2px); text-decoration:none;}
 .sb-explore__empty{display:block; font-size:13px; color:var(--ink-3,#9A8F7E); line-height:1.6; padding:4px 2px;}
+
+/* ── 顶栏语言切换（中 / EN） ── */
+.lang-toggle {
+  margin-left: 8px; padding: 6px 14px; border: 1px solid #E7DCC0;
+  background: #FFFDF7; color: #B8893B; border-radius: 999px;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
+}
+.lang-toggle:hover { background: #FBF3E2; }
+
+/* ── 收藏 / 学习路径 浮层（与更新日记同级定位） ── */
+.fav-panel, .path-panel {
+  position: fixed; right: 18px; bottom: 64px; width: 320px; max-height: 72vh;
+  background: #FFFDF7; border: 1px solid #EADFC4; border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(60,45,20,.18); z-index: 60;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.fav-panel__head, .path-panel__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid #F0E7D2; font-weight: 700; color: #3A332A;
+}
+.fav-panel__close, .path-panel__close {
+  border: none; background: transparent; font-size: 20px; line-height: 1; cursor: pointer; color: #9A8C76;
+}
+.fav-panel__list, .path-panel__list { padding: 10px; overflow-y: auto; }
+.fav-empty { padding: 18px 8px; color: #9A8C76; font-size: 13px; line-height: 1.6; }
+.fav-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 10px; margin-bottom: 6px;
+  border: 1px solid #F0E7D2; border-radius: 10px; background: #FFFEFA; cursor: pointer; text-align: left;
+}
+.fav-item:hover { background: #FBF3E2; }
+.fav-item__sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.fav-item__name { font-weight: 600; color: #3A332A; }
+.fav-item__en { color: #9A8C76; font-size: 12px; margin-left: auto; }
+.badge {
+  display: inline-block; min-width: 16px; padding: 0 5px; margin-left: 2px;
+  background: #B8893B; color: #fff; border-radius: 999px; font-size: 11px; text-align: center;
+}
+.path-card { padding: 10px; margin-bottom: 10px; border: 1px solid #F0E7D2; border-radius: 12px; background: #FFFEFA; }
+.path-card__title { font-weight: 700; color: #3A332A; margin-bottom: 4px; }
+.path-card__desc { font-size: 12px; color: #7A6E58; line-height: 1.6; margin-bottom: 8px; }
+.path-card__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.path-chip {
+  padding: 4px 9px; border-radius: 999px; border: 1px solid var(--c, #ccc);
+  background: color-mix(in srgb, var(--c, #ccc) 12%, #fff); color: #3A332A; font-size: 12px; cursor: pointer;
+}
+.path-chip:hover { background: color-mix(in srgb, var(--c, #ccc) 26%, #fff); }
+.path-card__go { font-size: 12px; padding: 5px 12px; }

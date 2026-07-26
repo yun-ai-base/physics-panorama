@@ -42,7 +42,7 @@ export function renderPeople(container, people, onPick) {
     const sw = p.eras
       .map(e => `<i class="swatch" style="background:${ERAS[e] ? ERAS[e].raw : 'var(--ink-3)'}"></i>`)
       .join(' ');
-    return `<button class="person-card" data-name="${esc(p.name)}" title="${esc(p.name)}">
+    return `<button class="person-card" data-name="${esc(p.name)}" title="${esc(p.name)}" aria-label="${esc(p.name)}，关联 ${p.nodeIds.length} 个理论节点">
       <span class="person-card__avatar">${avatarImg(p.name)}</span>
       <span class="person-card__name">${esc(p.name)}</span>
       <span class="person-card__meta">${sw}<span>${p.nodeIds.length} 个关联</span></span>

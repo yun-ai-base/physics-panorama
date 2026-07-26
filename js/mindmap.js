@@ -120,7 +120,7 @@ function computeLayout() {
           const dy = ny + (di - (dims.length - 1) / 2) * DIM_H;
           posMap.set(n.id + ':dim:' + d.key, {
             x: X_DIM, y: dy, w: DIM_W, h: DIM_H,
-            kind: 'dim', dimKey: d.key, dimLabel: d.label, nodeId: n.id,
+            kind: 'dim', dimKey: d.key, dimLabel: d.label, nodeId: n.id, nodeName: n.name,
           });
         });
       }
@@ -224,60 +224,124 @@ function render() {
 }
 
 function drawRoot(p, parent) {
-  const g = mk('g', { class: 'mm-node mm-root', 'data-kind': 'root' }, parent);
+  const g = mk('g', { class: 'mm-node mm-root', 'data-kind': 'root', tabindex: '0', role: 'button', 'aria-label': '物理学全景 · 根节点' }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 14, class: 'mm-rect mm-rect--root' }, g);
   mk('text', { x: p.x, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--root' }, g).textContent = '物理学全景';
 }
 function drawEra(p, parent) {
-  const g = mk('g', { class: 'mm-node mm-era', 'data-kind': 'era', 'data-era': p.era }, parent);
+  const g = mk('g', { class: 'mm-node mm-era', 'data-kind': 'era', 'data-era': p.era, tabindex: '0', role: 'button', 'aria-label': ERAS[p.era].name + ' 纪元' }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 12, class: 'mm-rect mm-rect--era', style: `fill:${ERAS[p.era].raw}` }, g);
   mk('text', { x: p.x, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--era' }, g).textContent = ERAS[p.era].name;
 }
 function drawNode(p, parent) {
   const n = p.node;
   const isCore = n.tier === 'core';
-  const g = mk('g', { class: 'mm-node mm-theory' + (isCore ? ' is-core' : ''), 'data-kind': 'node', 'data-id': n.id }, parent);
+  const hasDims = nodeDims(n).length > 0;
+  const a11y = { class: 'mm-node mm-theory' + (isCore ? ' is-core' : ''), 'data-kind': 'node', 'data-id': n.id, tabindex: '0', role: 'button' };
+  a11y['aria-label'] = n.name + (hasDims ? ' 理论节点，回车展开维度' : ' 理论节点');
+  if (hasDims && !expandAll) a11y['aria-expanded'] = String(expanded.has(n.id));
+  const g = mk('g', a11y, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 9, class: 'mm-rect mm-rect--node' + (isCore ? ' mm-rect--core' : '') }, g);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: 5, height: p.h, rx: 2, class: 'mm-bar', style: `fill:${ERAS[p.era].raw}` }, g);
   mk('text', { x: p.x - p.w / 2 + 15, y: p.y + 5, class: 'mm-text mm-text--node' }, g).textContent = truncate(n.name, 13);
-  if (!expandAll && nodeDims(n).length) {
+  if (!expandAll && hasDims) {
     const open = expanded.has(n.id);
     mk('text', { x: p.x + p.w / 2 - 13, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--toggle' }, g).textContent = open ? '−' : '+';
   }
 }
 function drawDim(p, parent) {
-  const g = mk('g', { class: 'mm-node mm-dim', 'data-kind': 'dim', 'data-id': p.nodeId, 'data-dim': p.dimKey }, parent);
+  const label = (p.nodeName || '该节点') + ' 的 ' + p.dimLabel + ' 维度';
+  const g = mk('g', { class: 'mm-node mm-dim', 'data-kind': 'dim', 'data-id': p.nodeId, 'data-dim': p.dimKey, tabindex: '0', role: 'button', 'aria-label': '打开 ' + label }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 7, class: 'mm-rect mm-rect--dim' }, g);
   mk('text', { x: p.x - p.w / 2 + 12, y: p.y + 4, class: 'mm-text mm-text--dim' }, g).textContent = p.dimLabel;
 }
 
-// ── 交互：缩放 / 拖拽 / 点击 ──
+// ── 交互：缩放 / 拖拽 / 点击（Pointer Events，兼容鼠标 + 触屏 + 双指缩放） ──
+const pointers = new Map();   // pointerId → { x, y }（SVG 本地坐标）
+let pinch = null;             // 双指缩放快照
+
+function svgPoint(e) {
+  const r = SVG.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
 function onWheel(e) {
   e.preventDefault();
-  const r = SVG.getBoundingClientRect();
-  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const p = svgPoint(e);
   const f = e.deltaY < 0 ? 1.12 : 0.892;
   const k0 = tf.k;
   const k1 = Math.min(3.2, Math.max(0.18, k0 * f));
-  const wx = (mx - tf.tx) / k0, wy = (my - tf.ty) / k0;
-  tf.tx = mx - wx * k1; tf.ty = my - wy * k1; tf.k = k1;
+  const wx = (p.x - tf.tx) / k0, wy = (p.y - tf.ty) / k0;
+  tf.tx = p.x - wx * k1; tf.ty = p.y - wy * k1; tf.k = k1;
   applyTransform();
 }
-function onDown(e) {
-  dragging = true; moved = false; lastX = e.clientX; lastY = e.clientY;
+
+function onPointerDown(e) {
+  SVG.setPointerCapture?.(e.pointerId);
+  const p = svgPoint(e);
+  pointers.set(e.pointerId, p);
+  if (pointers.size === 1) {
+    dragging = true; moved = false; lastX = p.x; lastY = p.y;
+  } else if (pointers.size === 2) {
+    // 进入双指缩放：固定初始变换与双指中点
+    const pts = [...pointers.values()];
+    const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+    pinch = {
+      dist: Math.hypot(dx, dy) || 1,
+      midX: (pts[0].x + pts[1].x) / 2,
+      midY: (pts[0].y + pts[1].y) / 2,
+      k0: tf.k, tx0: tf.tx, ty0: tf.ty,
+    };
+    dragging = false; moved = true;   // 阻止缩放收尾时的 click 误触
+  }
 }
-function onMove(e) {
-  if (!dragging) return;
-  const dx = e.clientX - lastX, dy = e.clientY - lastY;
-  if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
-  tf.tx += dx; tf.ty += dy; lastX = e.clientX; lastY = e.clientY;
-  applyTransform();
+
+function onPointerMove(e) {
+  if (!pointers.has(e.pointerId)) return;
+  const p = svgPoint(e);
+  pointers.set(e.pointerId, p);
+
+  // 双指缩放：以两指中点为锚点，按距离比缩放
+  if (pointers.size >= 2 && pinch) {
+    const pts = [...pointers.values()];
+    const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const midX = (pts[0].x + pts[1].x) / 2;
+    const midY = (pts[0].y + pts[1].y) / 2;
+    const f = dist / pinch.dist;
+    const k1 = Math.min(3.2, Math.max(0.18, pinch.k0 * f));
+    const wx = (midX - pinch.tx0) / pinch.k0;
+    const wy = (midY - pinch.ty0) / pinch.k0;
+    tf.k = k1;
+    tf.tx = midX - wx * k1;
+    tf.ty = midY - wy * k1;
+    applyTransform();
+    return;
+  }
+
+  // 单指 / 鼠标拖拽
+  if (dragging) {
+    const dx = p.x - lastX, dy = p.y - lastY;
+    if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+    tf.tx += dx; tf.ty += dy; lastX = p.x; lastY = p.y;
+    applyTransform();
+  }
 }
-function onUp() { dragging = false; }
-function onClick(e) {
-  if (moved) return;
-  const g = e.target.closest('.mm-node');
-  if (!g) return;
+
+function onPointerUp(e) {
+  pointers.delete(e.pointerId);
+  SVG.releasePointerCapture?.(e.pointerId);
+  if (pointers.size < 2) pinch = null;
+  if (pointers.size === 1) {
+    // 双指退回单指：重置基准避免跳变，且抑制本次 click
+    const [p] = [...pointers.values()];
+    dragging = true; moved = true; lastX = p.x; lastY = p.y;
+  } else if (pointers.size === 0) {
+    dragging = false;
+  }
+}
+
+function activateNode(g) {
   const kind = g.dataset.kind;
   if (kind === 'node') {
     const id = g.dataset.id;
@@ -290,11 +354,31 @@ function onClick(e) {
     if (onOpenDimension) onOpenDimension(id, dim);
   }
 }
+
+function onClick(e) {
+  if (moved) return;
+  const g = e.target.closest('.mm-node');
+  if (!g) return;
+  activateNode(g);
+}
+
+// 键盘可达性：聚焦节点后 Enter / Space 触发与点击一致的行为
+function onKeyDown(e) {
+  if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+  const el = document.activeElement;
+  if (el && el.classList && el.classList.contains('mm-node') && el.dataset && el.dataset.kind) {
+    e.preventDefault();
+    activateNode(el);
+  }
+}
+
 function bind() {
   if (!SVG || !VIEWPORT) return;
   SVG.addEventListener('wheel', onWheel, { passive: false });
-  SVG.addEventListener('mousedown', onDown);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onUp);
+  SVG.addEventListener('pointerdown', onPointerDown);
+  SVG.addEventListener('pointermove', onPointerMove);
+  SVG.addEventListener('pointerup', onPointerUp);
+  SVG.addEventListener('pointercancel', onPointerUp);
   VIEWPORT.addEventListener('click', onClick);
+  SVG.addEventListener('keydown', onKeyDown);
 }

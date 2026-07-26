@@ -1,9 +1,9 @@
 import { state } from './state.js';
-import { esc, buildEdges, relatedSet } from './utils.js';
-import { ERAS, ERA_ORDER } from './config.js';
+import { esc, buildEdges, relatedSet, getFavorites, isFavorite } from './utils.js';
+import { ERAS, ERA_ORDER, LEARNING_PATHS } from './config.js';
 import { computeLayout } from './views.js';
-import { initRenderer, renderGraph, applyState } from './renderer.js';
-import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
+import { initRenderer, renderGraph, applyState, onApplyState } from './renderer.js';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, updateMiniMap } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
@@ -61,6 +61,9 @@ async function boot() {
   initInteraction();
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
+  onApplyState(updateMiniMap);
+  updateMiniMap();
+  updateFavCount();
 
   // 思维导图模块初始化（仅缓存数据与绑定事件，渲染推迟到首次进入 void→思维导图）
   try {
@@ -126,6 +129,85 @@ function focusNode(id) {
 function nodeEl(id) { return document.querySelector(`.node[data-id="${id}"]`); }
 function clearSearchGlow() { document.querySelectorAll('.node.is-search').forEach(n => n.classList.remove('is-search')); }
 
+// 界面双语：取节点显示名（EN 取 nameEn，无则回退中文）
+function langName(n) { return state.lang === 'en' ? (n.nameEn || n.name) : n.name; }
+
+// 纪元顶栏标签（随语言切换重建；点击监听在 wireUI 用事件委托一次绑定）
+function buildEraTabs() {
+  const en = state.lang === 'en';
+  const eraTabs = document.getElementById('eraTabs');
+  if (!eraTabs) return;
+  eraTabs.innerHTML = `<button class="era-tab is-active" data-era="all"><span class="swatch" style="background:var(--gold)"></span>${en ? 'All' : '全部'}</button>` +
+    ERA_ORDER.map(e => `<button class="era-tab" data-era="${e}"><span class="swatch" style="background:${ERAS[e].raw}"></span>${en ? ERAS[e].nameEn : ERAS[e].name}</button>`).join('');
+}
+
+// 切换界面语言：重绘画布 + 顶栏纪元标签 + 重渲侧栏头部
+function applyLang() {
+  const en = state.lang === 'en';
+  const langBtn = document.getElementById('langBtn');
+  if (langBtn) langBtn.textContent = en ? '中' : 'EN';
+  document.documentElement.lang = en ? 'en' : 'zh';
+  renderGraph(state.view, currentLayout);
+  buildEraTabs();
+  if (state.selected) openNode(state.selected);
+  updateURL();
+}
+
+// ── 本地收藏面板（依赖 utils 的 localStorage 工具） ──
+function renderFavList() {
+  const list = document.getElementById('favList');
+  if (!list) return;
+  const ids = getFavorites();
+  if (!ids.length) { list.innerHTML = '<div class="fav-empty">还没有收藏。打开任意节点，点「☆ 收藏」即可加入。</div>'; return; }
+  list.innerHTML = ids.map(id => {
+    const n = byId.get(id); if (!n) return '';
+    return `<button class="fav-item" data-id="${esc(id)}">
+      <span class="fav-item__sw" style="background:${ERAS[n.era].raw}"></span>
+      <span class="fav-item__name">${esc(langName(n))}</span>
+      <span class="fav-item__en">${esc(n.nameEn || '')}</span>
+    </button>`;
+  }).join('');
+  list.querySelectorAll('.fav-item').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.id;
+    setView('timeline'); selectNode(id);
+    const fp = document.getElementById('favPanel'); if (fp) fp.hidden = true;
+  }));
+}
+function updateFavCount() {
+  const c = document.getElementById('favCount');
+  if (c) c.textContent = String(getFavorites().length);
+}
+
+// ── 预设学习路径面板 ──
+function renderPathList() {
+  const list = document.getElementById('pathList');
+  if (!list) return;
+  const en = state.lang === 'en';
+  list.innerHTML = LEARNING_PATHS.map(p => {
+    const chips = p.nodes.map(id => {
+      const n = byId.get(id); if (!n) return '';
+      return `<button class="path-chip" data-id="${esc(id)}" style="--c:${ERAS[n.era].raw}">${esc(en ? (n.nameEn || n.name) : n.name)}</button>`;
+    }).join('');
+    return `<div class="path-card">
+      <div class="path-card__title">${esc(en ? p.nameEn : p.name)}</div>
+      <div class="path-card__desc">${esc(p.desc)}</div>
+      <div class="path-card__chips">${chips}</div>
+      <button class="path-card__go linkbtn" data-path="${esc(p.id)}" type="button">高亮此路径</button>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.path-chip').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.id; setView('timeline'); selectNode(id);
+  }));
+  list.querySelectorAll('.path-card__go').forEach(b => b.addEventListener('click', () => {
+    const p = LEARNING_PATHS.find(x => x.id === b.dataset.path);
+    if (!p) return;
+    state.highlight = new Set(p.nodes);
+    state.filterEra = null; state.activeEra = null;
+    reflectEraActive(); applyState(); updateURL(); fit();
+    const pp = document.getElementById('pathPanel'); if (pp) pp.hidden = true;
+  }));
+}
+
 // ===== 新增：纪元序言卡（纯增量，复用 PREFACES 数据与 ERAS 配色） =====
 function showEraPreface(era) {
   const ep = document.getElementById('eraPreface');
@@ -148,8 +230,8 @@ function showNodePreview(n, x, y) {
   if (!pv) return;
   const sum = n.summary || (n.deepContent && n.deepContent.summary) || '—';
   pv.innerHTML =
-    `<div class="node-preview__name">${esc(n.name || '')}</div>` +
-    (n.nameEn ? `<div class="node-preview__en">${esc(n.nameEn)}</div>` : '') +
+    `<div class="node-preview__name">${esc(langName(n))}</div>` +
+    (n.nameEn ? `<div class="node-preview__en">${esc(state.lang === 'en' ? n.name : n.nameEn)}</div>` : '') +
     `<div class="node-preview__sum">${esc(sum)}</div>`;
   pv.hidden = false;
   const pad = 14, r = pv.getBoundingClientRect();
@@ -181,8 +263,7 @@ function wireUI() {
   if (mmResetBtn) mmResetBtn.addEventListener('click', () => resetMindmap());
 
   const eraTabs = document.getElementById('eraTabs');
-  eraTabs.innerHTML = `<button class="era-tab is-active" data-era="all"><span class="swatch" style="background:var(--gold)"></span>全部</button>` +
-    ERA_ORDER.map(e => `<button class="era-tab" data-era="${e}"><span class="swatch" style="background:${ERAS[e].raw}"></span>${ERAS[e].name}</button>`).join('');
+  buildEraTabs();
   eraTabs.addEventListener('click', e => {
     const b = e.target.closest('.era-tab'); if (!b) return;
     const a = b.dataset.era;
@@ -293,7 +374,7 @@ function wireUI() {
     sr.hidden = false;
     sr.innerHTML = hits.slice(0, 40).map(({ n, tags }) => {
       const extra = tags.filter(t => EXTRA_TAGS.has(t));
-      return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(n.name)} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">命中：${esc(extra.join('/'))}</span>` : ''}</button>`;
+      return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(langName(n))} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">命中：${esc(extra.join('/'))}</span>` : ''}</button>`;
     }).join('') || '<div style="padding:10px;color:var(--ink-3)">无匹配</div>';
     clearSearchGlow();
     hits.forEach(({ n }) => nodeEl(n.id)?.classList.add('is-search'));
@@ -346,6 +427,29 @@ function wireUI() {
     reflectEraActive(); reflectScaleActive();
     applyState(); updateURL(); fit();
   });
+  // 界面中/英切换（仅 UI 文案，正文综述/术语保持中文）
+  const langBtn = document.getElementById('langBtn');
+  if (langBtn) langBtn.addEventListener('click', () => {
+    state.lang = state.lang === 'en' ? 'zh' : 'en';
+    applyLang();
+  });
+  // 本地收藏面板
+  const favBtn = document.getElementById('favBtn');
+  const favPanel = document.getElementById('favPanel');
+  if (favBtn && favPanel) {
+    favBtn.addEventListener('click', () => { renderFavList(); updateFavCount(); favPanel.hidden = !favPanel.hidden; });
+    document.getElementById('favClose')?.addEventListener('click', () => { favPanel.hidden = true; });
+    favPanel.addEventListener('click', e => { if (e.target === favPanel) favPanel.hidden = true; });
+  }
+  window.addEventListener('pp:favChange', () => { renderFavList(); updateFavCount(); });
+  // 预设学习路径面板
+  const pathBtn = document.getElementById('pathBtn');
+  const pathPanel = document.getElementById('pathPanel');
+  if (pathBtn && pathPanel) {
+    pathBtn.addEventListener('click', () => { renderPathList(); pathPanel.hidden = !pathPanel.hidden; });
+    document.getElementById('pathClose')?.addEventListener('click', () => { pathPanel.hidden = true; });
+    pathPanel.addEventListener('click', e => { if (e.target === pathPanel) pathPanel.hidden = true; });
+  }
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
   window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });

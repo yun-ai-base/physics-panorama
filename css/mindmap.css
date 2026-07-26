@@ -106,13 +106,21 @@
     radial-gradient(circle at 1px 1px, rgba(42, 38, 32, .05) 1px, transparent 0) 0 0 / 22px 22px,
     var(--bg, #FBF9F4);
   cursor: grab;
+  touch-action: none;   /* 触屏缩放/拖拽手势交由 Pointer Events 处理，阻止页面滚动抢夺 */
 }
 .mindmap-svg:active { cursor: grabbing; }
 
 /* ── 节点与连线 ── */
 .mm-node { cursor: pointer; }
-.mm-rect { transition: filter .15s; }
+.mm-rect { transition: filter .15s, stroke-width .15s; }
 .mm-node:hover .mm-rect { filter: drop-shadow(0 3px 10px rgba(184, 137, 59, .38)); }
+/* 键盘聚焦可见环（SVG <g> 无法直接描边，改描其内 rect） */
+.mm-node:focus { outline: none; }
+.mm-node:focus-visible .mm-rect {
+  stroke: var(--gold, #B8893B);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 0 2px rgba(184, 137, 59, .45));
+}
 
 .mm-text { font-family: var(--font-sans, system-ui, sans-serif); fill: var(--ink, #2A2620); }
 .mm-text--root { font-family: var(--font-serif, serif); font-size: 17px; font-weight: 700; fill: #3a2f1a; }
