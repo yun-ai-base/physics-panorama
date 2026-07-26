@@ -284,6 +284,7 @@ function wireUI() {
       if (term) { window.dispatchEvent(new CustomEvent('pp:gotoTerm', { detail: { nodeId: id, termName: term.name } })); return; }
     }
     selectNode(id);
+    if (!window.matchMedia('(max-width:768px)').matches) focusNode(id);
     const dimZh = tags.find(t => DIM_KEY_MAP[t]);
     if (dimZh) openSidebarTab(DIM_KEY_MAP[dimZh]);
   });
@@ -301,6 +302,24 @@ function wireUI() {
 
   document.getElementById('shareBtn').addEventListener('click', () => {
     updateURL(); navigator.clipboard?.writeText(location.href); toast('当前视图链接已复制');
+  });
+  const expandAllBtn = document.getElementById('expandAllBtn');
+  expandAllBtn.addEventListener('click', () => {
+    state.expandAll = !state.expandAll;
+    expandAllBtn.textContent = state.expandAll ? '收起关联' : '展开全部关联';
+    if (state.selected) {
+      state.highlight = relatedSet(NODES, state.selected, state.expandAll);
+      applyState();
+    }
+    updateURL();
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    state.selected = null;
+    state.highlight = new Set();
+    state.activeEra = null;
+    state.activeScale = null;
+    reflectEraActive(); reflectScaleActive();
+    applyState(); updateURL(); fit();
   });
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));

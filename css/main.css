@@ -272,3 +272,11 @@ body.view-people .hint{display:none;}
 .node-preview__en{font-size:11px; color:var(--ink-3); letter-spacing:.04em; margin-top:1px;}
 .node-preview__sum{font-size:12.5px; line-height:1.6; color:var(--ink-2); margin-top:7px;}
 @keyframes npIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+/* ── 侧栏「探索更多」拓展阅读块（纯新增，复用 --gold/--gold-tint） ── */
+.sb-explore{margin-top:18px; padding:14px 16px 16px; border:1px solid rgba(184,137,59,.26); border-radius:12px; background:linear-gradient(180deg, rgba(243,233,214,.42), rgba(243,233,214,.16));}
+.sb-explore__title{font-family:var(--font-serif); font-size:15px; font-weight:700; color:var(--gold-dark,#8B6914); letter-spacing:.12em; margin-bottom:10px;}
+.sb-explore__list{display:flex; flex-direction:column; gap:8px;}
+.sb-explore__item{display:block; font-size:13.5px; line-height:1.5; color:var(--ink,#2A2620); text-decoration:none; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,.7); border:1px solid rgba(184,137,59,.18); transition:background .2s, border-color .2s, transform .15s;}
+.sb-explore__item:hover{background:#fff; border-color:var(--gold,#B8893B); transform:translateX(2px); text-decoration:none;}
+.sb-explore__empty{display:block; font-size:13px; color:var(--ink-3,#9A8F7E); line-height:1.6; padding:4px 2px;}

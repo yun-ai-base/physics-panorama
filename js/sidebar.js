@@ -579,6 +579,17 @@ function pathCtxHTML(node) {
 }
 
 /* ── 打开节点侧边栏 ───────────────────────────────────── */
+function exploreMoreHTML(node) {
+  const links = node.links || [];
+  const items = links.length
+    ? links.map(l => `<a class="sb-explore__item" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a>`).join('')
+    : '<span class="sb-explore__empty">相关拓展阅读 · 建设中</span>';
+  return `<div class="sb-explore">
+    <div class="sb-explore__title">探索更多</div>
+    <div class="sb-explore__list">${items}</div>
+  </div>`;
+}
+
 export function openNode(id) {
   const node = byId.get(id); if (!node) return;
   const sb = document.getElementById('sidebar');
@@ -641,6 +652,7 @@ export function openNode(id) {
     <div class="sb-mobile-tip">✦ 已高亮画布上的关联节点，关闭侧栏即可查看</div>
     <div class="sb-panel" id="tabBody"></div>
     ${pathCtxHTML(node)}
+    ${exploreMoreHTML(node)}
   `;
 
   bindAvatars(body);
