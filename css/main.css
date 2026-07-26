@@ -253,11 +253,11 @@ body.view-people .hint{display:none;}
 
 .void-view__wm-line{
   font-family:var(--font-serif);
-  font-size:clamp(14px, 1.7vw, 21px);
-  line-height:1.5; letter-spacing:.08em; text-align:center;
+  font-size:clamp(13px, 1.55vw, 19px);
+  line-height:1.45; letter-spacing:.08em; text-align:center;
   color:rgba(42, 38, 32, .28);                 /* 淡墨水印（提高可见度） */
   text-shadow:0 1px 0 rgba(255, 255, 255, .5), 0 0 22px rgba(184, 137, 59, .1);
-  opacity:.96; padding:8px 5px; white-space:normal; word-break:break-word;
+  opacity:.96; padding:7px 4px; white-space:normal; word-break:break-word;
   transition:color .9s ease, text-shadow .9s ease, opacity .9s ease, font-weight .9s ease;
 }
 .void-view__wm-line[hidden]{ display:none !important; }
