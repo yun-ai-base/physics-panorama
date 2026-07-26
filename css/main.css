@@ -4,7 +4,7 @@
   --gold:#B8893B; --gold-soft:#C9A14A; --gold-tint:#F3E9D6; --gold-dark:#8B6914;
   --era-classical:#C29A4E; --era-relativity:#41518F; --era-quantum:#7A5BA6;
   --era-standard:#357A5E; --era-frontier-a:#8C4A6B; --era-frontier-b:#6B4E8C;
-  --line-inherit:#7D6E58; --line-revolution:#8B3B24; --line-unify:#8F6A22; --line-conflict:#5E5346;
+  --line-inherit:#7D6E58; --line-revolution:#8B3B24; --line-unify:#8F6A22; --line-conflict:#9A5A55;
   --shadow:0 2px 12px rgba(42,38,32,.06); --shadow-hover:0 8px 28px rgba(42,38,32,.14);
   --radius:14px; --radius-sm:10px;
   --font-serif:"Noto Serif SC","Songti SC","STSong",serif;
@@ -128,6 +128,9 @@ body.view-scale .era-nav{display:none;}
 .bottombar__links .dot{color:var(--ink-3);}
 .linkbtn{border:none; background:transparent; color:var(--gold); font-size:13px; padding:0;}
 .linkbtn:hover{text-decoration:underline;}
+
+/* 手机端 <480px 竖排卡片列表容器（默认隐藏，仅超小屏经 responsive.css 显示，设计 4.4） */
+#mobileList{display:none;}
 .bottombar__tour{display:flex; gap:8px;}
 .tour-btn{
   border:1px solid rgba(42,38,32,.15); background:#fff; color:var(--ink-2);

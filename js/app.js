@@ -388,6 +388,35 @@ function wireUI() {
     fit();
     if (state.view === 'void' && voidTab === 'mindmap') renderMindmap();
   });
+
+  // ── 手机端 <480px：竖排卡片列表（设计 4.4，仅超小屏生效，桌面/平板不受影响） ──
+  const mobileList = document.getElementById('mobileList');
+  let _mobileBuilt = false;
+  function renderMobileList() {
+    if (!mobileList) return;
+    mobileList.innerHTML = ERA_ORDER.map(era => {
+      const e = ERAS[era];
+      const cards = NODES.filter(n => n.era === era).map(n => `
+        <button class="ml-card" data-id="${esc(n.id)}">
+          <span class="ml-card__tag" style="background:${e.raw}"></span>
+          <span class="ml-card__name">${esc(n.name)}</span>
+          <span class="ml-card__year">${esc(String(n.year))}</span>
+          <span class="ml-card__aha">${esc(n.aha || '')}</span>
+        </button>`).join('');
+      return `<div class="ml-group"><div class="ml-group__title" style="color:${e.raw}">${e.name}</div>${cards}</div>`;
+    }).join('');
+    mobileList.querySelectorAll('.ml-card').forEach(btn => {
+      btn.addEventListener('click', () => { selectNode(btn.dataset.id); openNode(btn.dataset.id); });
+    });
+  }
+  function syncMobile() {
+    if (!mobileList) return;
+    const isMobile = window.matchMedia('(max-width:480px)').matches;
+    if (isMobile && !_mobileBuilt) { renderMobileList(); _mobileBuilt = true; }
+    else if (!isMobile && _mobileBuilt) { mobileList.innerHTML = ''; _mobileBuilt = false; }
+  }
+  window.addEventListener('resize', syncMobile);
+  syncMobile();
 }
 
 // 纪元激活态：统一反映顶部导航 + 时间线大字的 UI 改造
@@ -470,6 +499,7 @@ function onPickPerson(name) {
 function updateURL() {
   const p = new URLSearchParams();
   if (state.view !== 'timeline') p.set('view', state.view);
+  if (state.view === 'void' && voidTab !== 'poem') p.set('vtab', voidTab);
   if (state.filterEra) p.set('era', state.filterEra);
   if (!state.onlyCore) p.set('core', '0');
   if (state.selected) p.set('node', state.selected);
@@ -483,6 +513,7 @@ function updateURL() {
 function readURL() {
   const p = new URLSearchParams(location.search);
   if (p.get('view')) state.view = p.get('view');
+  if (p.get('vtab')) voidTab = p.get('vtab');
   if (p.get('era')) state.filterEra = p.get('era');
   if (p.get('core') === '0') state.onlyCore = false;
   if (p.get('tab')) state.sidebarTab = p.get('tab');
