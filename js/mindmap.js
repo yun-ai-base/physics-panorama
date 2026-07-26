@@ -16,16 +16,18 @@ import { esc } from './utils.js';
 import { state } from './state.js';
 
 // ── 布局常量（画布坐标，单位 px，最终由 transform 缩放适配视口） ──
-const X_ROOT = 150;
-const X_ERA  = 470;
-const X_NODE = 830;
-const X_DIM  = 1210;
+const ROOT_X = 150;         // 根节点中心 x（最左）
+const LANE_X0 = 420;        // 第一个纪元中心 x
+const LANE_STEP = 270;      // 相邻纪元中心 x 间距
+const TOP_Y = 60;           // 纪元标签顶部 y（所有纪元同高起步）
 const ROOT_W = 196, ROOT_H = 58;
 const ERA_W  = 176, ERA_H  = 50;
 const NODE_W = 236, NODE_H = 44;
 const DIM_W  = 244, DIM_H  = 27;
 const GAP_Y = 16;       // 同纪元内节点纵向间隔
-const BLOCK_GAP = 64;   // 纪元块之间间隔
+// 纪元横向并列成 5 列：根在最左，各纪元一列、节点在纪元下纵向排、
+// 维度叶子纵向堆叠在该节点下（默认折叠，展开时才占高度）。整图呈「宽扁」、
+// 贴合宽屏，左右余白极小（取代原先「同一竖列」高瘦布局导致左右大留白的问题）。
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 
@@ -105,47 +107,43 @@ function truncate(s, n) {
 // ── 计算布局，填充 posMap ──
 function computeLayout() {
   posMap = new Map();
-  const erasData = ERA_ORDER.map(e => ({
-    era: e,
+  const erasData = ERA_ORDER.map((e, ei) => ({
+    era: e, ei,
     nodes: NODES.filter(n => n.era === e).sort((a, b) => yearNum(a) - yearNum(b)),
   }));
 
-  let yCursor = 0;
-  const eraCenters = [];
-  for (const blk of erasData) {
+  let maxBottom = 0;
+  erasData.forEach((blk, ei) => {
     const list = blk.nodes;
-    if (!list.length) { eraCenters.push({ era: blk.era, y: yCursor }); continue; }
-    const occ = list.map(n => {
-      const dimCount = (expandAll || expanded.has(n.id)) ? nodeDims(n).length : 0;
-      return Math.max(NODE_H, dimCount * DIM_H + 16);
-    });
-    const blockH = occ.reduce((s, h) => s + h, 0) + GAP_Y * (list.length - 1);
-    const eraY = yCursor + blockH / 2;
-    eraCenters.push({ era: blk.era, y: eraY });
-    posMap.set('era:' + blk.era, { x: X_ERA, y: eraY, w: ERA_W, h: ERA_H, kind: 'era', era: blk.era });
+    const eraX = LANE_X0 + ei * LANE_STEP;
+    const eraY = TOP_Y + ERA_H / 2;
+    posMap.set('era:' + blk.era, { x: eraX, y: eraY, w: ERA_W, h: ERA_H, kind: 'era', era: blk.era });
 
-    let cy = yCursor;
-    list.forEach((n, i) => {
-      const h = occ[i];
-      const ny = cy + h / 2;
-      posMap.set(n.id, { x: X_NODE, y: ny, w: NODE_W, h: NODE_H, kind: 'node', era: blk.era, node: n });
-      if (expandAll || expanded.has(n.id)) {
+    // 该纪元节点在「本列」内纵向依次排开；维度叶子默认折叠，展开时才纵向堆叠在节点下方占高度
+    let cy = TOP_Y + ERA_H + 30;
+    list.forEach((n) => {
+      const dimCount = (expandAll || expanded.has(n.id)) ? nodeDims(n).length : 0;
+      const dimBlock = dimCount > 0 ? (16 + dimCount * (DIM_H + 8)) : 0;
+      const h = NODE_H + dimBlock;
+      const ny = cy + NODE_H / 2;
+      posMap.set(n.id, { x: eraX, y: ny, w: NODE_W, h: NODE_H, kind: 'node', era: blk.era, node: n });
+      if (dimCount > 0) {
         const dims = nodeDims(n);
         dims.forEach((d, di) => {
-          const dy = ny + (di - (dims.length - 1) / 2) * DIM_H;
+          const dy = ny + NODE_H / 2 + 16 + di * (DIM_H + 8) + DIM_H / 2;
           posMap.set(n.id + ':dim:' + d.key, {
-            x: X_DIM, y: dy, w: DIM_W, h: DIM_H,
+            x: eraX, y: dy, w: DIM_W, h: DIM_H,
             kind: 'dim', dimKey: d.key, dimLabel: d.label, nodeId: n.id, nodeName: n.name,
           });
         });
       }
       cy += h + GAP_Y;
     });
-    yCursor += blockH + BLOCK_GAP;
-  }
-  const totalBottom = yCursor - BLOCK_GAP;
-  const rootY = totalBottom / 2;
-  posMap.set('root', { x: X_ROOT, y: rootY, w: ROOT_W, h: ROOT_H, kind: 'root' });
+    maxBottom = Math.max(maxBottom, cy - GAP_Y);
+  });
+
+  const rootY = maxBottom / 2;
+  posMap.set('root', { x: ROOT_X, y: rootY, w: ROOT_W, h: ROOT_H, kind: 'root' });
 }
 
 function bounds() {
