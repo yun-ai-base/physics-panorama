@@ -1,11 +1,19 @@
-// ════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 //  虚无-图景 · 思维导图模块
 //  水平树：根 → 五纪元 → 31 节点 →（点击展开）14 维度叶子
 //  跨纪元连线复用 buildEdges 生成的 EDGES（inherit/branch/revolution/unify/conflict）
 //  自带缩放 / 拖拽 / 重置，维度叶子点击回调打开侧栏对应维度
+//
+//  交互增强（无侵入增量）：
+//   · 悬浮聚焦：悬停某学说/纪元时，该分支高亮、其余分支淡出，悬停节点局部放大，
+//     并弹出含完整名称 + 综述的浮层卡片（解决全维度展示时文字过小的可读性问题）。
+//   · 搜索联动：focusMindmapNode(id) 由 app.js 搜索结果点击调用，自动展开该学说维度、
+//     高亮其分支路径（根 → 纪元 → 学说）并缩放定位，实现「按图索骥」。
 // ════════════════════════════════════════════════════════════════
 
 import { ERAS, ERA_ORDER, DIMENSIONS } from './config.js';
+import { esc } from './utils.js';
+import { state } from './state.js';
 
 // ── 布局常量（画布坐标，单位 px，最终由 transform 缩放适配视口） ──
 const X_ROOT = 150;
@@ -26,6 +34,9 @@ let EDGES = [];
 let SVG = null;
 let VIEWPORT = null;
 let onOpenDimension = null;
+let gBranchesEl = null;     // 渲染后的分支容器（hover / 搜索聚焦用）
+let MM_BY_ID = new Map();   // id → node（预览卡取数据）
+let persistFocus = null;     // 搜索联动的持久聚焦：{ era, id } 或 null
 
 let expanded = new Set();   // 手动展开维度的节点 id
 let expandAll = false;      // 一键展开全部维度
@@ -41,16 +52,18 @@ export function initMindmap({ nodes, edges, svg, viewport, onOpenDimension: cb }
   SVG = svg;
   VIEWPORT = viewport;
   onOpenDimension = cb;
+  MM_BY_ID = new Map((NODES || []).map(n => [n.id, n]));
   bind();
 }
-export function renderMindmap() { render(); requestAnimationFrame(() => fit()); }
+export function renderMindmap() { persistFocus = null; render(); requestAnimationFrame(() => fit()); }
 export function resetMindmap() {
-  expanded.clear(); expandAll = false;
+  expanded.clear(); expandAll = false; persistFocus = null;
   const c = document.getElementById('mmExpandAll'); if (c) c.checked = false;
   render(); requestAnimationFrame(() => fit());
 }
 export function setExpandAll(v) {
   expandAll = !!v;
+  persistFocus = null;
   if (expandAll) expanded.clear();
   const c = document.getElementById('mmExpandAll'); if (c) c.checked = expandAll;
   render(); requestAnimationFrame(() => fit());
@@ -73,6 +86,7 @@ function dimContent(node, key) {
     case 'future':      return !!node.deepContent?.future;
     case 'formula':     return !!(node.formula?.length);
     case 'terms':       return !!(node.terms?.length);
+    case 'particles':    return !!(node.particles?.groups?.length);
   }
   return false;
 }
@@ -189,7 +203,7 @@ function edgeColor(t) {
   })[t] || '#C9A24E';
 }
 
-// ── 渲染主流程 ──
+// ── 渲染主流程（分支分组：根组 + 每纪元一个 mm-branch，学说包成 mm-sub） ──
 function render() {
   if (!VIEWPORT) return;
   computeLayout();
@@ -215,13 +229,38 @@ function render() {
     edgePathEl(a, b, edgeColor(e.type), 'mm-edge mm-edge-' + e.type, dashed, gEdges);
   }
 
-  const gNodes = mk('g', { class: 'mm-nodes' });
-  for (const [, p] of posMap) {
-    if (p.kind === 'root') drawRoot(p, gNodes);
-    else if (p.kind === 'era') drawEra(p, gNodes);
-    else if (p.kind === 'node') drawNode(p, gNodes);
-    else if (p.kind === 'dim') drawDim(p, gNodes);
+  // 节点按分支分组，便于悬浮聚焦 / 搜索高亮时整支淡出或局部放大
+  const gB = mk('g', { class: 'mm-branches' });
+  gBranchesEl = gB;
+
+  const gRoot = mk('g', { class: 'mm-root-group' }, gB);
+  drawRoot(posMap.get('root'), gRoot);
+
+  for (const era of ERA_ORDER) {
+    const ep = posMap.get('era:' + era);
+    if (!ep) continue;
+    const gE = mk('g', { class: 'mm-branch', 'data-era': era }, gB);
+    gE.dataset.cx = ep.x; gE.dataset.cy = ep.y;
+    drawEra(ep, gE);
+    const list = NODES.filter(n => n.era === era).sort((a, b) => yearNum(a) - yearNum(b));
+    for (const n of list) {
+      const np = posMap.get(n.id);
+      if (!np) continue;
+      const gS = mk('g', { class: 'mm-sub', 'data-id': n.id }, gE);
+      gS.dataset.cx = np.x; gS.dataset.cy = np.y;
+      drawNode(np, gS);
+      if (expandAll || expanded.has(n.id)) {
+        const dims = nodeDims(n);
+        dims.forEach((d, di) => {
+          const dp = posMap.get(n.id + ':dim:' + d.key);
+          if (dp) drawDim(dp, gS);
+        });
+      }
+    }
   }
+
+  // 持久聚焦（搜索联动）在重建后自动恢复
+  if (persistFocus) applyFocusVisual(persistFocus.era, persistFocus.id, false);
 }
 
 function drawRoot(p, parent) {
@@ -364,6 +403,7 @@ function onClick(e) {
   const g = downNode;
   downNode = null;
   if (!g) return;
+  clearFocus(true);   // 点击导图内任意节点即清除搜索持久聚焦，恢复正常交互
   activateNode(g);
 }
 
@@ -377,6 +417,112 @@ function onKeyDown(e) {
   }
 }
 
+// ── 悬浮聚焦 + 搜索高亮 ──
+function scaleGroup(g, cx, cy, s) {
+  s = s || 1.14;
+  if (!g || cx == null || cy == null) return;
+  g.setAttribute('transform', `translate(${cx} ${cy}) scale(${s}) translate(${-cx} ${-cy})`);
+}
+// 高亮某分支（纪元 + 其下学说），其余分支淡出；doScale=true 时对悬停节点/纪元做局部放大
+function applyFocusVisual(era, id, doScale) {
+  if (!gBranchesEl) return;
+  gBranchesEl.classList.add('is-focusing');
+  gBranchesEl.querySelectorAll('.is-focus').forEach(e => e.classList.remove('is-focus'));
+  gBranchesEl.querySelectorAll('.mm-sub,.mm-branch').forEach(e => e.removeAttribute('transform'));
+  const b = era ? gBranchesEl.querySelector(`.mm-branch[data-era="${era}"]`) : null;
+  const sub = (b && id) ? b.querySelector(`.mm-sub[data-id="${id}"]`) : null;
+  if (b) b.classList.add('is-focus');
+  if (sub) {
+    sub.classList.add('is-focus');
+    if (doScale) scaleGroup(sub, +sub.dataset.cx, +sub.dataset.cy);
+  }
+  if (b && doScale && !sub) scaleGroup(b, +b.dataset.cx, +b.dataset.cy);
+}
+function clearFocus(includePersist) {
+  if (includePersist) persistFocus = null;
+  if (!gBranchesEl) return;
+  // 仅清除瞬时聚焦、保留搜索持久聚焦时，重新应用持久高亮
+  if (persistFocus && !includePersist) { applyFocusVisual(persistFocus.era, persistFocus.id, false); return; }
+  gBranchesEl.classList.remove('is-focusing');
+  gBranchesEl.querySelectorAll('.is-focus').forEach(e => e.classList.remove('is-focus'));
+  gBranchesEl.querySelectorAll('.mm-sub,.mm-branch').forEach(e => e.removeAttribute('transform'));
+}
+
+function onMmOver(e) {
+  const g = e.target.closest && e.target.closest('.mm-node');
+  if (!g) return;
+  const kind = g.dataset.kind;
+  if (kind === 'root') { if (!persistFocus) clearFocus(false); hideMmPreview(); return; }
+  const b = g.closest('.mm-branch');
+  const sub = g.closest('.mm-sub');
+  const era = b && b.dataset.era;
+  const id = sub && sub.dataset.id;
+  applyFocusVisual(era, id, true);   // 悬浮：局部放大
+  if ((kind === 'node' || kind === 'dim') && id) {
+    const n = MM_BY_ID.get(id);
+    if (n) showMmPreview(n, e.clientX, e.clientY);
+  }
+}
+function onMmOut(e) {
+  const to = e.relatedTarget;
+  if (to && to.closest && to.closest('.mm-node')) return; // 仍在某分支节点内，交给下一次 over
+  hideMmPreview();
+  if (persistFocus) applyFocusVisual(persistFocus.era, persistFocus.id, false);
+  else clearFocus(false);
+}
+
+function showMmPreview(n, x, y) {
+  const pv = document.getElementById('mmPreview');
+  if (!pv) return;
+  const nm = state.lang === 'en' ? (n.nameEn || n.name) : n.name;
+  const en = n.nameEn ? (state.lang === 'en' ? n.name : n.nameEn) : '';
+  const sum = n.summary || (n.deepContent && n.deepContent.summary) || '—';
+  pv.innerHTML =
+    `<div class="mm-preview__name">${esc(nm)}</div>` +
+    (en ? `<div class="mm-preview__en">${esc(en)}</div>` : '') +
+    `<div class="mm-preview__sum">${esc(sum)}</div>`;
+  pv.hidden = false;
+  const pad = 14, r = pv.getBoundingClientRect();
+  let px = x + 16, py = y + 16;
+  if (px + r.width > window.innerWidth - pad) px = x - r.width - 16;
+  if (py + r.height > window.innerHeight - pad) py = y - r.height - 16;
+  pv.style.left = Math.max(pad, px) + 'px';
+  pv.style.top = Math.max(pad, py) + 'px';
+}
+function hideMmPreview() { const pv = document.getElementById('mmPreview'); if (pv) pv.hidden = true; }
+
+// 搜索联动：展开该学说维度、高亮其分支路径（根 → 纪元 → 学说）并缩放定位
+export function focusMindmapNode(id) {
+  const n = MM_BY_ID.get(id);
+  if (!n) return;
+  persistFocus = { era: n.era, id };
+  expanded.add(id);
+  expandAll = false;
+  const c = document.getElementById('mmExpandAll'); if (c) c.checked = false;
+  render();
+  fitToNode(id);
+}
+function fitToNode(id) {
+  if (!SVG) return;
+  const np = posMap.get(id);
+  if (!np) return;
+  const dims = [...posMap.values()].filter(p => p.kind === 'dim' && p.nodeId === id);
+  const pts = [np, ...dims];
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const p of pts) {
+    minX = Math.min(minX, p.x - p.w / 2); maxX = Math.max(maxX, p.x + p.w / 2);
+    minY = Math.min(minY, p.y - p.h / 2); maxY = Math.max(maxY, p.y + p.h / 2);
+  }
+  const cw = SVG.clientWidth || 960, ch = SVG.clientHeight || 640;
+  if (cw < 50 || ch < 50) return;
+  const boxW = (maxX - minX) || 1, boxH = (maxY - minY) || 1;
+  const k = Math.min(cw / boxW, ch / boxH) * 0.72;   // 比整体 fit 更放大
+  tf.k = k;
+  tf.tx = (cw - boxW * k) / 2 - minX * k;
+  tf.ty = (ch - boxH * k) / 2 - minY * k;
+  applyTransform();
+}
+
 function bind() {
   if (!SVG || !VIEWPORT) return;
   SVG.addEventListener('wheel', onWheel, { passive: false });
@@ -384,6 +530,8 @@ function bind() {
   SVG.addEventListener('pointermove', onPointerMove);
   SVG.addEventListener('pointerup', onPointerUp);
   SVG.addEventListener('pointercancel', onPointerUp);
+  SVG.addEventListener('mouseover', onMmOver);   // 悬浮聚焦 + 预览卡
+  SVG.addEventListener('mouseout', onMmOut);
   SVG.addEventListener('click', onClick);   // 监听器必须绑在 SVG（节点的祖先）：setPointerCapture 会把 click.target 重定向到 SVG，且不经过 #mmViewport
   SVG.addEventListener('keydown', onKeyDown);
 }

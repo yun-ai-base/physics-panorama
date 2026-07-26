@@ -479,6 +479,85 @@ function parseContent(raw) {
   return linkTerms(html.join('')) || '<p class="sb-empty">暂无内容</p>';
 }
 
+/* ── 粒子组成表格 ─────────────────────────────────────── */
+function particlesHTML(data) {
+  if (!data || !data.groups?.length) return '<p class="sb-empty">该节点暂无组成数据</p>';
+  const en = state.lang === 'en';
+  const title = en ? (data.titleEn || data.title) : data.title;
+  const subtitle = data.subtitle || '';
+  let html = `<div class="sb-particles">`;
+  if (title) html += `<div class="sb-particles__title">${esc(title)}</div>`;
+  if (subtitle) html += `<div class="sb-particles__subtitle">${esc(subtitle)}</div>`;
+
+  for (const g of data.groups) {
+    const gName = en ? (g.nameEn || g.name) : g.name;
+    const gDesc = g.desc ? `<div class="sb-particles__gdesc">${esc(g.desc)}</div>` : '';
+    const color = g.color || '#B8893B';
+    const icon = esc(g.icon || '📦');
+
+    html += `<div class="sb-particles__group">
+      <div class="sb-particles__ghead" style="border-left-color:${color}">
+        <span class="sb-particles__gicon">${icon}</span>
+        <span class="sb-particles__gname">${esc(gName)}</span>
+      </div>${gDesc}`;
+
+    // 有 generations（费米子用三代结构）
+    if (g.generations && g.generations.length) {
+      html += `<table class="sb-particles__gen-table">`;
+      for (const gen of g.generations) {
+        const genLabel = en ? (gen.genEn || gen.gen) : gen.gen;
+        html += `<tr><td colspan="6" class="sb-particles__gen-label">${esc(genLabel)}</td></tr>`;
+        html += `<thead><tr><th>名称</th><th>符号</th><th>电荷</th><th>质量</th><th>自旋</th></tr></thead><tbody>`;
+        for (const p of gen.particles) {
+          const pName = en ? (p.nameEn || p.name) : p.name;
+          html += `<tr>
+            <td class="sb-particles__pname">${esc(pName)}</td>
+            <td class="sb-particles__psym">${esc(p.symbol)}</td>
+            <td>${esc(p.charge || '—')}</td>
+            <td>${esc(p.mass || '—')}</td>
+            <td>${esc(p.spin || '—')}</td>
+          </tr>`;
+        }
+        html += `</tbody>`;
+      }
+      html += `</table>`;
+    }
+    // 有 items（玻色子/简单列表）
+    else if (g.items && g.items.length) {
+      const head0 = g.items[0];
+      let ths = '<th>名称</th><th>符号</th>';
+      if (head0.force) ths += '<th>传递的力</th>';
+      ths += '<th>质量</th>';
+      if (head0.charge !== undefined) ths += '<th>电荷</th>';
+      if (head0.spin !== undefined) ths += '<th>自旋</th>';
+      if (head0.note) ths += '<th>备注</th>';
+      html += `<table class="sb-particles__table"><thead><tr>${ths}</tr></thead><tbody>`;
+      for (const p of g.items) {
+        const pName = en ? (p.nameEn || p.name) : p.name;
+        const pForce = p.force ? (en ? (p.forceEn || p.force) : p.force) : '';
+        html += `<tr>
+          <td class="sb-particles__pname">${esc(pName)}</td>
+          <td class="sb-particles__psym">${esc(p.symbol)}</td>
+          ${p.force ? `<td>${esc(pForce)}</td>` : ''}
+          <td>${esc(p.mass || '—')}</td>
+          ${p.charge !== undefined ? `<td>${esc(p.charge)}</td>` : ''}
+          ${p.spin !== undefined ? `<td>${esc(p.spin)}</td>` : ''}
+          ${p.note ? `<td class="sb-particles__pnote">${esc(p.note)}</td>` : ''}
+        </tr>`;
+      }
+      html += `</tbody></table>`;
+    }
+
+    html += `</div>`;
+  }
+
+  if (data.footnote) {
+    html += `<div class="sb-particles__foot">${parseContent(data.footnote)}</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
 /* ── 术语卡片 ─────────────────────────────────────────── */
 function termsHTML(terms) {
   if (!terms || !terms.length) return '<p class="sb-empty">该节点未提供术语释义</p>';
@@ -535,6 +614,11 @@ function renderDim(node, key) {
         : '';
       return `<div class="sb-fm" data-fm-wrap="${node.id}-${idx}">${nameTag}<div class="sb-fm__row"><div class="sb-fm__tex">${tex}</div>${appBtn}</div><div class="sb-fm__plain">${esc(f.plain || '')}</div>${appPanel}</div>`;
     }).join('');
+  }
+
+  // 粒子组成走独立逻辑
+  if (key === 'particles') {
+    return particlesHTML(node.particles);
   }
 
   // deep 节点：从 deepContent 取

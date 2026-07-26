@@ -1449,6 +1449,122 @@
       "limits": "QCD在原理上已被确认为强相互作用的标准理论，但面临若干深刻未解问题。首要的是夸克禁闭的严格证明——虽有无穷多的格点模拟证据和解析推理（如威尔逊环面积定律、东京模型），但尚未有一个完全解析的\"禁闭定理\"从QCD的拉格朗日量出发推导出禁闭势。这个问题的难度属于非阿贝尔规范场强耦合区的数学分析问题，与千禧年大奖难题中的\"杨-米尔斯质量间隙\"问题直接相关。第二个局限是低能区QCD的解析解缺失：格点QCD虽提供了高精度数值解，但缺乏闭式解析框架，阻碍了理论物理学家对强子结构和手征对称性破缺的深层理解。第三，有限重子密度下的QCD（致密星体内部物质）遭遇\"符号问题\"：格点模拟在非零化学势下的玻尔兹曼权重因子变成复数，无法直接进行蒙特卡罗样本，使得高密QCD相图——包括色超导相和夸克-强子混合相——几乎完全依靠模型推测。第四，QCD与电弱相互作用的精确衔接仍存在难题：重整化过程中的红外发散与共线发散的因子化方案虽已成熟，但在某些关键过程（如顶夸克产生、Higgs产生伴随喷注）中高阶QCD修正计算极为繁重。第五，强CP问题——QCD理论允许一个CP破坏的θ项，但实验测得的强CP破坏上限极低（θ < 10⁻¹⁰），暗示自然界存在某种精细调节机制（如裴奇-奎因提出的轴子机制），但至今缺乏实验证据。",
       "future": "QCD前沿呈现出多重科幻级延伸方向。第一个大胆方向是\"色禁闭的人工工程化\"：若人类最终完全理解禁闭的形成机制——特别是磁单极子凝聚和中心涡旋织构——理论上可通过操控真空拓扑结构在局部创造\"无禁闭\"区域，实现自由夸克或自由胶子的直接操纵，从而制造出能量密度远超核裂变的物质态。第二个方向是QCD真空工程：利用超高强度激光（如ELI-Extreme Light Infrastructure）或强子对撞机的极端多重度事件，研究真空中夸克凝聚和手征凝聚的局部破坏，探索真空结构可调性的极限。第三个方向是\"QCD计算宇宙学\"：随着格点QCD的最近点距离对计算机能力需求呈指数增长，未来量子计算机有望直接求解QCD——谷歌和IBM的量子纠错路线图中，QCD模拟被视为\"杀手级应用\"之一，一旦实现就能精确预言中子星内部状态方程，直接与LIGO/室女座的引力波数据形成相互约束。第四个方向涉及反物质研究：精确的QCD反物质产生截面计算将支撑更敏感的AMS-02和未来的国际空间站光谱仪实验，帮助回答\"为什么可观测宇宙几乎全是正物质\"的最大宇宙之谜。第五个方向是夸克星和中子星-QCD混合：如果高密度QCD预言的三-flavor色味锁相态确实稳定，那么有些中子星可能内嵌夸克核心甚至完全是夸克星，其极端致密性将改变我们对超新星爆炸机制的认知。最后还有\"QCD与类轴子物理\"的交叉：若强CP问题的轴子解正确，QCD轴子将成为暗物质候选者之一，而轴子的发现将不仅是粒子物理的突破，更是宇宙学和QCD理论交叉的殊荣。\n\n---\n\n**参考来源**\n\n1. Gross, D. J. & Wilczek, F. (1973). Ultraviolet Behavior of Non-Abelian Gauge Theories. *Physical Review D*, 8, 3633.\n2. Politzer, H. D. (1973). Reliable Perturbative Results for Strong Interactions? *Physical Review Letters*, 30, 1346.\n3. Fritzsch, H., Gell-Mann, M. & Leutwyler, H. (1973). Advantages of the Color Octet Gluon Picture. *Physics Letters B*, 47, 365.\n4. Wilson, K. G. (1974). Confinement of Quarks. *Physical Review D*, 10, 2445.\n5. Nambu, Y. (1966). A Systematics of Hadrons in Subnuclear Physics. In *Preludes in Theoretical Physics*.\n6. 't Hooft, G. (1971). Renormalization of Massless Yang-Mills Fields. *Nuclear Physics B*, 33, 173.\n7. Gross, D. J. (2005). The Discovery of Asymptotic Freedom and the Emergence of QCD. *Nobel Lecture*.\n8. Wilczek, F. (2005). Asymptotic Freedom: From Paradox to Paradigm. *Nobel Lecture*.\n9. Politzer, H. D. (2005). The Dilemma of Attribution. *Nobel Lecture*.\n10. Bethke, S. (2007). Experimental Tests of Asymptotic Freedom. *Progress in Particle and Nuclear Physics*, 58, 351.\n11. Durr, S. et al. (2008). Ab Initio Determination of Light Hadron Masses. *Science*, 322, 1224.\n12. Pich, A. (1995). Chiral Perturbation Theory. *Reports on Progress in Physics*, 58, 563.\n13. Fodor, Z. & Katz, S. D. (2004). Critical Point of QCD at Finite Temperature and Density. *Journal of High Energy Physics*, 04, 050.\n14. Carr, S. M. et al. (2016). QCD and the Standard Model. *Annual Review of Nuclear and Particle Science*, 66, 61.",
       "summary": "**研究对象**：强相互作用——把夸克束缚在质子、中子（以及更一般的强子）内部的基本力，是可见物质结合的根本。\n\n**核心思想**：强相互作用的\"荷\"不是电荷，而是\"色\"（红、绿、蓝三种色荷）；由胶子传递，而胶子自身也带色，会相互直接作用。由此产生两个反直觉特性：高能下渐近自由（距离越近力越弱），低能下夸克禁闭（无法把单个夸克孤立出来观测）。\n\n**数学表述**：基于 SU(3) 非阿贝尔规范对称性的量子场论；胶子存在八种色组合并自相互作用；耦合常数 α_s(Q²) 随能量跑动（高能变小）；强子性质常用格点 QCD 在计算机上数值模拟求解。\n\n**关键验证**：深度非弹性散射实验显示质子内部有\"部分子\"（即夸克）；对撞中喷注（jet）现象印证胶子存在；J/ψ 粒子（粲夸克束缚态）的发现验证粲夸克；格点 QCD 已能算出质子质量。\n\n**典型应用**：理解原子核的结合能、强子谱（粒子列表）、大型强子对撞机中的重离子碰撞（产生夸克-胶子等离子体）；核物理与恒星内核聚变过程。\n\n**地位与意义**：标准模型中负责强相互作用的部分；质子、中子质量的约 99% 来自强相互作用的束缚能（而非夸克静质量），它因而解释了可见物质质量的绝大部分来源。"
+    },
+    "particles": {
+      "title": "QCD 组成要素",
+      "titleEn": "QCD Constituents",
+      "subtitle": "色荷 · 胶子 · 强子分类",
+      "groups": [
+        {
+          "name": "色荷（Color Charge）",
+          "nameEn": "Color Charge",
+          "icon": "🌈",
+          "color": "#C0392B",
+          "desc": "强相互作用的「荷」，类比电荷但有三种（红/绿/蓝）及对应的反色。",
+          "items": [
+            {
+              "name": "红",
+              "nameEn": "Red",
+              "symbol": "R",
+              "mass": "—",
+              "note": "基本色荷之一"
+            },
+            {
+              "name": "绿",
+              "nameEn": "Green",
+              "symbol": "G",
+              "mass": "—",
+              "note": "基本色荷之一"
+            },
+            {
+              "name": "蓝",
+              "nameEn": "Blue",
+              "symbol": "B",
+              "mass": "—",
+              "note": "基本色荷之一"
+            },
+            {
+              "name": "反红",
+              "nameEn": "Anti-red",
+              "symbol": "R̄",
+              "mass": "—",
+              "note": "反色荷"
+            },
+            {
+              "name": "反绿",
+              "nameEn": "Anti-green",
+              "symbol": "Ḡ",
+              "mass": "—",
+              "note": "反色荷"
+            },
+            {
+              "name": "反蓝",
+              "nameEn": "Anti-blue",
+              "symbol": "B̄",
+              "mass": "—",
+              "note": "反色荷"
+            }
+          ]
+        },
+        {
+          "name": "胶子（Gluons）",
+          "nameEn": "Gluons",
+          "icon": "🟡",
+          "color": "#B9770E",
+          "desc": "传递强相互作用的规范玻色子，自身也带色荷。",
+          "items": [
+            {
+              "name": "胶子",
+              "nameEn": "Gluon",
+              "symbol": "g",
+              "force": "强相互作用",
+              "forceEn": "Strong",
+              "mass": "0",
+              "charge": "0",
+              "spin": "1",
+              "note": "8 个线性独立的色-反色组合态"
+            }
+          ]
+        },
+        {
+          "name": "强子分类（Hadrons）",
+          "nameEn": "Hadrons",
+          "icon": "🧩",
+          "color": "#1E8449",
+          "desc": "由夸克通过色禁闭结合成的无色（色中性）复合粒子。",
+          "items": [
+            {
+              "name": "重子",
+              "nameEn": "Baryon",
+              "symbol": "qqq",
+              "mass": "—",
+              "note": "由 3 个夸克组成（如质子 uud、中子 udd）"
+            },
+            {
+              "name": "介子",
+              "nameEn": "Meson",
+              "symbol": "q q̄",
+              "mass": "—",
+              "note": "由夸克-反夸克对组成（如 π 介子）"
+            },
+            {
+              "name": "四夸克态",
+              "nameEn": "Tetraquark",
+              "symbol": "qqq q̄",
+              "mass": "—",
+              "note": "由 4 个夸克组成的奇特强子（exotic hadron）"
+            },
+            {
+              "name": "五夸克态",
+              "nameEn": "Pentaquark",
+              "symbol": "qqq q̄",
+              "mass": "—",
+              "note": "由 5 个夸克组成的奇特强子（exotic hadron）"
+            }
+          ]
+        }
+      ],
+      "footnote": "**色禁闭**：自由粒子只能以「白色」（色中性）组合出现——重子含 RGB 三色各一，介子含色-反色对。这是为何实验中从不直接观测到孤立的夸克或胶子。"
     }
   },
   {
@@ -1533,7 +1649,232 @@
         "details": "**对称性自发破缺**\n早期宇宙电弱对称性完整，所有基本粒子无质量；当温度下降，希格斯场获得非零期望值，对称性自发破缺，W/Z 玻色子获得质量。\n\n**希格斯玻色子**\n希格斯场的量子激发，2012 年在 CERN 大型强子对撞机被发现，质量约 125 GeV。\n\n**质量来源**\n夸克、轻子通过希格斯机制获得质量；但质子/中子质量的绝大部分来自强相互作用结合能，而非夸克本身质量。",
         "target": "higgs"
       }
-    ]
+    ],
+    "particles": {
+      "title": "标准模型粒子谱",
+      "titleEn": "Standard Model Particle Spectrum",
+      "subtitle": "17 种基本粒子家族构成已知物质与相互作用",
+      "groups": [
+        {
+          "name": "夸克（Quarks）",
+          "nameEn": "Quarks",
+          "icon": "🔴",
+          "color": "#C0392B",
+          "desc": "带色荷的费米子，永不单独存在（色禁闭），组成质子、中子等强子。",
+          "generations": [
+            {
+              "gen": "第一代",
+              "genEn": "1st Generation",
+              "particles": [
+                {
+                  "name": "上夸克",
+                  "nameEn": "Up",
+                  "symbol": "u",
+                  "charge": "+2/3",
+                  "mass": "2.2 MeV",
+                  "spin": "1/2"
+                },
+                {
+                  "name": "下夸克",
+                  "nameEn": "Down",
+                  "symbol": "d",
+                  "charge": "−1/3",
+                  "mass": "4.7 MeV",
+                  "spin": "1/2"
+                }
+              ]
+            },
+            {
+              "gen": "第二代",
+              "genEn": "2nd Generation",
+              "particles": [
+                {
+                  "name": "粲夸克",
+                  "nameEn": "Charm",
+                  "symbol": "c",
+                  "charge": "+2/3",
+                  "mass": "1.28 GeV",
+                  "spin": "1/2"
+                },
+                {
+                  "name": "奇异夸克",
+                  "nameEn": "Strange",
+                  "symbol": "s",
+                  "charge": "−1/3",
+                  "mass": "96 MeV",
+                  "spin": "1/2"
+                }
+              ]
+            },
+            {
+              "gen": "第三代",
+              "genEn": "3rd Generation",
+              "particles": [
+                {
+                  "name": "顶夸克",
+                  "nameEn": "Top",
+                  "symbol": "t",
+                  "charge": "+2/3",
+                  "mass": "173.1 GeV",
+                  "spin": "1/2"
+                },
+                {
+                  "name": "底夸克",
+                  "nameEn": "Bottom",
+                  "symbol": "b",
+                  "charge": "−1/3",
+                  "mass": "4.18 GeV",
+                  "spin": "1/2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "轻子（Leptons）",
+          "nameEn": "Leptons",
+          "icon": "🔵",
+          "color": "#2471A3",
+          "desc": "不参与强相互作用的费米子，分带电轻子与中性中微子。",
+          "generations": [
+            {
+              "gen": "第一代",
+              "genEn": "1st Generation",
+              "particles": [
+                {
+                  "name": "电子",
+                  "nameEn": "Electron",
+                  "symbol": "e",
+                  "charge": "−1",
+                  "mass": "0.511 MeV",
+                  "spin": "1/2"
+                },
+                {
+                  "name": "电子中微子",
+                  "nameEn": "Electron Neutrino",
+                  "symbol": "νₑ",
+                  "charge": "0",
+                  "mass": "< 1 eV",
+                  "spin": "1/2"
+                }
+              ]
+            },
+            {
+              "gen": "第二代",
+              "genEn": "2nd Generation",
+              "particles": [
+                {
+                  "name": "μ 子",
+                  "nameEn": "Muon",
+                  "symbol": "μ",
+                  "charge": "−1",
+                  "mass": "105.7 MeV",
+                  "spin": "1/2"
+                },
+                {
+                  "name": "μ 中微子",
+                  "nameEn": "Muon Neutrino",
+                  "symbol": "νᵤ",
+                  "charge": "0",
+                  "mass": "< 0.17 MeV",
+                  "spin": "1/2"
+                }
+              ]
+            },
+            {
+              "gen": "第三代",
+              "genEn": "3rd Generation",
+              "particles": [
+                {
+                  "name": "τ 子",
+                  "nameEn": "Tau",
+                  "symbol": "τ",
+                  "charge": "−1",
+                  "mass": "1.777 GeV",
+                  "spin": "1/2"
+                },
+                {
+                  "name": "τ 中微子",
+                  "nameEn": "Tau Neutrino",
+                  "symbol": "νₜ",
+                  "charge": "0",
+                  "mass": "< 18.2 MeV",
+                  "spin": "1/2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "规范玻色子（Gauge Bosons）",
+          "nameEn": "Gauge Bosons",
+          "icon": "🟡",
+          "color": "#B9770E",
+          "desc": "传递基本相互作用的粒子。",
+          "items": [
+            {
+              "name": "光子",
+              "nameEn": "Photon",
+              "symbol": "γ",
+              "force": "电磁相互作用",
+              "forceEn": "Electromagnetism",
+              "mass": "0",
+              "charge": "0",
+              "spin": "1"
+            },
+            {
+              "name": "W 玻色子",
+              "nameEn": "W Boson",
+              "symbol": "W⁺/W⁻",
+              "force": "弱相互作用",
+              "forceEn": "Weak",
+              "mass": "80.4 GeV",
+              "charge": "+1 / −1",
+              "spin": "1"
+            },
+            {
+              "name": "Z 玻色子",
+              "nameEn": "Z Boson",
+              "symbol": "Z⁰",
+              "force": "弱相互作用",
+              "forceEn": "Weak",
+              "mass": "91.2 GeV",
+              "charge": "0",
+              "spin": "1"
+            },
+            {
+              "name": "胶子",
+              "nameEn": "Gluon",
+              "symbol": "g",
+              "force": "强相互作用",
+              "forceEn": "Strong",
+              "mass": "0",
+              "charge": "0",
+              "spin": "1",
+              "note": "8 种色组合态"
+            }
+          ]
+        },
+        {
+          "name": "标量玻色子（Scalar Boson）",
+          "nameEn": "Scalar Boson",
+          "icon": "🟣",
+          "color": "#6C3483",
+          "desc": "唯一自旋为 0 的基本粒子，通过希格斯机制赋予其他粒子质量。",
+          "items": [
+            {
+              "name": "希格斯玻色子",
+              "nameEn": "Higgs Boson",
+              "symbol": "H",
+              "mass": "125.1 GeV",
+              "charge": "0",
+              "spin": "0"
+            }
+          ]
+        }
+      ],
+      "footnote": "表中按「粒子家族」计为 **17 种**：6 夸克 + 6 轻子 +（光子、W、Z、胶子）4 种规范玻色子 + 希格斯。若把 W⁺/W⁻ 视为两种、把 8 个色态胶子分别计数，则独立量子态共 25 个。质量取自 PDG 推荐值的数量级近似。"
+    }
   },
   {
     "id": "higgs",

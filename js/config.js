@@ -41,6 +41,7 @@ export const DIMENSIONS = [
   { key:'future',      label:'🔮 猜想',   labelEn:'🔮 Outlook' },
   { key:'formula',     label:'📐 公式',   labelEn:'📐 Formula' },
   { key:'terms',       label:'🧩 术语',   labelEn:'🧩 Terms' },
+  { key:'particles',    label:'🔬 组成',   labelEn:'🔬 Particles' },
 ];
 
 // 浅色视图布局用的排名
