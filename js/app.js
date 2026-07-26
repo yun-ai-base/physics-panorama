@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { esc, buildEdges, relatedSet, getFavorites, isFavorite } from './utils.js';
-import { ERAS, ERA_ORDER, LEARNING_PATHS } from './config.js';
+import { ERAS, ERA_ORDER, LEARNING_PATHS, UI_LABELS } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState, onApplyState } from './renderer.js';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, updateMiniMap } from './sidebar.js';
@@ -30,7 +30,7 @@ function maybeShowMobileNotice() {
   box.id = 'mobileNotice';
   box.innerHTML = '<div class="mobile-notice__box">' +
     '<div class="mobile-notice__icon">🖥️</div>' +
-    '<div class="mobile-notice__text">为了更好浏览体验，请电脑网页端查看</div>' +
+    `<div class="mobile-notice__text">${t('mobileNotice')}</div>` +
     '</div>';
   document.body.appendChild(box);
   setTimeout(() => {
@@ -136,6 +136,107 @@ function clearSearchGlow() { document.querySelectorAll('.node.is-search').forEac
 // 界面双语：取节点显示名（EN 取 nameEn，无则回退中文）
 function langName(n) { return state.lang === 'en' ? (n.nameEn || n.name) : n.name; }
 
+// 通用 UI 文案取译（支持字符串或函数模板）
+function t(key, ...args) {
+  const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];
+  return typeof v === 'function' ? v(...args) : v ?? key;
+}
+
+// 统一刷新所有静态 UI 文案（视图 tab、底栏、尺度导航条、人物索引、面板标题等）
+function applyUILanguage() {
+  const en = state.lang === 'en';
+
+  // data-i18n 通用标签
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (key) el.textContent = t(key);
+  });
+
+  // 顶栏视图 tab
+  document.querySelectorAll('#viewTabs .view-tab').forEach(btn => {
+    const map = { timeline: 'viewTimeline', unification: 'viewUnification', scale: 'viewScale', people: 'viewPeople', void: 'viewVoid' };
+    const k = map[btn.dataset.view];
+    if (k) btn.textContent = t(k);
+  });
+
+  // 底栏按钮
+  const shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) shareBtn.textContent = t('shareView');
+  const expandAllBtn = document.getElementById('expandAllBtn');
+  if (expandAllBtn) expandAllBtn.textContent = state.expandAll ? t('collapseAll') : t('expandAll');
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) resetBtn.textContent = t('resetView');
+  const favBtn = document.getElementById('favBtn');
+  if (favBtn) {
+    const badge = favBtn.querySelector('.badge');
+    favBtn.textContent = t('favorites');
+    if (badge) favBtn.appendChild(badge);
+  }
+  const pathBtn = document.getElementById('pathBtn');
+  if (pathBtn) pathBtn.textContent = t('learningPaths');
+
+  // 提示条
+  const hint = document.getElementById('zoomHint');
+  if (hint) hint.textContent = t('hint');
+
+  // 搜索框占位符
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.placeholder = t('searchPlaceholder');
+
+  // only-core
+  const onlyCoreLabel = document.querySelector('#onlyCore + span');
+  if (onlyCoreLabel) onlyCoreLabel.textContent = t('onlyCore');
+
+  // 尺度导航条
+  const scaleChipMap = {
+    microscopic: 'scaleMicroscopic', mesoscopic: 'scaleMesoscopic', cosmic: 'scaleCosmic',
+    unified: 'scaleUnified', feedback: 'scaleFeedback'
+  };
+  document.querySelectorAll('#scaleMapBar .scale-map-bar__chip').forEach(btn => {
+    const k = scaleChipMap[btn.dataset.scale];
+    if (k) btn.textContent = t(k);
+  });
+  const scaleArrowMap = {
+    '微观 → 宏观 · 涌现': 'scaleEmergence',
+    '宏观 ↔ 宇观 · 引力桥梁': 'scaleGravityBridge',
+    '统一 → 宇观': 'scaleGrandUnification',
+    '统一 → 反哺': 'scaleTechFeedback',
+    '反哺 ← 微观': 'scaleClosedLoop'
+  };
+  document.querySelectorAll('#scaleMapBar .scale-map-bar__arrow').forEach(span => {
+    const k = scaleArrowMap[span.dataset.rel];
+    if (k) span.textContent = t(k);
+  });
+
+  // 人物索引视图
+  const peopleTitle = document.querySelector('#peopleView h2');
+  if (peopleTitle) peopleTitle.textContent = t('peopleTitle');
+  const peopleSub = document.querySelector('.people-view__sub');
+  if (peopleSub) peopleSub.textContent = t('peopleSubtitle');
+  const peopleSearch = document.getElementById('peopleSearch');
+  if (peopleSearch) peopleSearch.placeholder = t('peopleSearchPlaceholder');
+
+  // 面板标题
+  const favHead = document.querySelector('#favPanel .fav-panel__head > span');
+  if (favHead) favHead.textContent = t('myFavorites');
+  const pathHead = document.querySelector('#pathPanel .path-panel__head > span');
+  if (pathHead) pathHead.textContent = t('presetPaths');
+
+  // 导览按钮
+  const tour3 = document.getElementById('tour3');
+  if (tour3) tour3.textContent = t('tour3min');
+  const tour10 = document.getElementById('tour10');
+  if (tour10) tour10.textContent = t('tour10min');
+
+  // 更新日记按钮标题
+  const clHead = document.querySelector('#changelog .changelog__head > span');
+  if (clHead) clHead.textContent = t('changelogTitle');
+
+  // 若收藏/路径面板正在打开，重刷内容以同步语言
+  if (document.getElementById('favPanel')?.hidden === false) renderFavList();
+  if (document.getElementById('pathPanel')?.hidden === false) renderPathList();
+}
+
 // 纪元顶栏标签（随语言切换重建；点击监听在 wireUI 用事件委托一次绑定）
 function buildEraTabs() {
   const en = state.lang === 'en';
@@ -145,7 +246,7 @@ function buildEraTabs() {
     ERA_ORDER.map(e => `<button class="era-tab" data-era="${e}"><span class="swatch" style="background:${ERAS[e].raw}"></span>${en ? ERAS[e].nameEn : ERAS[e].name}</button>`).join('');
 }
 
-// 切换界面语言：重绘画布 + 顶栏纪元标签 + 重渲侧栏头部
+// 切换界面语言：重绘画布 + 顶栏纪元标签 + 重渲侧栏头部 + 刷新所有静态 UI 文案
 function applyLang() {
   const en = state.lang === 'en';
   const langBtn = document.getElementById('langBtn');
@@ -153,6 +254,7 @@ function applyLang() {
   document.documentElement.lang = en ? 'en' : 'zh';
   renderGraph(state.view, currentLayout);
   buildEraTabs();
+  applyUILanguage();
   if (state.selected) openNode(state.selected);
   updateURL();
 }
@@ -162,7 +264,7 @@ function renderFavList() {
   const list = document.getElementById('favList');
   if (!list) return;
   const ids = getFavorites();
-  if (!ids.length) { list.innerHTML = '<div class="fav-empty">还没有收藏。打开任意节点，点「☆ 收藏」即可加入。</div>'; return; }
+  if (!ids.length) { list.innerHTML = `<div class="fav-empty">${t('favEmpty')}</div>`; return; }
   list.innerHTML = ids.map(id => {
     const n = byId.get(id); if (!n) return '';
     return `<button class="fav-item" data-id="${esc(id)}">
@@ -196,7 +298,7 @@ function renderPathList() {
       <div class="path-card__title">${esc(en ? p.nameEn : p.name)}</div>
       <div class="path-card__desc">${esc(p.desc)}</div>
       <div class="path-card__chips">${chips}</div>
-      <button class="path-card__go linkbtn" data-path="${esc(p.id)}" type="button">高亮此路径</button>
+      <button class="path-card__go linkbtn" data-path="${esc(p.id)}" type="button">${t('highlightPath')}</button>
     </div>`;
   }).join('');
   list.querySelectorAll('.path-chip').forEach(b => b.addEventListener('click', () => {
@@ -382,7 +484,7 @@ function wireUI() {
     sr.innerHTML = hits.slice(0, 40).map(({ n, tags }) => {
       const extra = tags.filter(t => EXTRA_TAGS.has(t));
       return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(langName(n))} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">命中：${esc(extra.join('/'))}</span>` : ''}</button>`;
-    }).join('') || '<div style="padding:10px;color:var(--ink-3)">无匹配</div>';
+    }).join('') || `<div style="padding:10px;color:var(--ink-3)">${t('searchNoMatch')}</div>`;
     clearSearchGlow();
     hits.forEach(({ n }) => nodeEl(n.id)?.classList.add('is-search'));
   });
@@ -417,9 +519,10 @@ function wireUI() {
     updateURL(); navigator.clipboard?.writeText(location.href); toast('当前视图链接已复制');
   });
   const expandAllBtn = document.getElementById('expandAllBtn');
+  if (expandAllBtn) expandAllBtn.textContent = state.expandAll ? t('collapseAll') : t('expandAll');
   expandAllBtn.addEventListener('click', () => {
     state.expandAll = !state.expandAll;
-    expandAllBtn.textContent = state.expandAll ? '收起关联' : '展开全部关联';
+    expandAllBtn.textContent = state.expandAll ? t('collapseAll') : t('expandAll');
     if (state.selected) {
       state.highlight = relatedSet(NODES, state.selected, state.expandAll);
       applyState();

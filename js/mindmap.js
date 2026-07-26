@@ -32,6 +32,7 @@ let expandAll = false;      // 一键展开全部维度
 let posMap = new Map();     // key → { x,y,w,h,kind,... }
 let tf = { tx: 0, ty: 0, k: 1 };
 let dragging = false, moved = false, lastX = 0, lastY = 0;
+let downNode = null;   // pointerdown 时点中的节点（避开 setPointerCapture 导致的 click.target 错乱）
 
 // ── 对外接口 ──
 export function initMindmap({ nodes, edges, svg, viewport, onOpenDimension: cb }) {
@@ -278,6 +279,8 @@ function onWheel(e) {
 
 function onPointerDown(e) {
   SVG.setPointerCapture?.(e.pointerId);
+  // 在捕获前记录真实点中节点（setPointerCapture 会让后续 click.target 变成 SVG 本身）
+  downNode = e.target.closest?.('.mm-node') || null;
   const p = svgPoint(e);
   pointers.set(e.pointerId, p);
   if (pointers.size === 1) {
@@ -357,7 +360,9 @@ function activateNode(g) {
 
 function onClick(e) {
   if (moved) return;
-  const g = e.target.closest('.mm-node');
+  // 用 pointerdown 时记录的真实节点，避免 setPointerCapture 后 click.target 变成 SVG
+  const g = downNode;
+  downNode = null;
   if (!g) return;
   activateNode(g);
 }
@@ -379,6 +384,6 @@ function bind() {
   SVG.addEventListener('pointermove', onPointerMove);
   SVG.addEventListener('pointerup', onPointerUp);
   SVG.addEventListener('pointercancel', onPointerUp);
-  VIEWPORT.addEventListener('click', onClick);
+  SVG.addEventListener('click', onClick);   // 监听器必须绑在 SVG（节点的祖先）：setPointerCapture 会把 click.target 重定向到 SVG，且不经过 #mmViewport
   SVG.addEventListener('keydown', onKeyDown);
 }

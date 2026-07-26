@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { esc, chain, getFavorites, isFavorite, toggleFavorite, getNote, setNote } from './utils.js';
-import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_COLORS, SCALE_DESC } from './config.js';
+import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC, UI_LABELS } from './config.js';
 import { avatarImg, bindAvatars } from './data/portraitMap.js';
 import { getPOS } from './renderer.js';
 
@@ -8,6 +8,11 @@ let NODES = [], SUMMARIES = {};
 const byId = new Map();
 const termIndex = new Map(); // 术语名 -> { nodeId, termName }
 const MATURITY_LABEL = { foundation:'🏛 地基型', established:'🔬 成熟型', speculative:'🔮 探索型' };
+
+function t(key, ...args) {
+  const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];
+  return typeof v === 'function' ? v(...args) : v ?? key;
+}
 
 export function initSidebar(nodes, summaries) {
   NODES = nodes; SUMMARIES = summaries || {};
@@ -567,16 +572,20 @@ function renderDim(node, key) {
 /* ── 路径上下文（可点击跳转） ───────────────────── */
 function pathCtxHTML(node) {
   const c = chain(NODES, node.id);
-  const nm = id => byId.get(id)?.name || id;
+  const nm = id => {
+    const n = byId.get(id);
+    if (!n) return id;
+    return state.lang === 'en' ? (n.nameEn || n.name) : n.name;
+  };
   const upIds = c.parents || [];
   const downIds = c.children || [];
   const upHtml = upIds.length
     ? upIds.map(id => `<button class="sb-path__link" data-id="${esc(id)}">${esc(nm(id))}</button>`).join('')
-    : '<span class="sb-path__val">（理论起点）</span>';
+    : `<span class="sb-path__val">${t('theoryStart')}</span>`;
   const downHtml = downIds.length
     ? downIds.map(id => `<button class="sb-path__link" data-id="${esc(id)}">${esc(nm(id))}</button>`).join('')
-    : '<span class="sb-path__val">（脉络延续）</span>';
-  return `<div class="sb-path"><span class="sb-path__label">继承自</span> ${upHtml}<span class="sb-path__sep"></span><span class="sb-path__label">影响至</span> ${downHtml}</div>`;
+    : `<span class="sb-path__val">${t('lineageContinues')}</span>`;
+  return `<div class="sb-path"><span class="sb-path__label">${t('pathFrom')}</span> ${upHtml}<span class="sb-path__sep"></span><span class="sb-path__label">${t('pathTo')}</span> ${downHtml}</div>`;
 }
 
 /* ── 打开节点侧边栏 ───────────────────────────────────── */
@@ -584,9 +593,9 @@ function exploreMoreHTML(node) {
   const links = node.links || [];
   const items = links.length
     ? links.map(l => `<a class="sb-explore__item" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a>`).join('')
-    : '<span class="sb-explore__empty">相关拓展阅读 · 建设中</span>';
+    : `<span class="sb-explore__empty">${t('exploreEmpty')}</span>`;
   return `<div class="sb-explore">
-    <div class="sb-explore__title">探索更多</div>
+    <div class="sb-explore__title">${t('exploreMore')}</div>
     <div class="sb-explore__list">${items}</div>
   </div>`;
 }
@@ -637,7 +646,7 @@ export function openNode(id) {
   else defaultTab = dims[0]?.key || 'history';
   const back = history.state?.ppBack;
   const backBtn = back
-    ? `<button class="sb-back" type="button" data-action="back"><span>←</span> 返回</button>`
+    ? `<button class="sb-back" type="button" data-action="back"><span>←</span> ${t('back')}</button>`
     : '';
 
   const favOn = isFavorite(node.id);
@@ -647,7 +656,7 @@ export function openNode(id) {
     <div class="sb-head">
       <div class="sb-head__era"><span class="sb-swatch" style="background:${era.raw}"></span>${state.lang === 'en' ? era.nameEn : era.name} · ${era.range}</div>
       <div class="sb-head__title">${esc(titleName)}<small>${esc(titleSmall)}</small></div>
-      <button class="sb-fav ${favOn ? 'is-on' : ''}" id="sbFavBtn" type="button" data-id="${node.id}">${favOn ? '★ 已收藏' : '☆ 收藏'}</button>
+      <button class="sb-fav ${favOn ? 'is-on' : ''}" id="sbFavBtn" type="button" data-id="${node.id}">${favOn ? t('addedFavorite') : t('addFavorite')}</button>
       <div class="sb-head__quote">${esc(node.aha || '')}</div>
       <div class="sb-head__meta">
         <span class="sb-chip">${scaleLabel}</span>
@@ -657,12 +666,12 @@ export function openNode(id) {
       ${figuresHTML(node)}
     </div>
     <div class="sb-note">
-      <label class="sb-note__label">📝 我的笔记（仅存于本机浏览器）</label>
-      <textarea class="sb-note__area" id="sbNote" data-id="${node.id}" placeholder="写下你对这个节点的理解…">${esc(getNote(node.id))}</textarea>
+      <label class="sb-note__label">${t('myNoteLabel')}</label>
+      <textarea class="sb-note__area" id="sbNote" data-id="${node.id}" placeholder="${t('notePlaceholder')}">${esc(getNote(node.id))}</textarea>
     </div>
     ${backBtn}
     <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${state.lang === 'en' ? d.labelEn : d.label}</button>`).join('')}</div>
-    <div class="sb-mobile-tip">✦ 已高亮画布上的关联节点，关闭侧栏即可查看</div>
+    <div class="sb-mobile-tip">${t('mobileTip')}</div>
     <div class="sb-panel" id="tabBody"></div>
     ${pathCtxHTML(node)}
     ${exploreMoreHTML(node)}
@@ -681,7 +690,7 @@ export function openNode(id) {
     const id = favBtn.dataset.id;
     const on = toggleFavorite(id);
     favBtn.classList.toggle('is-on', on);
-    favBtn.textContent = on ? '★ 已收藏' : '☆ 收藏';
+    favBtn.textContent = on ? t('addedFavorite') : t('addFavorite');
     window.dispatchEvent(new CustomEvent('pp:favChange'));
   });
   // 绑定「我的笔记」输入框（实时写入 localStorage）
@@ -750,12 +759,12 @@ export function openEra(era) {
   const events = NODES.filter(n => n.era === era && n.type === 'event').length;
   body.innerHTML = `
     <div class="sb-head">
-      <div class="sb-head__era"><span class="sb-swatch" style="background:${e.raw}"></span>${e.name} · ${e.range}</div>
-      <div class="sb-head__title">${esc(e.name)}<small>纪元综述</small></div>
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${e.raw}"></span>${state.lang === 'en' ? e.nameEn : e.name} · ${e.range}</div>
+      <div class="sb-head__title">${esc(state.lang === 'en' ? e.nameEn : e.name)}<small>${t('eraOverview')}</small></div>
     </div>
     <div class="sb-panel">
       <div class="sb-para" style="font-size:14.5px;line-height:1.9;">${esc(txt || '')}</div>
-      <div class="sb-stats">本纪元收录 <b>${count}</b> 个学说 / 事件${events ? `，含 <b>${events}</b> 个里程碑` : ''}。点击时间线节点深入探索。</div>
+      <div class="sb-stats">${t('eraStats', count, events)}</div>
     </div>`;
   sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
   state.sidebarOpen = true;
@@ -768,7 +777,7 @@ export function openScale(scale, focusRel) {
   const c = d.concept || {};
   const sb = document.getElementById('sidebar'); const body = document.getElementById('sidebarBody');
   const count = NODES.filter(n => n.scale === scale).length;
-  const names = NODES.filter(n => n.scale === scale).map(n => n.name).join('、');
+  const names = NODES.filter(n => n.scale === scale).map(n => state.lang === 'en' ? (n.nameEn || n.name) : n.name).join(', ');
 
   const chips = arr => (arr || []).map(t => `<span class="sb-tag" style="--tag:${cfg.raw}">${esc(t)}</span>`).join('');
   const defRow = c.def ? `<div class="sb-dl"><dt>定义</dt><dd>${esc(c.def)}</dd></div>` : '';
