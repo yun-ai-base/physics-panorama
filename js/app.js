@@ -633,6 +633,11 @@ function toggleMindmapFullscreen() {
   // 浮动退出按钮双语
   const exitBtn = document.getElementById('mmExitFs');
   if (exitBtn) exitBtn.textContent = mindmapFs ? (t('exitFullscreen') || '✕ 退出全屏') : '✕ 退出全屏';
+  // 进入全屏时重置拖拽偏移（防止残留 tx/ty 导致内容偏移到看不见的位置）
+  if (mindmapFs) {
+    // 通过暴露在 window 上的函数重置（mindmap.js 的 resetMindmap 已做 tf={tx:0,ty:0,k:1} + fit()）
+    if (typeof resetMindmap === 'function') resetMindmap();
+  }
   // 全屏切换后等布局稳定再重排
   requestAnimationFrame(() => { renderMindmap(); });
 }
