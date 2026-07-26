@@ -42,17 +42,17 @@ export function initMindmap({ nodes, edges, svg, viewport, onOpenDimension: cb }
   onOpenDimension = cb;
   bind();
 }
-export function renderMindmap() { render(); fit(); }
+export function renderMindmap() { render(); requestAnimationFrame(() => fit()); }
 export function resetMindmap() {
   expanded.clear(); expandAll = false;
   const c = document.getElementById('mmExpandAll'); if (c) c.checked = false;
-  render(); fit();
+  render(); requestAnimationFrame(() => fit());
 }
 export function setExpandAll(v) {
   expandAll = !!v;
   if (expandAll) expanded.clear();
   const c = document.getElementById('mmExpandAll'); if (c) c.checked = expandAll;
-  render(); fit();
+  render(); requestAnimationFrame(() => fit());
 }
 
 // ── 维度内容判断：某节点某维度是否有可读内容 ──
@@ -149,8 +149,10 @@ function applyTransform() {
 }
 function fit() {
   if (!SVG) return;
-  const b = bounds();
   const cw = SVG.clientWidth || 960, ch = SVG.clientHeight || 640;
+  // SVG 尚未完成布局（如刚从 hidden 变可见）时跳过，由 rAF 重试
+  if (cw < 50 || ch < 50) return;
+  const b = bounds();
   const boxW = (b.maxX - b.minX) || 1, boxH = (b.maxY - b.minY) || 1;
   const k = Math.min(cw / boxW, ch / boxH) * 0.92;
   tf.k = k;

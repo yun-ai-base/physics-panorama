@@ -4,11 +4,12 @@
    ════════════════════════════════════════════════════════════ */
 
 /* 让虚无视图从「居中卡片」改为「纵向容器」，以容纳子选项栏与面板 */
+/* 必须用 #voidView 覆盖 main.css 中 .void-view 的 align-items/justify-content/padding */
 #voidView {
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  padding: 0;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  padding: 0 !important;
 }
 
 /* ── 子选项栏 ── */
@@ -50,6 +51,7 @@
   justify-content: center;
   overflow: auto;
 }
+.void-poem[hidden] { display: none !important; }
 
 /* ── 思维导图面板 ── */
 .void-mindmap {
@@ -59,7 +61,7 @@
   flex-direction: column;
   position: relative;
 }
-.void-mindmap[hidden] { display: none; }
+.void-mindmap[hidden] { display: none !important; }
 
 .mindmap-toolbar {
   flex: 0 0 auto;
