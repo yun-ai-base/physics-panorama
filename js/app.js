@@ -2,8 +2,8 @@ import { state } from './state.js';
 import { esc, buildEdges, relatedSet, getFavorites, isFavorite } from './utils.js';
 import { ERAS, ERA_ORDER, LEARNING_PATHS, UI_LABELS } from './config.js';
 import { computeLayout } from './views.js';
-import { initRenderer, renderGraph, applyState, onApplyState } from './renderer.js';
-import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, updateMiniMap } from './sidebar.js';
+import { initRenderer, renderGraph, applyState } from './renderer.js';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
@@ -61,8 +61,6 @@ async function boot() {
   initInteraction();
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
-  onApplyState(updateMiniMap);
-  updateMiniMap();
   updateFavCount();
 
   // 思维导图模块初始化（仅缓存数据与绑定事件，渲染推迟到首次进入 void→思维导图）

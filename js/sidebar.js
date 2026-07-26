@@ -2,7 +2,6 @@ import { state } from './state.js';
 import { esc, chain, getFavorites, isFavorite, toggleFavorite, getNote, setNote } from './utils.js';
 import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC, UI_LABELS } from './config.js';
 import { avatarImg, bindAvatars } from './data/portraitMap.js';
-import { getPOS } from './renderer.js';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();
@@ -909,47 +908,6 @@ export function openPerson(name, nodeIds) {
 export function openSidebarTab(tabKey) {
   const btn = document.querySelector(`.sb-tab[data-key="${tabKey.replace(/"/g, '\\"')}"]`);
   if (btn) btn.click();
-}
-
-// ── 侧栏迷你全景缩略图 + 选中红点（F 项；依赖 renderer.getPOS） ──
-export function updateMiniMap() {
-  const box = document.getElementById('minimap');
-  if (!box) return;
-  const pos = getPOS();
-  const ids = Object.keys(pos);
-  if (!ids.length) { box.hidden = true; return; }
-  box.hidden = false;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const id of ids) {
-    const p = pos[id]; if (!p) continue;
-    if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
-    if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
-  }
-  const W = 248, H = 132, pad = 10;
-  const sx = (W - 2 * pad) / (maxX - minX || 1);
-  const sy = (H - 2 * pad) / (maxY - minY || 1);
-  const s = Math.min(sx, sy);
-  const ox = pad + ((W - 2 * pad) - (maxX - minX) * s) / 2;
-  const oy = pad + ((H - 2 * pad) - (maxY - minY) * s) / 2;
-  const tx = p => ({ x: ox + (p.x - minX) * s, y: oy + (p.y - minY) * s });
-  let svg = `<svg viewBox="0 0 ${W} ${H}" class="mm-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">`;
-  for (const id of ids) {
-    const p = pos[id]; if (!p) continue;
-    const t = tx(p);
-    const n = byId.get(id);
-    const c = n ? (ERAS[n.era] ? ERAS[n.era].raw : '#9A8C76') : '#9A8C76';
-    svg += `<circle class="mm-dot" data-id="${esc(id)}" cx="${t.x.toFixed(1)}" cy="${t.y.toFixed(1)}" r="2.4" fill="${c}"><title>${esc(n ? (n.nameEn || n.name) : id)}</title></circle>`;
-  }
-  if (state.selected && pos[state.selected]) {
-    const t = tx(pos[state.selected]);
-    svg += `<circle class="mm-red" cx="${t.x.toFixed(1)}" cy="${t.y.toFixed(1)}" r="4" fill="#E23B3B" stroke="#FFFFFF" stroke-width="1"><title>当前选中</title></circle>`;
-  }
-  svg += '</svg>';
-  box.innerHTML = svg;
-  box.querySelectorAll('.mm-dot').forEach(d => d.addEventListener('click', () => {
-    const id = d.getAttribute('data-id');
-    if (id) window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: id }));
-  }));
 }
 
 export function focusTerm(termName) {

@@ -232,9 +232,4 @@
 }
 .sb-note__area:focus { outline: none; border-color: #E8B84A; }
 
-/* ── 侧栏迷你全景缩略图 + 选中红点 ── */
-.sidebar__minimap { padding: 10px 14px 6px; border-bottom: 1px solid #F0E7D2; }
-.mm-svg { width: 100%; height: auto; display: block; background: #FBF7EE; border: 1px solid #EFE6D0; border-radius: 10px; cursor: crosshair; }
-.mm-dot { cursor: pointer; transition: r .12s; }
-.mm-dot:hover { r: 4; }
-.mm-red { filter: drop-shadow(0 0 3px rgba(226,59,59,.7)); }
+
