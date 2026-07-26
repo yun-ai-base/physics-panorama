@@ -261,6 +261,9 @@ function wireUI() {
   if (mmExpand) mmExpand.addEventListener('change', e => setExpandAll(e.target.checked));
   const mmResetBtn = document.getElementById('mmReset');
   if (mmResetBtn) mmResetBtn.addEventListener('click', () => resetMindmap());
+  // 全屏模式切换
+  const mmFsBtn = document.getElementById('mmFullscreen');
+  if (mmFsBtn) mmFsBtn.addEventListener('click', () => toggleMindmapFullscreen());
 
   const eraTabs = document.getElementById('eraTabs');
   buildEraTabs();
@@ -562,6 +565,21 @@ function activateVoidTab(v) {
   if (mm) mm.hidden = (v !== 'mindmap');
   if (v === 'mindmap') renderMindmap();
 }
+
+// 思维导图全屏模式
+let mindmapFs = false;
+function toggleMindmapFullscreen() {
+  mindmapFs = !mindmapFs;
+  document.body.classList.toggle('mm-fs', mindmapFs);
+  // 全屏切换后等布局稳定再重排
+  requestAnimationFrame(() => { renderMindmap(); });
+}
+// ESC 退出全屏
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && mindmapFs) {
+    toggleMindmapFullscreen();
+  }
+});
 
 // 统一视图切换（含人物索引与虚无-图景覆盖层）
 function setView(v) {
