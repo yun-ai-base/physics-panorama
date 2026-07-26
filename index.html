@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/sidebar.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/tour.css" />
+  <link rel="stylesheet" href="css/mindmap.css" />
 </head>
 <body>
   <div id="app">
@@ -74,6 +75,27 @@
             <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#B8893B" flood-opacity="0.55" />
             </filter>
+            <!-- 冲突边：湍流位移制造"波浪纹"（设计 2.5「灰红波纹」） -->
+            <filter id="wave" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="turbulence" baseFrequency="0.012 0.05" numOctaves="2" seed="7" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+            <!-- 纪元背景渐变光晕（边缘透明→中心实色，相邻纪元自然融合，设计 4.1「渐变光晕过渡」） -->
+            <linearGradient id="eraGrad-classical" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#C29A4E" stop-opacity="0" /><stop offset="50%" stop-color="#C29A4E" stop-opacity="0.9" /><stop offset="100%" stop-color="#C29A4E" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="eraGrad-relativity" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#41518F" stop-opacity="0" /><stop offset="50%" stop-color="#41518F" stop-opacity="0.9" /><stop offset="100%" stop-color="#41518F" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="eraGrad-quantum" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#7A5BA6" stop-opacity="0" /><stop offset="50%" stop-color="#7A5BA6" stop-opacity="0.9" /><stop offset="100%" stop-color="#7A5BA6" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="eraGrad-standard-model" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#357A5E" stop-opacity="0" /><stop offset="50%" stop-color="#357A5E" stop-opacity="0.9" /><stop offset="100%" stop-color="#357A5E" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="eraGrad-frontier" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#6B4E8C" stop-opacity="0" /><stop offset="50%" stop-color="#6B4E8C" stop-opacity="0.9" /><stop offset="100%" stop-color="#6B4E8C" stop-opacity="0" />
+            </linearGradient>
           </defs>
           <g id="viewport">
             <g id="layer-era"></g>
@@ -90,6 +112,10 @@
         <div class="people-view__head">
           <h2>人物索引</h2>
           <p class="people-view__sub">物理学三百年的代表人物 · 点击查看其关联的学说与事件</p>
+          <div class="people-tools">
+            <input id="peopleSearch" class="people-search" type="search" placeholder="搜索人物姓名…" aria-label="搜索人物">
+            <span class="people-count" id="peopleCount"></span>
+          </div>
         </div>
         <div class="people-grid" id="peopleGrid"></div>
       </div>
@@ -109,24 +135,49 @@
       <!-- 悬停节点迷你预览卡（纯新增，pointer-events:none 不干扰拖拽/点击） -->
       <div class="node-preview" id="nodePreview" hidden></div>
 
-      <!-- 虚无-图景占位视图 -->
+      <!-- 虚无-图景视图（含「意境」与「思维导图」两个子选项） -->
       <div class="void-view" id="voidView" hidden>
-        <div class="void-view__watermark" aria-hidden="true">
-          <span>无极生太极</span>
-          <span>太极生两仪</span>
-          <span>两仪生四象</span>
-          <span>四象生八卦</span>
+        <div class="void-subtabs" id="voidSubtabs">
+          <button class="void-subtab is-active" data-void="poem" type="button">意境</button>
+          <button class="void-subtab" data-void="mindmap" type="button">思维导图</button>
         </div>
-        <div class="void-view__watermark void-view__watermark--left" aria-hidden="true">
-          <span>小径分叉的花园</span>
-          <span>过去、现在、未来同存</span>
+
+        <!-- 选项一：意境（原诗意占位） -->
+        <div class="void-poem" id="voidPoem">
+          <div class="void-view__watermark" aria-hidden="true">
+            <span>无极生太极</span>
+            <span>太极生两仪</span>
+            <span>两仪生四象</span>
+            <span>四象生八卦</span>
+          </div>
+          <div class="void-view__watermark void-view__watermark--left" aria-hidden="true">
+            <span>小径分叉的花园</span>
+            <span>过去、现在、未来同存</span>
+          </div>
+          <div class="void-view__card">
+            <p class="void-view__verse">一花一世界</p>
+            <p class="void-view__verse">一沙一天国</p>
+            <p class="void-view__verse">君掌盛无边</p>
+            <p class="void-view__verse">刹那含永劫</p>
+            <span class="void-view__sub">—— 虚无 · 图景 · 暂居</span>
+          </div>
         </div>
-        <div class="void-view__card">
-          <p class="void-view__verse">一花一世界</p>
-          <p class="void-view__verse">一沙一天国</p>
-          <p class="void-view__verse">君掌盛无边</p>
-          <p class="void-view__verse">刹那含永劫</p>
-          <span class="void-view__sub">—— 虚无 · 图景 · 暂居</span>
+
+        <!-- 选项二：思维导图 -->
+        <div class="void-mindmap" id="voidMindmap" hidden>
+          <div class="mindmap-toolbar">
+            <span class="mindmap-legend">
+              <span class="lg"><i style="border-top-color:#C0392B;border-top-style:dashed"></i>范式革命</span>
+              <span class="lg"><i style="border-top-color:#E67E22;border-top-style:dashed"></i>理论冲突</span>
+              <span class="lg"><i style="border-top-color:#C9A24E"></i>继承脉络</span>
+              <span class="lg"><i style="border-top-color:#2E8B57"></i>统一 / 分支</span>
+            </span>
+            <label class="mindmap-toggle"><input type="checkbox" id="mmExpandAll" /> 展开全部维度</label>
+            <button class="mindmap-reset" id="mmReset" type="button">重置视图</button>
+          </div>
+          <svg class="mindmap-svg" id="mindmapSvg" xmlns="http://www.w3.org/2000/svg">
+            <g id="mmViewport"></g>
+          </svg>
         </div>
       </div>
 

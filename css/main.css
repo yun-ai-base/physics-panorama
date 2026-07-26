@@ -156,6 +156,14 @@ body.view-people .era-nav,
 body.view-people .search,
 body.view-people .hint{display:none;}
 
+/* 人物索引：搜索与计数 */
+.people-tools{display:flex; align-items:center; gap:14px; margin-top:14px; flex-wrap:wrap; justify-content:center;}
+.people-search{padding:9px 16px; width:min(320px,80vw); border:1px solid rgba(184,137,59,.28); border-radius:999px; background:var(--card); color:var(--ink); font-size:14px; outline:none; transition:.2s;}
+.people-search:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,137,59,.16);}
+.people-search::placeholder{color:var(--ink-3);}
+.people-count{font-size:12.5px; color:var(--ink-3); letter-spacing:.3px;}
+.person-card.is-hidden{display:none !important;}
+
 /* 移动端首页提醒（检测到移动设备后弹出，停留 2 秒自动淡出） */
 .mobile-notice{
   position:fixed; top:0; right:0; bottom:0; left:0; z-index:9999;

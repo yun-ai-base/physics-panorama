@@ -26,11 +26,15 @@
 .edge--branch{stroke:var(--line-inherit); stroke-width:2.6; stroke-dasharray:5 6;}
 .edge--revolution{stroke:var(--line-revolution); stroke-width:3.8; stroke-dasharray:7 5; animation:pulseRev 1.4s ease-in-out infinite;}
 .edge--unify{stroke:var(--line-unify); stroke-width:3.8; filter:url(#goldGlow);}
-.edge--conflict{stroke:var(--line-conflict); stroke-width:2.8; stroke-dasharray:2 5; opacity:.88;}
+.edge--conflict{stroke:var(--line-conflict); stroke-width:2.8; stroke-dasharray:3 4; filter:url(#wave); opacity:.9;}
 @keyframes pulseRev{0%,100%{opacity:.55;}50%{opacity:1;}}
 .edge.is-dim{opacity:.08 !important;}
 /* 选中节点与关联节点之间的连线：金色强调，让关系在画布上更直观 */
 .edge.is-related{stroke:var(--gold); stroke-width:2.6px; opacity:1 !important; filter:url(#goldGlow);}
+
+/* 继承边：金色小光点从父节点缓速流向子节点（设计 2.5「慢速光点从父流向子」） */
+.edge--inherit-flow{fill:none; stroke:var(--gold); stroke-width:3.4; stroke-linecap:round; stroke-dasharray:0.1 16; stroke-dashoffset:0; pointer-events:none; filter:url(#goldGlow); animation:inheritFlow 1.8s linear infinite;}
+@keyframes inheritFlow{to{stroke-dashoffset:-16.1;}}
 
 /* 连线含义小标签 */
 .edge__label{font-family:var(--font-sans); font-size:10px; font-weight:700; fill:var(--ink-2); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,.92); stroke-width:4px; stroke-linejoin:round; opacity:.92; transition:opacity .3s;}
@@ -46,7 +50,7 @@
 /* 关联节点（选中节点的直系父子）：金色描边 + 光晕，让其在画布上明确"显出来" */
 .node.is-related .node__circle{stroke:var(--gold); stroke-width:3.4px; filter:url(#goldGlow);}
 .node.is-related .node__label{font-weight:700;}
-.node.is-dim{opacity:.14 !important;}
+.node.is-dim{opacity:.20 !important;}
 
 /* 纪元色：实心浅底 + 深描边（色彩差异化核心） */
 .node[data-era="classical"] .node__circle{fill:#F5E6CC; stroke:#A07840; stroke-width:2.8;}

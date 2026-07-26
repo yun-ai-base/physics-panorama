@@ -6,7 +6,8 @@ import { initRenderer, renderGraph, applyState } from './renderer.js';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
-import { buildPeople, renderPeople } from './people.js';
+import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
+import { initMindmap, renderMindmap, resetMindmap, setExpandAll } from './mindmap.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -60,6 +61,17 @@ async function boot() {
   initInteraction();
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
+
+  // 思维导图模块初始化（仅缓存数据与绑定事件，渲染推迟到首次进入 void→思维导图）
+  try {
+    initMindmap({
+      nodes: NODES,
+      edges: EDGES,
+      svg: document.getElementById('mindmapSvg'),
+      viewport: document.getElementById('mmViewport'),
+      onOpenDimension: (id, dim) => { openNode(id); openSidebarTab(dim); },
+    });
+  } catch (err) { console.error('[mindmap] init failed', err); }
 
   const node = readURL();
   const restoreTab = state.sidebarTab;
@@ -154,6 +166,19 @@ function wireUI() {
     const b = e.target.closest('.view-tab'); if (!b) return;
     setView(b.dataset.view);
   });
+
+  // 虚无-图景子选项（意境 / 思维导图）切换
+  const vsEl = document.getElementById('voidSubtabs');
+  if (vsEl) vsEl.addEventListener('click', e => {
+    const b = e.target.closest('.void-subtab'); if (!b) return;
+    voidTab = b.dataset.void;
+    activateVoidTab(voidTab);
+    updateURL();
+  });
+  const mmExpand = document.getElementById('mmExpandAll');
+  if (mmExpand) mmExpand.addEventListener('change', e => setExpandAll(e.target.checked));
+  const mmResetBtn = document.getElementById('mmReset');
+  if (mmResetBtn) mmResetBtn.addEventListener('click', () => resetMindmap());
 
   const eraTabs = document.getElementById('eraTabs');
   eraTabs.innerHTML = `<button class="era-tab is-active" data-era="all"><span class="swatch" style="background:var(--gold)"></span>全部</button>` +
@@ -359,7 +384,10 @@ function wireUI() {
   // 侧边栏内部状态变化时同步 URL
   window.addEventListener('pp:updateURL', updateURL);
 
-  window.addEventListener('resize', fit);
+  window.addEventListener('resize', () => {
+    fit();
+    if (state.view === 'void' && voidTab === 'mindmap') renderMindmap();
+  });
 }
 
 // 纪元激活态：统一反映顶部导航 + 时间线大字的 UI 改造
@@ -391,6 +419,17 @@ function reflectScaleActive() {
     l.classList.toggle('is-active-scale', l.dataset.scale === state.activeScale));
 }
 
+// 虚无-图景子选项（意境 / 思维导图）
+let voidTab = 'poem';
+function activateVoidTab(v) {
+  document.querySelectorAll('.void-subtab').forEach(t => t.classList.toggle('is-active', t.dataset.void === v));
+  const poem = document.getElementById('voidPoem');
+  const mm = document.getElementById('voidMindmap');
+  if (poem) poem.hidden = (v !== 'poem');
+  if (mm) mm.hidden = (v !== 'mindmap');
+  if (v === 'mindmap') renderMindmap();
+}
+
 // 统一视图切换（含人物索引与虚无-图景覆盖层）
 function setView(v) {
   state.view = v;
@@ -410,10 +449,14 @@ function setView(v) {
   const eraNav = document.getElementById('eraNav');
   if (eraNav) eraNav.style.display = isVoid ? 'none' : '';
   if (isPeople) {
-    renderPeople(document.getElementById('peopleGrid'), [...PEOPLE_MAP.values()], onPickPerson);
+    const pg = document.getElementById('peopleGrid');
+    renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
+    const ps = document.getElementById('peopleSearch');
+    if (ps) { ps.oninput = () => filterPeopleGrid(ps.value); filterPeopleGrid(ps.value); }
     closeSidebar();
   } else if (isVoid) {
     closeSidebar();
+    activateVoidTab(voidTab);
   } else {
     renderCurrent(); fit();
   }

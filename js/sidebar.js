@@ -629,7 +629,11 @@ export function openNode(id) {
     }
   }
 
-  const defaultTab = dims[0]?.key || 'history';
+  // 智能默认标签（设计 2.6）：深度理论节点默认停「脉络」，实验/事件节点默认停「实验」
+  let defaultTab;
+  if (node.type === 'event' && dims.find(d => d.key === 'experiments')) defaultTab = 'experiments';
+  else if (dims.find(d => d.key === 'history')) defaultTab = 'history';
+  else defaultTab = dims[0]?.key || 'history';
   const back = history.state?.ppBack;
   const backBtn = back
     ? `<button class="sb-back" type="button" data-action="back"><span>←</span> 返回</button>`

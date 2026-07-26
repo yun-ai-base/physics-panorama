@@ -1,23 +1,34 @@
 // 人物索引视图：从节点列表提取唯一人物，渲染为卡片网格
 import { esc } from './utils.js';
 import { ERAS } from './config.js';
-import { avatarImg, bindAvatars } from './data/portraitMap.js';
+import { avatarImg, bindAvatars, portraitName } from './data/portraitMap.js';
 
-// 从节点列表提取唯一人物及其关联学说（按关联数降序）
+// 从节点列表提取唯一人物及其关联学说（按关联数降序）。
+// 同一人物的不同称呼（如"阿尔伯特·爱因斯坦（预言）"）按肖像别名归一合并为一张卡，避免重复。
 export function buildPeople(nodes) {
   const map = new Map();
   for (const n of nodes) {
     for (const f of (n.figures || [])) {
-      const name = typeof f === 'string' ? f : (f && f.name) || '';
-      if (!name) continue;
-      if (!map.has(name)) map.set(name, { name, eras: new Set(), nodeIds: [] });
-      const e = map.get(name);
+      const raw = typeof f === 'string' ? f : (f && f.name) || '';
+      if (!raw) continue;
+      const key = portraitName(raw); // 归一 key（合并别名 / 连字符差异）
+      if (!map.has(key)) map.set(key, { key, aliases: new Set([raw]), eras: new Set(), nodeIds: [] });
+      const e = map.get(key);
+      e.aliases.add(raw);
       if (n.era) e.eras.add(n.era);
       e.nodeIds.push(n.id);
     }
   }
   return [...map.values()]
-    .map(p => ({ name: p.name, eras: [...p.eras], nodeIds: p.nodeIds }))
+    .map(p => {
+      // 显示名：优先不含括号且最长的原始称呼（剥离"预言"/"开尔文勋爵"等别名后缀）
+      const disp = [...p.aliases].sort((a, b) => {
+        const ca = (a.includes('（') || a.includes('(')) ? 1 : 0;
+        const cb = (b.includes('（') || b.includes('(')) ? 1 : 0;
+        return ca - cb || b.length - a.length;
+      })[0];
+      return { key: p.key, name: disp, eras: [...p.eras], nodeIds: [...new Set(p.nodeIds)] };
+    })
     .sort((a, b) => b.nodeIds.length - a.nodeIds.length || a.name.localeCompare(b.name, 'zh'));
 }
 
@@ -41,4 +52,20 @@ export function renderPeople(container, people, onPick) {
   container.querySelectorAll('.person-card').forEach(c => {
     c.addEventListener('click', () => onPick(c.dataset.name));
   });
+}
+
+// 按姓名实时过滤人物网格（不重渲染，仅切换隐藏态）。供搜索框调用。
+export function filterPeopleGrid(query) {
+  const grid = document.getElementById('peopleGrid');
+  if (!grid) return;
+  if (grid.querySelector('.people-empty')) { const c = document.getElementById('peopleCount'); if (c) c.textContent = ''; return; }
+  const q = (query || '').trim().toLowerCase();
+  let shown = 0;
+  grid.querySelectorAll('.person-card').forEach(c => {
+    const hit = !q || (c.dataset.name || '').toLowerCase().includes(q);
+    c.classList.toggle('is-hidden', !hit);
+    if (hit) shown++;
+  });
+  const cnt = document.getElementById('peopleCount');
+  if (cnt) cnt.textContent = q ? `匹配 ${shown} / ${grid.children.length} 位` : `共 ${grid.children.length} 位`;
 }

@@ -71,7 +71,7 @@ function drawEraBands(layer) {
     const active = era === state.activeEra;
     const rect = el('rect', {
       x: minX, y: globalMinY, width: maxX - minX, height: globalMaxY - globalMinY,
-      fill: ERAS[era].raw, 'fill-opacity': active ? 0.14 : 0.08, rx: 18, class: 'era-band',
+      fill: `url(#eraGrad-${era})`, 'fill-opacity': active ? 0.14 : 0.08, rx: 18, class: 'era-band',
     }, layer);
     if (active) {
       const hlW = ERAS[era].name.length * 20 + 22;
@@ -215,6 +215,10 @@ function drawEdges(layer) {
     const path = el('path', {
       d, class: `edge ${EDGE_CLASS[e.type]}`,
     }, layer);
+    // 继承边：叠加一条金色流动光点（从父 a 流向子 b），父→子方向天然正确
+    if (e.type === 'inherit') {
+      el('path', { d, class: 'edge edge--inherit-flow' }, layer);
+    }
     const m = isScale ? scaleLabelMid(a, b) : bezierMidpoint(a, b);
     const text = EDGE_LABELS[e.type] || e.type;
     const lw = labelW(text, 10) + 10;
