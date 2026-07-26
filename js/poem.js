@@ -1,7 +1,8 @@
 // 虚无-图景 · 意境页 淡墨水印诗文轮换
 // 居中的「一花一世界…刹那含永劫」保持不动（由 index.html 的 .void-view__card 负责）。
-// 左右各 4 首淡墨水印，每边一次只显示 1 首（其余隐藏=交替显示），左右同步轮换，
+// 左右淡墨水印，每边一次只显示 1 首（其余隐藏=交替显示），左右同步轮换，
 // 每首停留 5s，出现时先 2s 高亮加黑再淡回淡墨水印（高亮时显示该诗全文）。仅在「意境」子页可见时运行。
+// 注：「小径分岔的花园」与「过去现在未来」已合并为左列 idx=3 一首（含 <br> 两行），故左 4 首 / 右 3 首，数量可不等。
 
 const STEP_MS = 5000; // 每首停留时间
 const HOT_MS = 2000;  // 高亮加黑持续时间
@@ -15,7 +16,7 @@ function initPoemRotation() {
 
   const leftLines = Array.from(leftWrap.querySelectorAll('.void-view__wm-line'));
   const rightLines = Array.from(rightWrap.querySelectorAll('.void-view__wm-line'));
-  const n = Math.min(leftLines.length, rightLines.length);
+  const n = leftLines.length; // 合并诗后左4右3，允许左右数量不等；showStep 已用 if(L)/if(R) 容错，缺失侧不显示
   if (n === 0) return;
 
   // 初始全部隐藏（交替显示：任意时刻每边只显 1 首）
