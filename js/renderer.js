@@ -150,9 +150,14 @@ function drawScaleBands(layer, labelLayer) {
     // 交界 Y 坐标（两个带的中点之间）
     const gapY = (bandA.maxY + bandB.minY) / 2;
 
-    // 从当前尺度的 extend 中找指向下一个尺度的关系标签
+    // 从当前尺度的 extend 中找"明确指向相邻下一尺度"的渗透标签（箭头 →/↔ 后紧跟目标尺度名或英文 key）
     const descA = SCALE_DESC[sA];
-    const relEntry = (descA?.extend || []).find(e => e.rel && (e.rel.includes(sB) || e.rel.includes(SCALE_LABEL[sB])));
+    const targetLabel = SCALE_LABEL[sB];
+    const relEntry = (descA?.extend || []).find(e => {
+      const rel = e.rel || '';
+      return rel.includes('→ ' + targetLabel) || rel.includes('→ ' + sB) ||
+             rel.includes('↔ ' + targetLabel) || rel.includes('↔ ' + sB);
+    });
     const relLabel = relEntry ? relEntry.rel : '';
 
     if (!relLabel) continue;

@@ -66,6 +66,7 @@
 /* 成熟度样式 */
 .node[data-maturity="foundation"] .node__circle{stroke-width:3.6;}
 .node[data-maturity="speculative"] .node__circle{stroke-dasharray:5 3;}
+.node[data-maturity="established"] .node__circle{stroke:var(--gold); stroke-width:3;}
 
 /* 标签 —— 加大加粗，描边加厚防被节点遮挡 */
 .node__label{font-family:var(--font-sans); font-size:14px; font-weight:600; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,1); stroke-width:6.5px; stroke-linejoin:round;}
