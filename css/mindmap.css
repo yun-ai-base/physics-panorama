@@ -165,9 +165,9 @@ body.mm-fs .void-mindmap {
 
 .mm-rect--root { fill: var(--gold, #B8893B); stroke: #8B6914; stroke-width: 1.5; }
 .mm-rect--era  { stroke: rgba(255, 255, 255, .6); stroke-width: 1; }
-.mm-rect--node { fill: #fff; stroke: rgba(42, 38, 32, .18); stroke-width: 1; }
+.mm-rect--node { fill: rgba(255, 255, 255, .82); stroke: rgba(42, 38, 32, .18); stroke-width: 1; }
 .mm-rect--node.mm-rect--core { stroke: var(--gold, #B8893B); stroke-width: 2; }
-.mm-rect--dim  { fill: #fff; stroke: rgba(42, 38, 32, .12); stroke-width: 1; }
+.mm-rect--dim  { fill: rgba(255, 255, 255, .78); stroke: rgba(42, 38, 32, .12); stroke-width: 1; }
 
 /* 连线 */
 .mm-edge { fill: none; stroke-linecap: round; }
