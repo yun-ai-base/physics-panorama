@@ -324,7 +324,7 @@ function dimSummaryText(node, key) {
     raw = (node.formula || []).slice(0, 4).join('，');
   } else if (key === 'particles') {
     const gs = (node.particles && node.particles.groups) || [];
-    raw = gs.slice(0, 4).map(x => (x && (x.name || x)) || '').filter(Boolean).join('、');
+    raw = gs.slice(0, 4).map(x => typeof x === 'string' ? x : (x && x.name) || '').filter(Boolean).join('、');
   }
   if (!raw) return '';
   raw = raw.replace(/\*\*/g, '').replace(/[*_`>#]/g, '').replace(/\s+/g, ' ').trim();
