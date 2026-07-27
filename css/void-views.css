@@ -120,6 +120,7 @@
   background: rgba(8,6,14,0.92); backdrop-filter: blur(3px);
   display: flex; flex-direction: column;
   animation: jcIn .22s ease both;
+  pointer-events: auto;
 }
 .particle-overlay__head {
   display: flex; align-items: center; justify-content: space-between;

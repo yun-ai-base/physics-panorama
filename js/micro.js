@@ -152,7 +152,12 @@ function onNodeClick(node, api){
   lastNode = node;
   if (node.family){
     api.hideCard();
-    if (overlay) overlay.hidden = false;
+    if (overlay) {
+      overlay.hidden = false;
+      // 禁用底层 SVG 指针事件，防止抢夺浮层点击
+      const svg = mount.querySelector('.journey-svg');
+      if (svg) svg.style.pointerEvents = 'none';
+    }
     return;
   }
   api.focusNode(node);
@@ -173,9 +178,26 @@ export function initMicro(mount){
   overlay.hidden = true;
   overlay.innerHTML = buildOverlayHTML();
   mount.appendChild(overlay);
+
+  // 关闭粒子浮层并恢复底层 SVG 交互
+  function closeOverlay(){
+    overlay.hidden = true;
+    const svg = mount.querySelector('.journey-svg');
+    if (svg) svg.style.pointerEvents = '';
+  }
+
+  // 直接绑定返回按钮（确保不被 SVG 或其他全局监听拦截）
+  const backBtn = overlay.querySelector('.particle-back');
+  if (backBtn) {
+    backBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      closeOverlay();
+    });
+  }
+  // 委托模式：处理粒子点击（备用）
   overlay.addEventListener('click', e => {
     const back = e.target.closest('.particle-back');
-    if (back){ overlay.hidden = true; return; }
+    if (back){ closeOverlay(); return; }
     const cell = e.target.closest('.pcell');
     if (cell){ const p = PARTICLE_MAP[cell.dataset.sym]; if (p) renderParticleDetail(p); }
   });
@@ -189,5 +211,15 @@ export function refreshMicroLang(){
   if (!controller) return;
   controller.refreshLang();
   if (lastNode && !lastNode.family) controller.showCard(cardHTML(lastNode));
-  if (overlay && !overlay.hidden){ overlay.innerHTML = buildOverlayHTML(); }
+  if (overlay && !overlay.hidden){
+    overlay.innerHTML = buildOverlayHTML();
+    // 重建后重新绑定返回按钮（innerHTML 会销毁旧按钮及其监听器）
+    const backBtn = overlay.querySelector('.particle-back');
+    if (backBtn) {
+      backBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        closeOverlay();
+      });
+    }
+  }
 }
