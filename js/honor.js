@@ -4,6 +4,7 @@
 import { NOBEL_PHYSICS } from './data/nobel-physics.js';
 import { NOBEL_PHYSICS_ZH } from './data/nobel-physics-zh.js';
 import { NOBEL_PHYSICS_NAT } from './data/nobel-physics-nationality.js';
+import { NOBEL_PHYSICS_IMPACT } from './data/nobel-physics-impact.js';
 import { state } from './state.js';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -47,13 +48,18 @@ function popContent(d) {
   } else {
     // 获奖者名单 + 获奖时国籍（国籍数据见 nobel-physics-nationality.js，按名字顺序对齐）
     names.forEach((nm, i) => {
-      const country = (zh && zh.countries && zh.countries[i]) ? zh.countries[i] : '';
+      const country = (nat && nat[i]) ? nat[i] : '';
       html += `<div class="honor-pop__name">${nm}` +
         (country ? ` <span class="honor-pop__country">· ${country}</span>` : '') +
         `</div>`;
     });
     html += `<div class="honor-pop__count">${en ? 'Total ' + String(names.length) + ' laureate' + (names.length > 1 ? 's' : '') : '本屆共 ' + String(names.length) + ' 位获奖者'}</div>`;
     html += `<div class="honor-pop__mot">${mot}</div>`;
+    // 获奖贡献对后世的影响（数据见 nobel-physics-impact.js，按年份索引）
+    const impact = NOBEL_PHYSICS_IMPACT[d.year];
+    if (impact) {
+      html += `<div class="honor-pop__impact"><span class="honor-pop__impact-label">${en ? 'Impact' : '历史影响'}</span>${impact}</div>`;
+    }
     // 仅英文模式显示英文官方原文；中文模式不显示（motivationZh 已是中文获奖理论）
     if (en && d.motivation) {
       html += `<div class="honor-pop__orig"><span class="honor-pop__orig-label">Official citation</span>${d.motivation}</div>`;
