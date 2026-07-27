@@ -73,6 +73,71 @@ function chips(arr){
   return (arr||[]).map(x => `<span class="jc-chip">${esc(x)}</span>`).join('');
 }
 
+// 仰望星空 · 随尺度淡入淡出的真实科学背景图（各阶段中心对应一个天体节点）
+// 图片来源：NASA 公共领域（银河 / 黑色弹珠·城市灯火 / 蓝色弹珠 / 太阳系）· ESA Planck CMB（CC BY-SA 3.0 IGO）
+const SKY_BG = [
+  { id:'observer', log:0,    img:'assets/sky/sky_observer.jpg' },     // 你仰望的银河（NASA-JPL）
+  { id:'city',     log:3,    img:'assets/sky/sky_city.jpg' },          // 城市灯火·地球之夜（NASA Black Marble）
+  { id:'earth',    log:6.8,  img:'assets/sky/sky_earth.jpg' },         // 蓝色弹珠（NASA Blue Marble）
+  { id:'solar',    log:16,   img:'assets/sky/sky_solarsystem.jpg' },   // 太阳系（NASA）
+  { id:'cmb',      log:26.9, img:'assets/sky/sky_cmb.jpg' },           // 普朗克 CMB 全天图（ESA）
+];
+
+let bgLayers = [];
+let bgEl = null;
+let bgCredit = null;
+
+function buildSkyBg(mount){
+  bgEl = document.createElement('div');
+  bgEl.className = 'sky-bg';
+  bgLayers = SKY_BG.map(stage => {
+    const layer = document.createElement('div');
+    layer.className = 'sky-bg__layer';
+    layer.style.backgroundImage = `url("${stage.img}")`;
+    layer.dataset.id = stage.id;
+    bgEl.appendChild(layer);
+    return layer;
+  });
+  const scrim = document.createElement('div');
+  scrim.className = 'sky-bg__scrim';
+  bgEl.appendChild(scrim);
+  mount.insertBefore(bgEl, mount.firstChild);   // 压在 svg 之下
+
+  bgCredit = document.createElement('div');
+  bgCredit.className = 'sky-credit';
+  bgCredit.innerHTML = '背景图：NASA（蓝色弹珠 / 黑色弹珠·城市灯火 / 银河 / 太阳系）· ESA Planck（CMB 全天图，CC BY-SA 3.0 IGO）';
+  mount.appendChild(bgCredit);                   // 署名条，压在交互层之上、提示之下
+}
+
+// 给定当前视角中心对数尺度 c，返回每层不透明度。
+// 模型：相邻图在各自中点之间平滑交叉；窗口外最近图全显 —— 任意尺度都恰好有背景，无空白死区。
+function bgOpacities(c){
+  const logs = SKY_BG.map(s => s.log);
+  const mids = [];
+  for (let i = 0; i < logs.length - 1; i++) mids.push((logs[i] + logs[i+1]) / 2);
+  const t = 1.5;                                 // 过渡半宽（对数单位，须 ≤ 最小间隔的一半=1.5，否则节点中心无法满显）
+  const ops = logs.map(() => 0);
+  let nearest = 0;
+  for (let i = 0; i < logs.length; i++)
+    if (Math.abs(c - logs[i]) < Math.abs(c - logs[nearest])) nearest = i;
+  ops[nearest] = 1;
+  for (let i = 0; i < mids.length; i++){
+    const bm = mids[i];
+    if (Math.abs(c - bm) < t){
+      const f = Math.max(0, Math.min(1, (c - (bm - t)) / (2 * t)));  // 0→1：左图淡出、右图淡入（钳制避免负值）
+      ops[i] = 1 - f;
+      ops[i+1] = f;
+    }
+  }
+  return ops;
+}
+
+function updateSkyBg(c){
+  if (!bgLayers.length) return;
+  const ops = bgOpacities(c);
+  for (let i = 0; i < bgLayers.length; i++) bgLayers[i].style.opacity = ops[i].toFixed(3);
+}
+
 function cardHTML(node){
   const title = node.zh;
   const en = node.en || '';
@@ -102,12 +167,14 @@ function onNodeClick(node, api){
 
 export function initSky(mount){
   if (controller) return;
+  buildSkyBg(mount);
   controller = createJourney({
     mount,
     axis: { minLog: 0, maxLog: 27 },
     nodes: SKY_NODES,
     theme: 'sky',
     onNodeClick,
+    onViewChange: updateSkyBg,
   });
 }
 

@@ -14,7 +14,7 @@ function sup(L){ return String(L).split('').map(c => SUP[c] || c).join(''); }
 function fmtScale(L){ return L === 0 ? '1 m' : `10${sup(L)} m`; }
 
 export function createJourney(opts){
-  const { mount, axis, nodes, theme, onNodeClick } = opts;
+  const { mount, axis, nodes, theme, onNodeClick, onViewChange } = opts;
 
   const svg = el('svg', { class: 'journey-svg', xmlns: 'http://www.w3.org/2000/svg' }, mount);
   const bgLayer  = el('g', { class: 'journey-bg' }, svg);
@@ -96,8 +96,14 @@ export function createJourney(opts){
       g.addEventListener('click', () => { if (moved) return; onNodeClick(node, api); });
     }
   }
-  function apply(){ vp.setAttribute('transform', `translate(${tx} ${ty}) scale(${k})`); updateReadout(); }
-  function updateReadout(){ const wy = (H()/2 - ty)/k; const L = logOfY(wy); readout.textContent = '当前视角尺度 · ' + fmtScale(Math.round(L)); }
+  function apply(){
+    vp.setAttribute('transform', `translate(${tx} ${ty}) scale(${k})`);
+    const wy = (H()/2 - ty)/k;
+    const centerLog = logOfY(wy);
+    updateReadout(centerLog);
+    if (typeof onViewChange === 'function') onViewChange(centerLog);
+  }
+  function updateReadout(L){ readout.textContent = '当前视角尺度 · ' + fmtScale(Math.round(L)); }
   function computeFit(){ worldH = Math.max(H()*0.9, Math.abs(axis.maxLog-axis.minLog)*160 + 260); worldHalfH = worldH/2; fitK = clamp(H()/worldH, 0.3, 4); }
   function reset(){ computeFit(); k = fitK; tx = W()/2; ty = H()/2; apply(); }
   function initView(){ computeFit(); k = 1; tx = W()/2; ty = H()/2 - yOf(axis.minLog); apply(); } // 从最小尺度端（底部）起步
