@@ -3,6 +3,7 @@
 // 中文补充：js/data/nobel-physics-zh.js（中文字段，按年份索引）
 import { NOBEL_PHYSICS } from './data/nobel-physics.js';
 import { NOBEL_PHYSICS_ZH } from './data/nobel-physics-zh.js';
+import { NOBEL_PHYSICS_NAT } from './data/nobel-physics-nationality.js';
 import { state } from './state.js';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -28,6 +29,7 @@ function ensurePop() {
 // 按当前语言生成内容
 function popContent(d) {
   const zh = NOBEL_PHYSICS_ZH[d.year];
+  const nat = NOBEL_PHYSICS_NAT[d.year];   // 获奖时国籍，按获奖者顺序对齐
   const en = state.lang === 'en';
   const names = en
     ? d.names
@@ -43,12 +45,18 @@ function popContent(d) {
       : (zh && zh.motivationZh ? zh.motivationZh : '本年未颁奖');
     html += `<div class="honor-pop__none">${none}</div>`;
   } else {
-    html += names.map(nm => `<div class="honor-pop__name">${nm}</div>`).join('');
-    html += `<div class="honor-pop__count">本屆共 ${names.length} 位获奖者</div>`;
+    // 获奖者名单 + 获奖时国籍（国籍数据见 nobel-physics-nationality.js，按名字顺序对齐）
+    names.forEach((nm, i) => {
+      const country = (zh && zh.countries && zh.countries[i]) ? zh.countries[i] : '';
+      html += `<div class="honor-pop__name">${nm}` +
+        (country ? ` <span class="honor-pop__country">· ${country}</span>` : '') +
+        `</div>`;
+    });
+    html += `<div class="honor-pop__count">${en ? 'Total ' + String(names.length) + ' laureate' + (names.length > 1 ? 's' : '') : '本屆共 ' + String(names.length) + ' 位获奖者'}</div>`;
     html += `<div class="honor-pop__mot">${mot}</div>`;
-    // 中文模式下附英文官方原文
-    if (!en && d.motivation) {
-      html += `<div class="honor-pop__orig"><span class="honor-pop__orig-label">English</span>${d.motivation}</div>`;
+    // 仅英文模式显示英文官方原文；中文模式不显示（motivationZh 已是中文获奖理论）
+    if (en && d.motivation) {
+      html += `<div class="honor-pop__orig"><span class="honor-pop__orig-label">Official citation</span>${d.motivation}</div>`;
     }
   }
   return html;
@@ -128,16 +136,23 @@ export function renderHonor() {
   let perRow = Math.max(6, Math.min(14, Math.floor((avail - 2 * padX) / colW)));
   const rows = Math.ceil(n / perRow);
 
-  // 蛇形坐标：偶数行正序，奇数行倒序
+  // 蛇形坐标：偶数行正序，奇数行倒序（末尾追加「未来」占位节点）
   const pos = data.map((d, i) => {
     const r = Math.floor(i / perRow);
     const c = i % perRow;
     const cc = (r % 2 === 0) ? c : (perRow - 1 - c);
     return { x: padX + cc * colW, y: padY + r * rowH, r, c, idx: i };
   });
+  // 未来节点：接在最后一个数据之后
+  const fi = n;
+  const fr = Math.floor(fi / perRow);
+  const fc = fi % perRow;
+  const fcc = (fr % 2 === 0) ? fc : (perRow - 1 - fc);
+  pos.push({ x: padX + fcc * colW, y: padY + fr * rowH, r: fr, c: fc, idx: fi, isFuture: true });
 
+  const totalRows = Math.ceil((n + 1) / perRow);
   const svgW = padX * 2 + (perRow - 1) * colW;
-  const svgH = padY * 2 + (rows - 1) * rowH;
+  const svgH = padY * 2 + (totalRows - 1) * rowH;
 
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('width', svgW);
@@ -159,6 +174,23 @@ export function renderHonor() {
     const path = document.createElementNS(NS, 'path');
     path.setAttribute('d', d);
     path.setAttribute('class', 'honor-link');
+    svg.appendChild(path);
+  }
+
+  // 末尾数据节点 → 未来节点的连线（虚线，表示延续）
+  {
+    const a = pos[n - 1], b = pos[n];
+    let d;
+    if (a.r === b.r) {
+      d = `M${a.x},${a.y} L${b.x},${b.y}`;
+    } else {
+      const aEndX = (a.r % 2 === 0) ? padX + (perRow - 1) * colW : padX;
+      const bStartX = (b.r % 2 === 0) ? padX : padX + (perRow - 1) * colW;
+      d = `M${a.x},${a.y} L${aEndX},${a.y} L${aEndX},${b.y} L${bStartX},${b.y} L${b.x},${b.y}`;
+    }
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'honor-link honor-link--future');
     svg.appendChild(path);
   }
 
@@ -216,6 +248,40 @@ export function renderHonor() {
     });
     svg.appendChild(g);
   });
+
+  // ── 未来节点（收尾）────────────────────────────────────
+  {
+    const fp = pos[n];
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'honor-node honor-node--future');
+    g.setAttribute('transform', `translate(${fp.x},${fp.y})`);
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', '未来 · 物理学仍在前行');
+
+    const circle = document.createElementNS(NS, 'circle');
+    circle.setAttribute('r', nodeR);
+    circle.setAttribute('class', 'honor-dot honor-dot--future');
+    g.appendChild(circle);
+
+    // 圆内 X
+    const xTxt = document.createElementNS(NS, 'text');
+    xTxt.setAttribute('class', 'honor-count honor-count--future');
+    xTxt.setAttribute('text-anchor', 'middle');
+    xTxt.setAttribute('y', 4.5);
+    xTxt.textContent = 'X';
+    g.appendChild(xTxt);
+
+    // 下方文字"未来"
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('y', nodeR + 16);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('class', 'honor-year honor-year--future');
+    // 根据 state.lang 决定文案
+    t.textContent = (state.lang === 'en') ? 'Future' : '未来';
+    g.appendChild(t);
+
+    svg.appendChild(g);
+  }
 
   host.appendChild(svg);
 

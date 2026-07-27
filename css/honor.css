@@ -125,6 +125,35 @@
   stroke: #aaa;
 }
 
+/* 未来收尾节点 */
+.honor-node--future { cursor: default; }
+.honor-dot--future {
+  fill: transparent;
+  stroke: #c9a24e;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.honor-count--future {
+  fill: #c9a24e;
+  font-size: 14px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: rgba(255, 250, 240, 0.7);
+  stroke-width: 2px;
+}
+.honor-year--future {
+  fill: #c9a24e;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+/* 到未来的连线：虚线 */
+.honor-link--future {
+  stroke: rgba(201, 162, 78, 0.35);
+  stroke-width: 1.8;
+  stroke-dasharray: 6 4;
+}
+
 /* ── 旧详情面板已废弃，改用 tooltip ── */
 .honor-detail {
   display: none !important;
@@ -165,6 +194,12 @@
   font-weight: 600;
   color: #2d2820;
   line-height: 1.6;
+}
+.honor-pop__country {
+  font-size: 12px;
+  font-weight: 500;
+  color: #b8860b;
+  letter-spacing: 0.02em;
 }
 .honor-pop__mot {
   margin-top: 10px;
