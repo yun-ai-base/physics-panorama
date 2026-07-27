@@ -135,6 +135,7 @@ export function createJourney(opts){
 
   const api = {
     render(){
+      computeFit();                          // 必须先计算 worldH/worldHalfH，否则首次 drawNodes 把所有节点算到 y=0 堆叠
       drawBg(); drawAxis(); drawNodes();
       if (!rendered){ initView(); rendered = true; }
       else apply();
