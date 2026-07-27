@@ -27,11 +27,13 @@ physics-panorama/
 ├── index.html              # 主页面（浅色主题 + SVG 容器 + 侧边栏）
 ├── .nojekyll               # 禁止 GitHub Pages 的 Jekyll 处理（保留 _ 开头文件）
 ├── css/  main.css timeline.css sidebar.css responsive.css
+│         tour.css mindmap.css honor.css
 ├── js/   config.js state.js utils.js views.js
 │         renderer.js interaction.js sidebar.js app.js tour.js
-│         data/portraitMap.js
+│         mindmap.js people.js honor.js poem.js changelog.js
+│         data/portraitMap.js nobel-physics.js
 ├── assets/portraits/       # 物理学家肖像（缺图者用淡金首字占位）
-├── nodes.json              # 统一数据源（31 节点，深度节点已内联 12 维）
+├── nodes.json              # 统一数据源（31 节点；30 个深度节点内联 14 维度内容，1 个轻量卡片）
 ├── physics-data.json       # 关系冲突边 + 五纪元序言
 ├── dev/                    # 源/中间/审阅文件（不进站点渲染）
 └── 设计方案.md  物理学十三大学说深度阐述.md  物理学演化路径.md
@@ -48,11 +50,15 @@ physics-panorama/
 
 ## 数据来源
 
-- `nodes.json`：31 个学说/事件节点，含 `prevIds`（边单向生成）、`scale` 尺度标签、`depth`（13 个深度理论内联 12 维内容）、`maturity` 成熟度。
+- `nodes.json`：31 个学说/事件节点，含 `prevIds`（边单向生成）、`scale` 尺度标签、`depth`、`maturity` 成熟度。30 个深度节点内联 **14 维度**内容（综述 / 脉络 / 人物 / 分支 / 作品 / 溢出 / 范式 / 工具 / 实验 / 交锋 / 局限 / 猜想 / 公式 / 术语），1 个轻量节点仅一句话卡片。
 - `physics-data.json`：`conflicts`（理论冲突边，已通过审阅清洗，零引用断裂）、`summaries`（五纪元序言卡）。
+- `js/data/nobel-physics.js`：诺贝尔物理学奖完整列表（1901–2025，共 125 届，`{year, names[], motivation}`），支撑「荣誉殿堂」视图。
 - 深度内容源自《物理学十三大学说深度阐述》。
 
 ## 已知待办（Phase 2）
 
-- ✅ **人物索引视图**（已上线：顶栏「人物索引」tab → 卡片网格展示 77 位人物 → 点人物打开侧边栏列出其关联学说，点击可跳回时间线选中）
-- 待做：引导式漫游（3 分钟/10 分钟）、搜索实时联想高亮、多视图动画过渡、英文切换、收藏笔记。
+- ✅ **人物索引视图**（顶栏「人物索引」tab → 卡片网格展示 77 位人物 → 点人物打开侧边栏列出其关联学说，点击可跳回时间线选中）
+- ✅ **引导式漫游**（3 分钟概览 / 10 分钟全览，带文字旁白）
+- ✅ **英文切换**（顶栏 EN/中 一键切换，覆盖 77 位人物、UI 文案、思维导图、荣誉殿堂标题等）
+- ✅ **虚无-图景视图**（含三个子页：意境 / 思维导图 / **荣誉殿堂**。荣誉殿堂为诺贝尔物理学奖蛇形时间线，1901–2025 共 125 届，点击节点查看获奖者与官方获奖理由，未颁奖年份灰显）
+- 待做：搜索实时联想高亮、多视图动画过渡、收藏笔记（localStorage）、节点分享卡片生成。

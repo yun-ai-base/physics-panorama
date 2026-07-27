@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/tour.css" />
   <link rel="stylesheet" href="css/mindmap.css" />
+  <link rel="stylesheet" href="css/honor.css" />
 </head>
 <body>
   <div id="app">
@@ -145,6 +146,7 @@
         <div class="void-subtabs" id="voidSubtabs">
           <button class="void-subtab is-active" data-void="poem" type="button">意境</button>
           <button class="void-subtab" data-void="mindmap" type="button">思维导图</button>
+          <button class="void-subtab" data-void="honor" type="button">荣誉殿堂</button>
         </div>
 
         <!-- 选项一：意境（原诗意占位） -->
@@ -189,6 +191,16 @@
             <g id="mmViewport"></g>
           </svg>
           <div class="mm-preview" id="mmPreview" hidden></div>
+        </div>
+
+        <!-- 选项三：荣誉殿堂 -->
+        <div class="void-honor" id="voidHonor" hidden>
+          <div class="honor-toolbar">
+            <span class="honor-caption">诺贝尔物理学奖 · 荣誉殿堂</span>
+            <span class="honor-meta" id="honorMeta"></span>
+          </div>
+          <div class="honor-timeline" id="honorTimeline"></div>
+          <div class="honor-detail" id="honorDetail" hidden></div>
         </div>
       </div>
 

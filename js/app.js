@@ -8,6 +8,7 @@ import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode } from './mindmap.js';
+import { renderHonor } from './honor.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -217,10 +218,14 @@ function applyUILanguage() {
 
   // 虚无-图景子选项
   document.querySelectorAll('#voidSubtabs .void-subtab').forEach(btn => {
-    const map = { poem: 'voidPoem', mindmap: 'voidMindmap' };
+    const map = { poem: 'voidPoem', mindmap: 'voidMindmap', honor: 'voidHonor' };
     const k = map[btn.dataset.void];
     if (k) btn.textContent = t(k);
   });
+
+  // 荣誉殿堂标题（随语言切换）
+  const honorCap = document.querySelector('.honor-caption');
+  if (honorCap) honorCap.textContent = t('honorCaption');
 
   // 思维导图全屏按钮
   const mmFs = document.getElementById('mmFullscreen');
@@ -263,6 +268,8 @@ function applyLang() {
     const pg = document.getElementById('peopleGrid');
     if (pg) renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
   }
+  // 切语言时重渲染荣誉殿堂（按钮/标题已随 applyUILanguage 切换，此处确保视图状态一致）
+  if (state.view === 'void' && voidTab === 'honor') renderHonor();
   updateURL();
 }
 
@@ -546,6 +553,7 @@ function wireUI() {
   window.addEventListener('resize', () => {
     fit();
     if (state.view === 'void' && voidTab === 'mindmap') renderMindmap();
+    if (state.view === 'void' && voidTab === 'honor') renderHonor();
   });
 
   // ── 手机端 <480px：竖排卡片列表（设计 4.4，仅超小屏生效，桌面/平板不受影响） ──
@@ -617,9 +625,12 @@ function activateVoidTab(v) {
   document.querySelectorAll('.void-subtab').forEach(t => t.classList.toggle('is-active', t.dataset.void === v));
   const poem = document.getElementById('voidPoem');
   const mm = document.getElementById('voidMindmap');
+  const honor = document.getElementById('voidHonor');
   if (poem) poem.hidden = (v !== 'poem');
   if (mm) mm.hidden = (v !== 'mindmap');
+  if (honor) honor.hidden = (v !== 'honor');
   if (v === 'mindmap') renderMindmap();
+  if (v === 'honor') renderHonor();
 }
 
 // 思维导图全屏模式

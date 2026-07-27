@@ -1,0 +1,141 @@
+/* 荣誉殿堂 · 诺贝尔物理学奖蛇形时间线 */
+.void-honor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 16px 22px 22px;
+  box-sizing: border-box;
+}
+/* 与 mindmap.css 中 .void-poem[hidden]/.void-mindmap[hidden] 一致：
+   作者样式 display:flex 会压过 UA 的 [hidden]{display:none}，必须显式兜底，
+   否则荣誉页永远显示、与意境/思维导图叠在一起（修复"看起来没生效"的元凶） */
+.void-honor[hidden] { display: none !important; }
+
+.honor-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(201, 162, 78, 0.22);
+  padding-bottom: 8px;
+}
+.honor-caption {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #e9e3d6;
+}
+.honor-meta {
+  font-size: 12.5px;
+  color: #9a948a;
+}
+
+.honor-timeline {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  padding: 8px 4px;
+}
+.honor-svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.honor-link {
+  fill: none;
+  stroke: rgba(180, 170, 155, 0.42);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.honor-node { cursor: pointer; outline: none; }
+.honor-dot {
+  fill: #c9a24e;
+  stroke: rgba(20, 18, 15, 0.85);
+  stroke-width: 2;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+.honor-year {
+  fill: #cfc8ba;
+  font-size: 12px;
+  font-family: inherit;
+  pointer-events: none;
+  transition: fill 0.15s ease;
+}
+.honor-node:hover .honor-dot,
+.honor-node:focus-visible .honor-dot {
+  fill: #f0c969;
+  stroke: #fff;
+}
+.honor-node:hover .honor-year,
+.honor-node:focus-visible .honor-year {
+  fill: #fff;
+  font-weight: 700;
+}
+.honor-node.is-selected .honor-dot {
+  fill: #f0c969;
+  stroke: #fff;
+  stroke-width: 3;
+}
+.honor-node.is-selected .honor-year {
+  fill: #fff;
+  font-weight: 700;
+}
+/* 未颁奖年份 */
+.honor-node--none .honor-dot {
+  fill: #4a4742;
+  stroke: #2c2a27;
+}
+.honor-node--none .honor-year {
+  fill: #7d776e;
+}
+.honor-node--none:hover .honor-dot {
+  fill: #6b665e;
+  stroke: #aaa;
+}
+
+.honor-detail {
+  flex: 0 0 auto;
+  margin-top: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(28, 26, 22, 0.82);
+  border: 1px solid rgba(201, 162, 78, 0.28);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  max-height: 30vh;
+  overflow: auto;
+}
+.honor-detail__year {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f0c969;
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+.honor-detail__name {
+  font-size: 15px;
+  color: #ece6d9;
+  line-height: 1.55;
+}
+.honor-detail__mot {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #b8b2a6;
+}
+.honor-detail__none {
+  font-size: 14px;
+  color: #9a948a;
+  font-style: italic;
+}
+
+/* 移动端：节点间距略缩 */
+@media (max-width: 768px) {
+  .honor-caption { font-size: 15px; }
+  .honor-detail { max-height: 36vh; }
+}
