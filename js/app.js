@@ -8,7 +8,7 @@ import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js';
-import { renderHonor, refreshHonorLang } from './honor.js';
+import { renderHonor, refreshHonorLang, closeHonorPop } from './honor.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -646,6 +646,7 @@ function activateVoidTab(v) {
   if (poem) poem.hidden = (v !== 'poem');
   if (mm) mm.hidden = (v !== 'mindmap');
   if (honor) honor.hidden = (v !== 'honor');
+  if (v !== 'honor') closeHonorPop();   // 离开荣誉殿堂时清理残留的获奖者简介 popover
   if (v === 'mindmap') renderMindmap();
   if (v === 'honor') renderHonor();
 }

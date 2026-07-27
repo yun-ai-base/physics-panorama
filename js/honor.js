@@ -113,6 +113,15 @@ function positionPop(nodeEl) {
   popEl.style.top = Math.max(8, top) + 'px';
 }
 
+// 强制隐藏跟随面罩（切换子页 / 离开荣誉殿堂时调用，防止 popover 残留在其他视图）
+export function closeHonorPop() {
+  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+  if (!popEl) return;
+  popEl.classList.remove('is-visible');
+  popCur = null;
+  popEl.hidden = true;
+}
+
 // 切换语言时刷新当前面罩内容
 export function refreshHonorLang() {
   if (popEl && popCur && !popEl.hidden) {
