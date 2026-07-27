@@ -137,6 +137,18 @@ function drawScaleBands(layer, labelLayer) {
       }, labelL);
     }
 
+    // 标签下加通俗认知提示（面向非专业读者，最多两行）
+    if (desc && desc.hint) {
+      const hintLines = String(desc.hint).split('\n');
+      const hintEl = el('text', {
+        x: globalMinX + 20, y: minY + 73,
+        class: 'scale-band__hint',
+      }, labelL);
+      hintLines.forEach((ln, i) => {
+        el('tspan', { x: globalMinX + 20, dy: i === 0 ? 0 : 18, text: ln }, hintEl);
+      });
+    }
+
     // 淡淡的下边界分隔线
     el('line', {
       x1: globalMinX + 12, y1: maxY - 10,

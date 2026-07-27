@@ -37,6 +37,12 @@
     }).join('');
   }
 
+  // 首页顶部「最近更新」摘要（取最新一条，单一数据源 = LOG[0]）
+  var upd = document.getElementById('lastUpdate');
+  if (upd && LOG.length) {
+    upd.textContent = '最近更新：' + LOG[0].date + ' · ' + LOG[0].title;
+  }
+
   function setOpen(v) {
     if (!panel || !toggle) return;
     panel.hidden = !v;

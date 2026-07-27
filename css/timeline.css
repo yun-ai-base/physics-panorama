@@ -102,6 +102,12 @@
   letter-spacing:.5px; paint-order:stroke; stroke:rgba(247,243,234,.85); stroke-width:2px;
   stroke-linejoin:round; opacity:.78; pointer-events:none;
 }
+/* 标签下通俗认知提示（面向非专业读者，两行） */
+.scale-band__hint{
+  font-family:var(--font-sans); font-size:11px; font-weight:500;
+  letter-spacing:.4px; fill:#9A8F7E; opacity:.85; pointer-events:none;
+  paint-order:stroke; stroke:rgba(247,243,234,.7); stroke-width:1.6px; stroke-linejoin:round;
+}
 /* 尺度间桥接标签（涌现 / 引力桥梁 / 统一 / 反哺） */
 .scale-gap__label{
   font-family:var(--font-sans); font-size:11.5px; font-weight:700;

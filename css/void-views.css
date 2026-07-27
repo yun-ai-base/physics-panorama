@@ -1,0 +1,172 @@
+/* 虚无-图景 · 仰望星空 / 探幽识微 —— 对数尺度之旅交互可视化 */
+
+.void-sky,
+.void-micro {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  user-select: none;
+}
+/* 深空背景（仰望星空） */
+#voidSky {
+  background:
+    radial-gradient(1200px 800px at 70% 18%, rgba(70,110,180,0.20), transparent 60%),
+    radial-gradient(900px 700px at 20% 80%, rgba(120,80,180,0.16), transparent 60%),
+    linear-gradient(180deg, #060912 0%, #0a1124 55%, #070a16 100%);
+}
+/* 微观背景（探幽识微） */
+#voidMicro {
+  background:
+    radial-gradient(900px 700px at 30% 20%, rgba(120,70,170,0.18), transparent 60%),
+    radial-gradient(900px 700px at 80% 85%, rgba(60,90,160,0.16), transparent 60%),
+    linear-gradient(180deg, #0b0814 0%, #120a1f 55%, #08060f 100%);
+}
+
+.journey-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+.journey-svg:active { cursor: grabbing; }
+
+/* 轴线与刻度 */
+.journey-axis__line { stroke: rgba(200,180,140,0.22); stroke-width: 1.5; }
+.journey-tick { stroke: rgba(200,180,140,0.38); stroke-width: 1.5; }
+.journey-tick__label {
+  fill: #b6a986; font-size: 11px; font-family: var(--font-serif, serif);
+  paint-order: stroke; stroke: rgba(0,0,0,0.5); stroke-width: 2.2px;
+}
+
+/* 节点 */
+.journey-node__circle { transition: fill-opacity .15s; }
+.journey-node:hover .journey-node__circle { fill-opacity: 0.42; }
+.journey-node__glow { pointer-events: none; }
+.journey-node__label {
+  fill: #f3ecdc; font-size: 14px; font-family: var(--font-serif, serif);
+  paint-order: stroke; stroke: rgba(0,0,0,0.55); stroke-width: 2.6px; pointer-events: none;
+}
+.journey-node__sub {
+  fill: #c8bca0; font-size: 11px; font-family: var(--font-serif, serif);
+  paint-order: stroke; stroke: rgba(0,0,0,0.5); stroke-width: 2.2px; pointer-events: none;
+}
+
+/* 操作提示 */
+.journey-hint {
+  position: absolute; left: 16px; top: 14px; z-index: 5;
+  font-size: 12px; color: #b6a986; letter-spacing: .04em;
+  background: rgba(10,12,20,0.42); padding: 6px 11px; border-radius: 999px;
+  border: 1px solid rgba(200,180,140,0.18); pointer-events: none;
+}
+
+/* 控制条 */
+.journey-ctrl {
+  position: absolute; right: 14px; top: 14px; z-index: 6;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(10,12,20,0.5); padding: 7px 9px; border-radius: 12px;
+  border: 1px solid rgba(200,180,140,0.2); backdrop-filter: blur(4px);
+}
+.journey-btn {
+  width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+  border: 1px solid rgba(200,180,140,0.3); background: rgba(40,34,22,0.7);
+  color: #f3ecdc; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, border-color .15s;
+}
+.journey-btn:hover { background: rgba(60,50,30,0.9); border-color: var(--gold, #c9a24e); }
+.journey-readout {
+  font-size: 12px; color: #d8cba8; margin-left: 4px; white-space: nowrap;
+  font-family: var(--font-serif, serif);
+}
+
+/* 简介卡片 */
+.journey-card {
+  position: absolute; left: 18px; bottom: 18px; z-index: 7;
+  width: min(370px, 82%); max-height: 72%; overflow: auto;
+  background: rgba(14,12,18,0.92); border: 1px solid rgba(200,180,140,0.32);
+  border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  animation: jcIn .22s ease both;
+}
+@keyframes jcIn { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+.journey-card__inner { padding: 16px 18px 18px; position: relative; }
+.journey-card__close {
+  position: absolute; right: 10px; top: 8px; width: 26px; height: 26px;
+  border: none; background: transparent; color: #b6a986; font-size: 20px; cursor: pointer; line-height: 1;
+}
+.journey-card__close:hover { color: #fff; }
+.journey-card__title {
+  font-family: var(--font-serif, serif); font-size: 20px; color: #f5eede; margin: 0 0 4px;
+  padding-right: 26px;
+}
+.journey-card__en { font-size: 13px; color: #b6a986; margin-left: 8px; font-family: var(--font-sans, sans-serif); }
+.journey-card__scale {
+  font-size: 12px; color: var(--gold, #c9a24e); letter-spacing: .03em; margin-bottom: 10px;
+}
+.journey-card__desc { font-size: 13.5px; line-height: 1.7; color: #e3dccb; margin: 0 0 8px; }
+.journey-card__desc--en { font-size: 12px; line-height: 1.6; color: #9d937c; margin: 0 0 4px; }
+.journey-card__sec {
+  font-size: 12px; color: #b6a986; margin: 12px 0 6px; letter-spacing: .08em;
+  border-top: 1px solid rgba(200,180,140,0.16); padding-top: 10px;
+}
+.jc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.jc-chip {
+  font-size: 12px; color: #e8dcc0; background: rgba(201,162,78,0.14);
+  border: 1px solid rgba(201,162,78,0.35); border-radius: 999px; padding: 3px 10px;
+}
+
+/* 标准模型粒子家族 overlay */
+.particle-overlay {
+  position: absolute; inset: 0; z-index: 8;
+  background: rgba(8,6,14,0.92); backdrop-filter: blur(3px);
+  display: flex; flex-direction: column;
+  animation: jcIn .22s ease both;
+}
+.particle-overlay__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(200,180,140,0.18);
+}
+.particle-overlay__title {
+  font-family: var(--font-serif, serif); font-size: 18px; color: #f3ecdc;
+}
+.particle-back {
+  border: 1px solid rgba(200,180,140,0.35); background: rgba(40,34,22,0.7);
+  color: #f3ecdc; padding: 7px 14px; border-radius: 9px; cursor: pointer; font-size: 13px;
+}
+.particle-back:hover { border-color: var(--gold, #c9a24e); background: rgba(60,50,30,0.9); }
+.particle-overlay__body {
+  flex: 1; display: flex; gap: 16px; flex-wrap: wrap; align-content: flex-start;
+  padding: 18px 20px; overflow: auto;
+}
+.pcol { flex: 1 1 220px; min-width: 200px; }
+.pcol__h {
+  font-family: var(--font-serif, serif); font-size: 14px; color: var(--gold, #c9a24e);
+  margin-bottom: 10px; letter-spacing: .06em;
+}
+.pcol__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pcell {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 10px 4px; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(200,180,140,0.22); background: rgba(30,26,38,0.7);
+  color: #f0e8d6; transition: background .15s, border-color .15s, transform .1s;
+}
+.pcell:hover { background: rgba(60,50,30,0.85); border-color: var(--gold, #c9a24e); transform: translateY(-2px); }
+.pcell__sym { font-size: 22px; font-family: var(--font-serif, serif); line-height: 1; }
+.pcell__name { font-size: 11px; color: #b6a986; }
+
+.particle-detail {
+  border-top: 1px solid rgba(200,180,140,0.18); padding: 14px 20px; min-height: 96px;
+  font-size: 13.5px; color: #e3dccb; line-height: 1.6;
+}
+.pd__title { font-family: var(--font-serif, serif); font-size: 17px; color: #f5eede; }
+.pd__type { font-size: 12px; color: #b6a986; margin: 2px 0 10px; }
+.pd__rows { display: flex; gap: 22px; flex-wrap: wrap; margin-bottom: 8px; }
+.pd__rows > div { display: flex; flex-direction: column; }
+.pd__rows span { font-size: 11px; color: #9d937c; }
+.pd__rows b { font-size: 15px; color: #f0e8d6; font-family: var(--font-serif, serif); }
+.pd__desc { margin: 0; }
+
+@media (max-width: 640px) {
+  .journey-readout { display: none; }
+  .journey-card { left: 10px; right: 10px; bottom: 10px; width: auto; }
+  .pcol { flex: 1 1 100%; }
+}

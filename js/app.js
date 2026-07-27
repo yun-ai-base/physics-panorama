@@ -9,6 +9,8 @@ import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js';
 import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, focusHonorYear, scrollHonorToOldest, scrollHonorToNewest } from './honor.js';
+import { initSky, renderSky, refreshSkyLang } from './sky.js';
+import { initMicro, renderMicro, refreshMicroLang } from './micro.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -73,6 +75,10 @@ async function boot() {
       onOpenDimension: (id, dim) => { openNode(id); openSidebarTab(dim); },
     });
   } catch (err) { console.error('[mindmap] init failed', err); }
+
+  // 仰望星空 / 探幽识微 模块初始化（仅缓存数据并创建 DOM，渲染推迟到首次进入对应子选项）
+  try { initSky(document.getElementById('voidSky')); } catch (err) { console.error('[sky] init failed', err); }
+  try { initMicro(document.getElementById('voidMicro')); } catch (err) { console.error('[micro] init failed', err); }
 
   const node = readURL();
   const restoreTab = state.sidebarTab;
@@ -149,11 +155,14 @@ function applyUILanguage() {
     if (key) el.textContent = t(key);
   });
 
-  // 顶栏视图 tab
+  // 顶栏视图 tab（主标题 + 副标题分层更新，避免 textContent 清空副标题）
   document.querySelectorAll('#viewTabs .view-tab').forEach(btn => {
     const map = { timeline: 'viewTimeline', unification: 'viewUnification', scale: 'viewScale', people: 'viewPeople', void: 'viewVoid' };
     const k = map[btn.dataset.view];
-    if (k) btn.textContent = t(k);
+    const main = btn.querySelector('.view-tab__main');
+    if (main && k) main.textContent = t(k);
+    const sub = btn.querySelector('.view-tab__sub');
+    if (sub) sub.textContent = t(sub.dataset.navsub);
   });
 
   // 底栏按钮
@@ -218,7 +227,7 @@ function applyUILanguage() {
 
   // 虚无-图景子选项
   document.querySelectorAll('#voidSubtabs .void-subtab').forEach(btn => {
-    const map = { poem: 'voidPoem', mindmap: 'voidMindmap', honor: 'voidHonor' };
+    const map = { poem: 'voidPoem', mindmap: 'voidMindmap', honor: 'voidHonor', sky: 'voidSky', micro: 'voidMicro' };
     const k = map[btn.dataset.void];
     if (k) btn.textContent = t(k);
   });
@@ -255,7 +264,7 @@ function buildEraTabs() {
 function applyLang() {
   const en = state.lang === 'en';
   const langBtn = document.getElementById('langBtn');
-  if (langBtn) langBtn.textContent = en ? '中' : 'EN';
+  if (langBtn) langBtn.textContent = en ? '🌐 English' : '🌐 中文';
   document.documentElement.lang = en ? 'en' : 'zh';
   renderGraph(state.view, currentLayout);
   buildEraTabs();
@@ -270,6 +279,8 @@ function applyLang() {
   }
   // 切语言时刷新荣誉殿堂（重建时间线 + 刷新当前面板内容，避免面板仍显示旧语言）
   if (state.view === 'void' && voidTab === 'honor') { renderHonor(); refreshHonorLang(); }
+  if (state.view === 'void' && voidTab === 'sky') refreshSkyLang();
+  if (state.view === 'void' && voidTab === 'micro') refreshMicroLang();
   const hs = document.getElementById('honorSearch');
   if (hs) hs.placeholder = en ? 'Search laureate or year…' : '搜索获奖者或年份…';
   updateURL();
@@ -657,19 +668,19 @@ function reflectScaleActive() {
     l.classList.toggle('is-active-scale', l.dataset.scale === state.activeScale));
 }
 
-// 虚无-图景子选项（意境 / 思维导图）
+// 虚无-图景子选项（意境 / 思维导图 / 仰望星空 / 探幽识微 / 荣誉殿堂）
 let voidTab = 'poem';
+const VOID_TABS = ['poem','mindmap','honor','sky','micro'];
 function activateVoidTab(v) {
+  if (!VOID_TABS.includes(v)) v = 'poem';   // 旧链接 / 未知 vtab 回退默认
   document.querySelectorAll('.void-subtab').forEach(t => t.classList.toggle('is-active', t.dataset.void === v));
-  const poem = document.getElementById('voidPoem');
-  const mm = document.getElementById('voidMindmap');
-  const honor = document.getElementById('voidHonor');
-  if (poem) poem.hidden = (v !== 'poem');
-  if (mm) mm.hidden = (v !== 'mindmap');
-  if (honor) honor.hidden = (v !== 'honor');
+  const map = { poem:'voidPoem', mindmap:'voidMindmap', honor:'voidHonor', sky:'voidSky', micro:'voidMicro' };
+  for (const key in map) { const el = document.getElementById(map[key]); if (el) el.hidden = (v !== key); }
   if (v !== 'honor') closeHonorPop();   // 离开荣誉殿堂时清理残留的获奖者简介 popover
   if (v === 'mindmap') renderMindmap();
   if (v === 'honor') renderHonor();
+  if (v === 'sky') renderSky();
+  if (v === 'micro') renderMicro();
 }
 
 // 思维导图全屏模式

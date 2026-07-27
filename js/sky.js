@@ -1,0 +1,111 @@
+// 虚无-图景 · 仰望星空（宇宙尺度之旅）
+// 竖向对数尺度轴（你在底、可观测宇宙在顶），滚轮缩放 / 拖拽平移，点击天体看简介。
+
+import { createJourney } from './journey.js';
+import { esc } from './utils.js';
+
+const SKY_NODES = [
+  { id:'you', logSize:0, zh:'你（观察者）', en:'You (Observer)', subZh:'尺度基准 · 1 m', subEn:'Scale origin · 1 m',
+    color:'#E8C16A', r:12,
+    descZh:'所有尺度测量的原点。你正站在此处，向上仰望无垠星空，向下探入微观深处。',
+    descEn:'The origin of all measurement. Standing here, you look up to the boundless cosmos and down into the infinitesimal.',
+    theories:['日常经典物理'] },
+  { id:'city', logSize:3, zh:'城市', en:'City', subZh:'~10³ m', subEn:'~10³ m',
+    color:'#C9A24E', r:12,
+    descZh:'人类尺度的杰作，宏观经典物理在此完美适用——连续、确定、可预测。',
+    descEn:'A product of human scale, where classical physics applies perfectly—continuous, deterministic, predictable.',
+    theories:['经典力学','热力学'] },
+  { id:'earth', logSize:6.8, zh:'地球', en:'Earth', subZh:'半径 ~6.4×10⁶ m', subEn:'radius ~6.4×10⁶ m',
+    color:'#4F8FCF', glow:true, r:18,
+    descZh:'我们唯一的家园，一颗在引力与电磁力共同塑造下的蓝色行星。',
+    descEn:'Our only home—a blue planet shaped by gravity and electromagnetism.',
+    theories:['万有引力','地球科学'] },
+  { id:'moon', logSize:8.6, zh:'地月系统', en:'Earth–Moon System', subZh:'~3.8×10⁸ m', subEn:'~3.8×10⁸ m',
+    color:'#9DB8D6', r:14,
+    descZh:'月球以引力束缚绕地运行，潮汐与地月距离定义了近地空间尺度。',
+    descEn:'The Moon orbits Earth through gravity; tides and distance define near-Earth space.',
+    theories:['天体力学'] },
+  { id:'sun', logSize:11.2, zh:'太阳（日地距离）', en:'Sun (1 AU)', subZh:'~1.5×10¹¹ m', subEn:'~1.5×10¹¹ m',
+    color:'#F2B441', glow:true, r:22,
+    descZh:'太阳系的中心恒星，1 天文单位（日地距离）是行星尺度的标尺。光需约 8 分 20 秒抵达地球。',
+    descEn:'The central star; 1 AU (Earth–Sun distance) is the ruler of planetary scale. Light takes ~8 min 20 s to reach us.',
+    theories:['恒星物理','核聚变'] },
+  { id:'solarsys', logSize:16, zh:'太阳系（奥尔特云）', en:'Solar System', subZh:'~10¹⁶ m', subEn:'~10¹⁶ m',
+    color:'#D89A3C', r:16,
+    descZh:'八大行星、矮行星与柯伊伯带、奥尔特云共同构成的引力王国，半径约 1 光年。',
+    descEn:'Eight planets, dwarf planets, the Kuiper belt and Oort cloud—a gravitational realm ~1 light-year across.',
+    theories:['天体力学','行星科学'] },
+  { id:'proxima', logSize:16.8, zh:'比邻星', en:'Proxima Centauri', subZh:'~4×10¹⁶ m', subEn:'~4×10¹⁶ m',
+    color:'#FFD27F', r:12,
+    descZh:'离太阳最近的恒星，约 4.24 光年之遥，提醒我们恒星际空间的广袤。',
+    descEn:'The nearest star to the Sun, ~4.24 light-years away—a reminder of interstellar vastness.',
+    theories:['恒星天文'] },
+  { id:'galaxy', logSize:21, zh:'银河系', en:'Milky Way', subZh:'~10²¹ m（约 10 万光年）', subEn:'~10²¹ m (~100,000 ly)',
+    color:'#B98AD6', glow:true, r:24,
+    descZh:'数千亿颗恒星组成的棒旋星系，太阳位于一条旋臂上，绕银心周期约 2.3 亿年。',
+    descEn:'A barred spiral of hundreds of billions of stars; the Sun rides one arm, orbiting the center every ~230 Myr.',
+    theories:['星系动力学','银河系结构'] },
+  { id:'group', logSize:23, zh:'本星系群', en:'Local Group', subZh:'~10²³ m', subEn:'~10²³ m',
+    color:'#8E7BD6', r:16,
+    descZh:'银河系与仙女座等约 50 个星系组成的引力聚落，跨度约 1000 万光年。',
+    descEn:'A gravitationally bound cluster of ~50 galaxies including Andromeda, ~10 million light-years across.',
+    theories:['宇宙大尺度结构'] },
+  { id:'universe', logSize:26.9, zh:'可观测宇宙', en:'Observable Universe', subZh:'~8.8×10²⁶ m（约 930 亿光年）', subEn:'~8.8×10²⁶ m (~93 Bly)',
+    color:'#6FA8DC', glow:true, r:28,
+    descZh:'以我们为中心、光自大爆炸以来能抵达的最大球域。包含约 2 万亿个星系，暗能量正加速其膨胀。',
+    descEn:'The largest sphere from which light could reach us since the Big Bang—~2 trillion galaxies, expanding faster under dark energy.',
+    theories:['宇宙学','广义相对论','ΛCDM 模型'],
+    phenomena:['宇宙膨胀','暗物质','暗能量','宇宙微波背景'] },
+];
+
+function chips(arr){
+  return (arr||[]).map(x => `<span class="jc-chip">${esc(x)}</span>`).join('');
+}
+
+function cardHTML(node){
+  const title = node.zh;
+  const en = node.en || '';
+  const scale = node.subZh || '';
+  const desc = node.descZh || '';
+  const enDesc = node.descEn || '';
+  return `
+    <div class="journey-card__inner">
+      <button class="journey-card__close" aria-label="关闭">×</button>
+      <div class="journey-card__title">${esc(title)} <span class="journey-card__en">${esc(en)}</span></div>
+      <div class="journey-card__scale">特征尺度 · ${esc(scale)}</div>
+      <p class="journey-card__desc">${esc(desc)}</p>
+      <p class="journey-card__desc journey-card__desc--en">${esc(enDesc)}</p>
+      ${node.theories ? `<div class="journey-card__sec">相关理论</div><div class="jc-chips">${chips(node.theories)}</div>` : ''}
+      ${node.phenomena ? `<div class="journey-card__sec">典型现象</div><div class="jc-chips">${chips(node.phenomena)}</div>` : ''}
+    </div>`;
+}
+
+let controller = null;
+let lastNode = null;
+
+function onNodeClick(node, api){
+  lastNode = node;
+  api.focusNode(node);
+  api.showCard(cardHTML(node));
+}
+
+export function initSky(mount){
+  if (controller) return;
+  controller = createJourney({
+    mount,
+    axis: { minLog: 0, maxLog: 27 },
+    nodes: SKY_NODES,
+    theme: 'sky',
+    onNodeClick,
+  });
+}
+
+export function renderSky(){
+  if (controller) controller.render();
+}
+
+export function refreshSkyLang(){
+  if (!controller) return;
+  controller.refreshLang();
+  if (lastNode && !lastNode.family) controller.showCard(cardHTML(lastNode));
+}

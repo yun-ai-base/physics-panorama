@@ -1,0 +1,18 @@
+/* 关于本项目页（独立静态页） */
+.about-page{max-width:760px; margin:0 auto; padding:48px 22px 64px;}
+.about-head{margin-bottom:36px;}
+.about-back{display:inline-block; font-size:13px; color:var(--gold); text-decoration:none; margin-bottom:18px; font-weight:600;}
+.about-back:hover{text-decoration:underline;}
+.about-title{font-family:var(--font-serif); font-size:34px; font-weight:900; color:var(--ink); letter-spacing:1px; margin:0 0 14px;}
+.about-lead{font-size:16px; line-height:1.8; color:var(--ink-2); margin:0;}
+.about-main{display:flex; flex-direction:column; gap:34px;}
+.about-sec h2{
+  font-family:var(--font-serif); font-size:21px; font-weight:800;
+  color:var(--gold-dark, #8B6914); margin:0 0 12px;
+  padding-bottom:8px; border-bottom:1px solid rgba(184,137,59,.22);
+}
+.about-sec p{font-size:15px; line-height:1.85; color:var(--ink-2); margin:0 0 12px;}
+.about-sec ul{margin:0; padding-left:20px;}
+.about-sec li{font-size:15px; line-height:1.9; color:var(--ink-2); margin-bottom:8px;}
+.about-sec strong{color:var(--ink); font-weight:700;}
+.about-foot{margin-top:48px; padding-top:20px; border-top:1px solid rgba(42,38,32,.08); text-align:center; font-size:12px; color:var(--ink-3);}

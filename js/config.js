@@ -68,6 +68,7 @@ export const SCALE_COLORS = {
 export const SCALE_DESC = {
   microscopic: {
     tag: '原子 / 亚原子尺度 · 量子主导',
+    hint: '量子效应主导，粒子兼具波粒二象性\n经典确定轨迹在此失效',
     concept: {
       def: '原子及以下的微观世界（电子、光子、夸克等），物理量离散且概率化，粒子同时具备波动与粒子双重属性。这是当代最精确、也最反直觉的物理层级，统一了强、弱、电磁三种基本相互作用。',
       scale: '10⁻¹⁰ m（原子半径）– 10⁻¹⁵ m（原子核）；典型能量 1 eV – 10² GeV',
@@ -82,6 +83,7 @@ export const SCALE_DESC = {
   },
   mesoscopic: {
     tag: '日常可感尺度 · 经典物理适用域',
+    hint: '经典决定论在此成立\n宏观量是微观粒子的统计平均',
     concept: {
       def: '人类可直接或间接观测的日常世界，从尘埃到行星、从钟摆到工程结构。这一层由经典物理主导，物理量连续、确定、可同时精确测量，是“决定论宇宙”的舞台。',
       scale: '10⁻³ m – 10⁶ m（毫米到千公里）；速度 ≪ 光速 c；温度 ~ 10⁻² K – 10³ K',
@@ -96,6 +98,7 @@ export const SCALE_DESC = {
   },
   cosmic: {
     tag: '宇宙 / 星系尺度 · 引力主导',
+    hint: '引力为主角，时空被质量弯曲\n宇宙起源与命运在此上演',
     concept: {
       def: '星系与宇宙学层级（百万光年以上），引力成为绝对主角，时空本身可被质量弯曲。这里上演着宇宙的诞生、膨胀与终极命运，也是检验引力理论的终极实验室。',
       scale: '> 10²⁰ m（星系际）；典型 > 10²² m（百万光年）；时间尺度 10⁹ – 10¹⁰ 年',
@@ -111,6 +114,7 @@ export const SCALE_DESC = {
   },
   unified: {
     tag: '理论最前沿 · 统一四种基本相互作用',
+    hint: '尺度维度的尽头目标\n将引力与三力纳入同一框架',
     concept: {
       def: '“统一”不是某个空间尺度，而是尺度维度的尽头目标：把引力与量子力、乃至强、弱、电磁四种基本相互作用，纳入同一套自洽的数学框架。',
       scale: '普朗克尺度 10⁻³⁵ m；普朗克能量 ~ 10¹⁹ GeV；普朗克温度 ~ 10³² K',
@@ -125,6 +129,7 @@ export const SCALE_DESC = {
   },
   feedback: {
     tag: '从微观原理回哺技术 · 交叉前沿',
+    hint: '基础研究催生激光等技术\n技术反哺新物理，形成闭环',
     concept: {
       def: '“反哺”代表物理的回流：基础微观理论转化为可操控的新能力，形成“微观 → 技术 → 再反哺微观”的闭环。它是尺度维度里最“接地气”的一环。',
       scale: '跨越尺度：以微观量子态为资源，输出宏观可工程化的技术',
@@ -147,6 +152,11 @@ export const UI_LABELS = {
     viewScale: '尺度维度',
     viewPeople: '人物索引',
     viewVoid: '虚无-图景',
+    navTimelineSub: '三百年物理重大事件',
+    navUnificationSub: '从牛顿到标准模型',
+    navScaleSub: '普朗克到宇宙尺度',
+    navPeopleSub: '三百年物理学家',
+    navVoidSub: '物理·哲学·意境',
     scaleMicroscopic: '微观',
     scaleMesoscopic: '宏观',
     scaleCosmic: '宇观',
@@ -157,6 +167,8 @@ export const UI_LABELS = {
     scaleGrandUnification: '大统一',
     scaleTechFeedback: '技术回流',
     scaleClosedLoop: '↺ 闭环',
+    voidSky: '仰望星空',
+    voidMicro: '探幽识微',
     shareView: '分享当前视图',
     expandAll: '展开全部关联',
     collapseAll: '收起关联',
@@ -262,6 +274,11 @@ export const UI_LABELS = {
     viewScale: 'Scales',
     viewPeople: 'Figures',
     viewVoid: 'Void',
+    navTimelineSub: '300 years of physics',
+    navUnificationSub: 'Newton to Standard Model',
+    navScaleSub: 'Planck to cosmic scales',
+    navPeopleSub: 'Physicists across 300 yrs',
+    navVoidSub: 'Physics · Philosophy · Mood',
     scaleMicroscopic: 'Microscopic',
     scaleMesoscopic: 'Macroscopic',
     scaleCosmic: 'Cosmic',
@@ -272,6 +289,8 @@ export const UI_LABELS = {
     scaleGrandUnification: 'Grand Unification',
     scaleTechFeedback: 'Tech Feedback',
     scaleClosedLoop: '↺ Closed Loop',
+    voidSky: 'Stargaze',
+    voidMicro: 'Microcosm',
     shareView: 'Share View',
     expandAll: 'Expand All',
     collapseAll: 'Collapse',
