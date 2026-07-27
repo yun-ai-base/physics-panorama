@@ -69,6 +69,22 @@
   pointer-events: none;
   transition: fill 0.15s ease;
 }
+/* 圆内居中显示的当年获奖人数 */
+.honor-count {
+  fill: #2a2419;
+  font-size: 12.5px;
+  font-weight: 800;
+  font-family: inherit;
+  paint-order: stroke;
+  stroke: rgba(255, 250, 240, 0.85);
+  stroke-width: 2.4px;
+  pointer-events: none;
+}
+.honor-node:hover .honor-count,
+.honor-node:focus-visible .honor-count,
+.honor-node.is-selected .honor-count {
+  fill: #1c160c;
+}
 .honor-node:hover .honor-dot,
 .honor-node:focus-visible .honor-dot {
   fill: #f0c969;
@@ -106,98 +122,87 @@
   display: none !important;
 }
 
-/* ── 独立介绍面板层（右侧滑出 / 移动端底部抽屉）────────────── */
-.honor-panel {
+/* ── 跟随式悬浮面罩（popover）────────────────────────────── */
+.honor-pop {
   position: fixed;
-  top: 0;
-  right: 0;
-  width: 340px;
-  max-width: 86vw;
-  height: 100%;
-  padding: 22px 24px;
-  box-sizing: border-box;
-  background: rgba(255, 252, 245, 0.98);
-  border-left: 1px solid rgba(201, 162, 78, 0.3);
-  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.12);
-  overflow-y: auto;
   z-index: 1000;
-  transform: translateX(100%);
-  transition: transform 0.25s ease;
+  width: max(240px, min(340px, calc(100vw - 32px)));
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(201, 162, 78, 0.25);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #3d3830;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(4px) scale(0.97);
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
-.honor-panel[hidden] { display: none; }
-.honor-panel.is-open { transform: translateX(0); }
-.honor-panel__close {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: transparent;
-  font-size: 26px;
-  line-height: 1;
-  color: #b8b2a6;
-  cursor: pointer;
-  border-radius: 6px;
+.honor-pop[hidden] { display: none; }
+.honor-pop.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
-.honor-panel__close:hover { color: #6b6560; background: rgba(0, 0, 0, 0.04); }
-.honor-panel__year {
-  font-size: 24px;
+.honor-pop__year {
+  font-size: 18px;
   font-weight: 800;
   color: #b8860b;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   letter-spacing: 0.02em;
 }
-.honor-panel__name {
-  font-size: 16px;
+.honor-pop__name {
+  font-size: 14.5px;
   font-weight: 600;
   color: #2d2820;
   line-height: 1.6;
 }
-.honor-panel__mot {
-  margin-top: 12px;
-  font-size: 14px;
-  line-height: 1.75;
-  color: #4a443c;
+.honor-pop__mot {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5a544c;
 }
-.honor-panel__orig {
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(201, 162, 78, 0.3);
-  font-size: 12px;
-  line-height: 1.6;
-  color: #8a8478;
+.honor-pop__orig {
+  margin-top: 12px;
+  padding-top: 9px;
+  border-top: 1px dashed rgba(201, 162, 78, 0.25);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: #9a948a;
   font-style: italic;
 }
-.honor-panel__orig-label {
+.honor-pop__orig-label {
   display: block;
   font-style: normal;
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 0.08em;
   color: #b8860b;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
-.honor-panel__none {
-  font-size: 14px;
+.honor-pop__none {
+  font-size: 13.5px;
   font-style: italic;
   color: #9a948a;
 }
+.honor-pop__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b8860b;
+  margin: 2px 0 8px;
+  letter-spacing: 0.02em;
+}
+/* 荣誉殿堂工具栏图例：说明圆点内数字含义 */
+.honor-legend {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-left: 2px;
+  letter-spacing: 0.02em;
+}
 
-/* 移动端：面板改为底部抽屉 */
+/* 移动端：悬浮面罩略窄 */
 @media (max-width: 768px) {
   .honor-caption { font-size: 15px; }
-  .honor-panel {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    max-height: 52vh;
-    top: auto;
-    bottom: 0;
-    right: 0;
-    border-left: none;
-    border-top: 1px solid rgba(201, 162, 78, 0.3);
-    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
-    transform: translateY(100%);
-  }
-  .honor-panel.is-open { transform: translateY(0); }
+  .honor-pop { width: calc(100vw - 32px); max-width: 340px; }
 }

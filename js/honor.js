@@ -7,37 +7,26 @@ import { state } from './state.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 
-/* ── 独立介绍面板层（右侧滑出 / 移动端底部抽屉）────────────── */
-let panelEl = null;
-let panelBody = null;
-let panelCur = null;      // 当前展示的节点数据
+/* ── 跟随式悬浮面罩（popover）────────────────────────────── */
+let popEl = null;
+let popBody = null;
+let popCur = null;
 let hoverTimer = null;
 
-function ensurePanel() {
-  if (panelEl) return panelEl;
-  panelEl = document.createElement('aside');
-  panelEl.className = 'honor-panel';
-  panelEl.setAttribute('role', 'dialog');
-  panelEl.setAttribute('aria-label', '诺贝尔物理学奖介绍');
-
-  const close = document.createElement('button');
-  close.className = 'honor-panel__close';
-  close.type = 'button';
-  close.setAttribute('aria-label', '关闭');
-  close.textContent = '×';
-  close.addEventListener('click', hidePanel);
-  panelEl.appendChild(close);
-
-  panelBody = document.createElement('div');
-  panelBody.className = 'honor-panel__body';
-  panelEl.appendChild(panelBody);
-
-  document.body.appendChild(panelEl);
-  return panelEl;
+function ensurePop() {
+  if (popEl) return popEl;
+  popEl = document.createElement('div');
+  popEl.className = 'honor-pop';
+  popEl.setAttribute('role', 'tooltip');
+  popBody = document.createElement('div');
+  popBody.className = 'honor-pop__body';
+  popEl.appendChild(popBody);
+  document.body.appendChild(popEl);
+  return popEl;
 }
 
-// 按当前语言生成面板内容（中文模式附英文原文作参考）
-function panelContent(d) {
+// 按当前语言生成内容
+function popContent(d) {
   const zh = NOBEL_PHYSICS_ZH[d.year];
   const en = state.lang === 'en';
   const names = en
@@ -47,44 +36,73 @@ function panelContent(d) {
     ? d.motivation
     : (zh && zh.motivationZh ? zh.motivationZh : d.motivation);
 
-  let html = `<div class="honor-panel__year">${d.year}</div>`;
+  let html = `<div class="honor-pop__year">${d.year}</div>`;
   if (!d.names || d.names.length === 0) {
     const none = en
       ? 'No prize awarded this year'
       : (zh && zh.motivationZh ? zh.motivationZh : '本年未颁奖');
-    html += `<div class="honor-panel__none">${none}</div>`;
+    html += `<div class="honor-pop__none">${none}</div>`;
   } else {
-    html += names.map(nm => `<div class="honor-panel__name">${nm}</div>`).join('');
-    html += `<div class="honor-panel__mot">${mot}</div>`;
-    // 中文模式下附英文官方原文（文献资料保留英文）
+    html += names.map(nm => `<div class="honor-pop__name">${nm}</div>`).join('');
+    html += `<div class="honor-pop__count">本屆共 ${names.length} 位获奖者</div>`;
+    html += `<div class="honor-pop__mot">${mot}</div>`;
+    // 中文模式下附英文官方原文
     if (!en && d.motivation) {
-      html += `<div class="honor-panel__orig"><span class="honor-panel__orig-label">英文原文</span>${d.motivation}</div>`;
+      html += `<div class="honor-pop__orig"><span class="honor-pop__orig-label">English</span>${d.motivation}</div>`;
     }
   }
   return html;
 }
 
-function showPanel(d) {
-  const el = ensurePanel();
-  panelCur = d;
-  panelBody.innerHTML = panelContent(d);
+function showPop(d, nodeEl) {
+  const el = ensurePop();
+  popCur = d;
+  popBody.innerHTML = popContent(d);
   el.hidden = false;
-  requestAnimationFrame(() => el.classList.add('is-open'));
+  positionPop(nodeEl);
+  requestAnimationFrame(() => el.classList.add('is-visible'));
 }
 
-function hidePanel() {
-  if (!panelEl) return;
-  panelEl.classList.remove('is-open');
-  panelCur = null;
+function hidePop() {
+  if (!popEl) return;
+  popEl.classList.remove('is-visible');
+  popCur = null;
   setTimeout(() => {
-    if (!panelEl.classList.contains('is-open')) panelEl.hidden = true;
-  }, 200);
+    if (!popEl.classList.contains('is-visible')) popEl.hidden = true;
+  }, 150);
 }
 
-// 切换语言时刷新当前面板内容（applyLang 调用）
+function positionPop(nodeEl) {
+  if (!popEl || !nodeEl) return;
+  const rect = nodeEl.getBoundingClientRect();
+  const W = popEl.offsetWidth || 300;   // CSS max-width 约束
+  const H = popEl.offsetHeight || 120;
+
+  // 默认：节点右下方弹出
+  let left = rect.right + 12;
+  let top = rect.top - 8;
+
+  // 右边界：超出则翻到左侧
+  if (left + W > window.innerWidth - 16) {
+    left = rect.left - W - 12;
+  }
+  // 上边界：顶部不够则翻到下方
+  if (top < 8) {
+    top = rect.bottom + 8;
+  }
+  // 下边界：底部不够则上移
+  if (top + H > window.innerHeight - 16) {
+    top = window.innerHeight - H - 16;
+  }
+
+  popEl.style.left = Math.max(8, left) + 'px';
+  popEl.style.top = Math.max(8, top) + 'px';
+}
+
+// 切换语言时刷新当前面罩内容
 export function refreshHonorLang() {
-  if (panelEl && panelCur && !panelEl.hidden) {
-    panelBody.innerHTML = panelContent(panelCur);
+  if (popEl && popCur && !popEl.hidden) {
+    popBody.innerHTML = popContent(popCur);
   }
 }
 
@@ -132,10 +150,8 @@ export function renderHonor() {
     const a = pos[i], b = pos[i + 1];
     let d;
     if (a.r === b.r) {
-      // 同行：直接水平
       d = `M${a.x},${a.y} L${b.x},${b.y}`;
     } else {
-      // 折返：本行末端 → 垂直下行 → 下一行始端 → 水平到目标
       const aEndX = (a.r % 2 === 0) ? padX + (perRow - 1) * colW : padX;
       const bStartX = (b.r % 2 === 0) ? padX : padX + (perRow - 1) * colW;
       d = `M${a.x},${a.y} L${aEndX},${a.y} L${aEndX},${b.y} L${bStartX},${b.y} L${b.x},${b.y}`;
@@ -163,6 +179,16 @@ export function renderHonor() {
     circle.setAttribute('class', 'honor-dot');
     g.appendChild(circle);
 
+    // 圆内居中显示当年获奖人数（仅实际有颁奖的年份）
+    if (d.names && d.names.length) {
+      const cnt = document.createElementNS(NS, 'text');
+      cnt.setAttribute('class', 'honor-count');
+      cnt.setAttribute('text-anchor', 'middle');
+      cnt.setAttribute('y', 4.5);            // 视觉垂直居中（基线微调）
+      cnt.textContent = String(d.names.length);
+      g.appendChild(cnt);
+    }
+
     const t = document.createElementNS(NS, 'text');
     t.setAttribute('y', nodeR + 16);
     t.setAttribute('text-anchor', 'middle');
@@ -170,23 +196,23 @@ export function renderHonor() {
     t.textContent = d.year;
     g.appendChild(t);
 
-    // 桌面：悬停（轻微延迟防抖）显示；点击切换；移动端点击亦可
+    // 桌面：悬停显示；点击 toggle；移动端点击亦可
     g.addEventListener('mouseenter', () => {
       clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => showPanel(d), 120);
+      hoverTimer = setTimeout(() => showPop(d, g), 100);
     });
     g.addEventListener('mouseleave', () => {
       clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => { if (panelCur === d) hidePanel(); }, 220);
+      hoverTimer = setTimeout(() => { if (popCur === d) hidePop(); }, 180);
     });
     g.addEventListener('click', e => {
       e.stopPropagation();
       clearTimeout(hoverTimer);
-      if (panelCur === d && panelEl && !panelEl.hidden) hidePanel();
-      else showPanel(d);
+      if (popCur === d && popEl && !popEl.hidden) hidePop();
+      else showPop(d, g);
     });
     g.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPanel(d); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPop(d, g); }
     });
     svg.appendChild(g);
   });
@@ -197,6 +223,13 @@ export function renderHonor() {
   if (meta) {
     const awarded = data.filter(d => d.names && d.names.length).length;
     meta.textContent = `1901–${data[n - 1].year} · 共 ${awarded} 届颁奖`;
+    // 图例：说明圆点内数字 = 当年获奖人数（仅在未添加时插入，避免重复渲染叠加）
+    if (!meta.parentElement.querySelector('.honor-legend')) {
+      const legend = document.createElement('span');
+      legend.className = 'honor-legend';
+      legend.textContent = '· 圆点内的数字 = 当年获奖人数';
+      meta.insertAdjacentElement('afterend', legend);
+    }
   }
 }
 
