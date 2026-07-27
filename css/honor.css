@@ -41,7 +41,15 @@
   display: flex;
   justify-content: center;
   padding: 8px 4px;
+  /* 统一滚动条风格（与 changelog / sidebar 一致） */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 137, 59, .55) transparent;
 }
+.honor-timeline::-webkit-scrollbar { width: 5px; }
+.honor-timeline::-webkit-scrollbar-track { background: transparent; margin: 8px 0; border-radius: 10px; }
+.honor-timeline::-webkit-scrollbar-thumb { background: rgba(184, 137, 59, .45); border-radius: 10px; min-height: 32px; }
+.honor-timeline::-webkit-scrollbar-thumb:hover { background: rgba(184, 137, 59, .75); }
+.honor-timeline::-webkit-scrollbar-corner { background: transparent; }
 .honor-svg {
   display: block;
   margin: 0 auto;
@@ -71,19 +79,19 @@
 }
 /* 圆内居中显示的当年获奖人数 */
 .honor-count {
-  fill: #2a2419;
-  font-size: 12.5px;
+  fill: #fffdf7;
+  font-size: 13px;
   font-weight: 800;
   font-family: inherit;
   paint-order: stroke;
-  stroke: rgba(255, 250, 240, 0.85);
-  stroke-width: 2.4px;
+  stroke: rgba(139, 105, 20, 0.92);
+  stroke-width: 1.8px;
   pointer-events: none;
 }
 .honor-node:hover .honor-count,
 .honor-node:focus-visible .honor-count,
 .honor-node.is-selected .honor-count {
-  fill: #1c160c;
+  fill: #fffbe9;
 }
 .honor-node:hover .honor-dot,
 .honor-node:focus-visible .honor-dot {
