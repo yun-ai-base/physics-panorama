@@ -300,6 +300,8 @@ export function applyState() {
     let show = true;
     if (state.filterEra && n.era !== state.filterEra) show = false;
     if (state.onlyCore && n.tier !== 'core' && n.type !== 'event') show = false;
+    // 阅读路径：非路径内节点（且非选中关联）隐藏
+    if (state.pathIds && !state.pathIds.has(n.id) && !(state.selected && state.highlight.has(n.id))) show = false;
     // 选中关联强制显示
     if (state.selected && state.highlight.has(n.id)) show = true;
     g.style.display = show ? '' : 'none';
@@ -314,6 +316,9 @@ export function applyState() {
     // 关联节点（选中节点的直系父子，非选中本身）→ 明确高亮，让它在画布上"显出来"
     const related = state.selected ? state.highlight.has(n.id) : false;
     g.classList.toggle('is-related', related && !isSel);
+    // A.4 阅读路径：路径内节点青色高亮（与选中关联金色区分）
+    const inPath = state.pathIds ? state.pathIds.has(n.id) : false;
+    g.classList.toggle('is-path', inPath && !isSel);
     const dim = state.selected ? !state.highlight.has(n.id) : false;
     g.classList.toggle('is-dim', dim);
   }

@@ -55,6 +55,39 @@ export const SCALE_LABEL = {
 export const SCALE_LABEL_EN = {
   mesoscopic:'Macroscopic', cosmic:'Cosmic', microscopic:'Microscopic', unified:'Unified', feedback:'Feedback',
 };
+
+// A.4 阅读路径：按读者背景预定义的「推荐阅读路线」（节点 id 列表，聚合自现有节点）
+export const READER_PATHS = [
+  {
+    id: 'highschool',
+    name: '高中生',
+    nameEn: 'High School',
+    desc: '从日常现象出发，建立对经典与近代物理的直观印象',
+    nodeIds: ['newton-mechanics','thermodynamics','maxwell-em','michelson-morley','special-relativity','blackbody-radiation','planck-quantum','photoelectric','bohr-model','ligo'],
+  },
+  {
+    id: 'popular',
+    name: '科普读者',
+    nameEn: 'Curious Reader',
+    desc: '面向非专业的科学爱好者，按「故事性」串联关键突破',
+    nodeIds: ['newton-mechanics','maxwell-em','michelson-morley','special-relativity','general-relativity','planck-quantum','quantum-mechanics','solvay-conference','standard-model','higgs','dark-matter-energy','ligo','string-theory'],
+  },
+  {
+    id: 'undergrad',
+    name: '大学生',
+    nameEn: 'Undergrad',
+    desc: '物理/相关专业的低年级路线，覆盖核心理论与数学框架',
+    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','quantum-mechanics','uncertainty-principle','dirac-equation','qed','standard-model','higgs'],
+  },
+  {
+    id: 'physics',
+    name: '物理系学生',
+    nameEn: 'Physics Major',
+    desc: '近乎完整的理论主干，适合系统学习物理系核心脉络',
+    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','blackbody-radiation','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','photoelectric','bohr-model','quantum-mechanics','uncertainty-principle','dirac-equation','qed','yang-mills','electroweak','qcd','standard-model','higgs','string-theory','loop-quantum-gravity','dark-matter-energy','quantum-computing','ligo','quantum-gravity-test','grand-unification'],
+  },
+];
+
 export const SCALE_COLORS = {
   mesoscopic:  { raw:'#A07840', name:'宏观' },   // 经典棕
   cosmic:      { raw:'#41518F', name:'宇观' },   // 宇宙蓝
@@ -267,6 +300,10 @@ export const UI_LABELS = {
     tourNext: '下一步',
     tourFinish: '完成',
     tourStep: (i, n) => `Step ${i} / ${n}`,
+    voidGuideTitle: '虚无 · 图景',
+    voidGuideDesc: '这是一个「物理 × 哲学 × 人文」交织的意境空间。我们以诗、图、星空与粒子，邀你从理性之外感受宇宙的尺度与诗意。',
+    voidGuideOrderLabel: '推荐阅读顺序',
+    voidGuideOrder: '意境 → 思维导图 → 仰望星空 → 探幽识微 → 荣誉殿堂',
   },
   en: {
     viewTimeline: 'Timeline',
@@ -388,5 +425,9 @@ export const UI_LABELS = {
     tourNext: 'Next',
     tourFinish: 'Done',
     tourStep: (i, n) => `Step ${i} / ${n}`,
+    voidGuideTitle: 'The Void · A Landscape',
+    voidGuideDesc: 'A contemplative space where physics, philosophy, and the humanities intertwine. Through poetry, diagrams, stars, and particles, we invite you to sense the scale and poetry of the universe beyond pure reason.',
+    voidGuideOrderLabel: 'Suggested order',
+    voidGuideOrder: 'Poem → Mindmap → Stargaze → Microcosm → Hall of Honor',
   }
 };

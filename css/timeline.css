@@ -51,6 +51,9 @@
 .node.is-related .node__circle{stroke:var(--gold); stroke-width:3.4px; filter:url(#goldGlow);}
 .node.is-related .node__label{font-weight:700;}
 .node.is-dim{opacity:.20 !important;}
+/* A.4 阅读路径：路径内节点青色描边 + 光晕，与「选中关联」金色区分 */
+.node.is-path .node__circle{stroke:#3FA7C4; stroke-width:3.4px; filter:url(#goldGlow);}
+.node.is-path .node__label{font-weight:700;}
 
 /* 纪元色：实心浅底 + 深描边（色彩差异化核心） */
 .node[data-era="classical"] .node__circle{fill:#F5E6CC; stroke:#A07840; stroke-width:2.8;}

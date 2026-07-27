@@ -88,6 +88,74 @@ const BOSONS = [
 const ALL_PARTICLES = [...QUARKS, ...LEPTONS, ...BOSONS];
 const PARTICLE_MAP = Object.fromEntries(ALL_PARTICLES.map(p => [p.sym, p]));
 
+// 探幽识微 · 随尺度淡入淡出的真实科学背景图（各阶段中心对应一个层级节点）
+// 图片来源：NASA 图片 API（images-api.nasa.gov，公共领域）。
+// 原子及以下无真实照片，NASA 图为科学可视化/科普图——署名中如实标注。
+const MICRO_BG = [
+  { id:'you',     log:0.0,   img:'assets/micro/micro_you.svg' },
+  { id:'ant',     log:-2.0,  img:'assets/micro/micro_ant.svg' },
+  { id:'cell',    log:-5.0,  img:'assets/micro/micro_cell.jpg' },
+  { id:'dna',     log:-8.5,  img:'assets/micro/micro_dna.jpg' },
+  { id:'atom',    log:-10.2, img:'assets/micro/micro_atom.svg' },
+  { id:'nucleus', log:-14.2, img:'assets/micro/micro_nucleus.svg' },
+  { id:'quark',   log:-18.5, img:'assets/micro/micro_quark.svg' },
+  { id:'quantum', log:-33.0, img:'assets/micro/micro_quantum.svg' },
+  { id:'planck',  log:-34.8, img:'assets/micro/micro_planck.svg' },
+];
+
+let bgLayers = [];
+let bgEl = null;
+let bgCredit = null;
+
+function buildMicroBg(mount){
+  bgEl = document.createElement('div');
+  bgEl.className = 'sky-bg';
+  bgLayers = MICRO_BG.map(stage => {
+    const layer = document.createElement('div');
+    layer.className = 'sky-bg__layer';
+    layer.style.backgroundImage = `url("${stage.img}")`;
+    layer.dataset.id = stage.id;
+    bgEl.appendChild(layer);
+    return layer;
+  });
+  const scrim = document.createElement('div');
+  scrim.className = 'sky-bg__scrim';
+  bgEl.appendChild(scrim);
+  mount.insertBefore(bgEl, mount.firstChild);   // 压在 svg 之下
+
+  bgCredit = document.createElement('div');
+  bgCredit.className = 'sky-credit';
+  bgCredit.innerHTML = '背景图：NASA（公共领域）· 细胞 / DNA / 分子等为真实科研与科普图；原子及以下为科学可视化';
+  mount.appendChild(bgCredit);                   // 署名条，压在交互层之上
+}
+
+// 给定当前视角中心对数尺度 c，返回每层不透明度。
+// 模型：相邻阶段在各自间隔中点之间平滑交叉（过渡半宽取该间隔一半，更自然）；窗口外最近阶段全显——任意尺度都恰好有背景，无空白死区。
+function bgOps(c){
+  const logs = MICRO_BG.map(s => s.log);
+  const ops = logs.map(() => 0);
+  let nearest = 0;
+  for (let i = 0; i < logs.length; i++)
+    if (Math.abs(c - logs[i]) < Math.abs(c - logs[nearest])) nearest = i;
+  ops[nearest] = 1;
+  for (let i = 0; i < logs.length - 1; i++){
+    const bm = (logs[i] + logs[i+1]) / 2;
+    const t = Math.max(0.4, (logs[i+1] - logs[i]) / 2 * 0.9);   // 该间隔一半（下限防极窄瞬切）
+    if (Math.abs(c - bm) < t){
+      const f = Math.max(0, Math.min(1, (c - (bm - t)) / (2 * t)));
+      ops[i] = 1 - f;
+      ops[i+1] = f;
+    }
+  }
+  return ops;
+}
+
+function updateMicroBg(c){
+  if (!bgLayers.length) return;
+  const ops = bgOps(c);
+  for (let i = 0; i < bgLayers.length; i++) bgLayers[i].style.opacity = ops[i].toFixed(3);
+}
+
 function chips(arr){ return (arr||[]).map(x => `<span class="jc-chip">${esc(x)}</span>`).join(''); }
 
 function cardHTML(node){
@@ -166,12 +234,14 @@ function onNodeClick(node, api){
 
 export function initMicro(mount){
   if (controller) return;
+  buildMicroBg(mount);
   controller = createJourney({
     mount,
     axis: { minLog: -35, maxLog: 0.5 },
     nodes: MICRO_NODES,
     theme: 'micro',
     onNodeClick,
+    onViewChange: updateMicroBg,
   });
   overlay = document.createElement('div');
   overlay.className = 'particle-overlay';
@@ -204,7 +274,7 @@ export function initMicro(mount){
 }
 
 export function renderMicro(){
-  if (controller) controller.render();
+  if (controller){ controller.render(); requestAnimationFrame(() => controller.render()); }
 }
 
 export function refreshMicroLang(){

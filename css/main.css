@@ -86,6 +86,22 @@ button{font-family:inherit; cursor:pointer;}
 .era-tab.is-active[data-era="quantum"]{background:#7A5BA6;box-shadow:0 4px 14px rgba(122,91,166,.42);}
 .era-tab.is-active[data-era="standard-model"]{background:#357A5E;box-shadow:0 4px 14px rgba(53,122,94,.42);}
 .era-tab.is-active[data-era="frontier"]{background:#6B4E8C;box-shadow:0 4px 14px rgba(107,78,140,.42);}
+/* A.4 阅读路径 tab（青色强调，与纪元 tab 区分） */
+.path-tabs{display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding-left:14px; margin-left:6px; border-left:1px solid rgba(42,38,32,.12);}
+.path-tab{
+  border:none; background:transparent;
+  color:var(--ink-2); font-size:13px; font-weight:500;
+  padding:5px 12px 3px; border-radius:0; transition:.2s; display:flex; align-items:center; gap:6px;
+  cursor:pointer;
+}
+.path-tab__dot{width:8px; height:8px; border-radius:50%; background:#3FA7C4; opacity:.55; transition:.2s;}
+.path-tab:hover{color:var(--ink); background:rgba(63,167,196,.08);}
+.path-tab.is-active{
+  color:#fff; font-weight:800;
+  background:#3FA7C4; border-radius:999px; padding:5px 13px 4px;
+  box-shadow:0 4px 14px rgba(63,167,196,.4);
+}
+.path-tab.is-active .path-tab__dot{opacity:1; box-shadow:0 0 0 2px #fff;}
 .only-core{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2); cursor:pointer; user-select:none;}
 .only-core input{accent-color:var(--gold); width:15px; height:15px;}
 

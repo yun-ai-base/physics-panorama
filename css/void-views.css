@@ -215,3 +215,31 @@
   max-width: 62%; text-align: right; pointer-events: none;
   text-shadow: 0 1px 3px rgba(0,0,0,0.75);
 }
+
+/* A.8 虚无-图景引导说明 */
+.void-guide {
+  position: relative; z-index: 10;
+  max-width: 760px; margin: 22px auto 10px; padding: 18px 22px;
+  text-align: center;
+  background: rgba(14,12,18,0.55);
+  border: 1px solid rgba(200,180,140,0.22);
+  border-radius: 14px;
+  backdrop-filter: blur(4px);
+}
+.void-guide__title {
+  font-family: var(--font-serif, serif); font-size: 22px; font-weight: 700;
+  color: #f3ecdc; margin: 0 0 8px; letter-spacing: .04em;
+}
+.void-guide__desc {
+  font-size: 13.5px; line-height: 1.75; color: #d8cba8; margin: 0 0 10px;
+}
+.void-guide__order {
+  font-size: 12.5px; color: #b6a986; letter-spacing: .03em;
+}
+.void-guide__order-label {
+  color: var(--gold, #c9a24e); margin-right: 8px; font-weight: 600;
+}
+.void-guide__order-seq { font-family: var(--font-serif, serif); }
+/* 沉浸式背景子页（仰望星空 / 探幽识微）下隐藏引导块，避免遮挡 */
+.void-view:has(#voidSky:not([hidden])) .void-guide,
+.void-view:has(#voidMicro:not([hidden])) .void-guide { display: none; }

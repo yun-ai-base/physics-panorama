@@ -51,7 +51,7 @@ export function createJourney(opts){
   hintBar.appendChild(backBtn);
   mount.appendChild(hintBar);
 
-  let k = 1, tx = 0, ty = 0, fitK = 1, worldH = 0, worldHalfH = 0;
+  let k = 1, tx = 0, ty = 0, fitK = 1, worldH = 0, worldHalfH = 0, lastH = 0;
   let down = false, moved = false, lastX = 0, lastY = 0, rendered = false, pinchD = 0;
 
   const W = () => mount.clientWidth || 900;
@@ -68,9 +68,7 @@ export function createJourney(opts){
       const x = Math.random()*W(), y = Math.random()*H();
       el('circle', { cx:x, cy:y, r: Math.random()*1.3+0.2, fill: theme==='sky'?'#cfe0ff':'#d9c8ff', 'fill-opacity': 0.12 + Math.random()*0.5 }, bgLayer);
     }
-    if (theme === 'micro'){
-      for (let i=0;i<6;i++){ const x=Math.random()*W(), y=Math.random()*H(); el('circle',{cx:x,cy:y,r:Math.random()*120+60,fill:'#6b4aa0','fill-opacity':0.10},bgLayer); }
-    }
+    // micro 现已用真实科学背景图（buildMicroBg），不再叠加程序化紫斑，避免脏化真实图
   }
   function drawAxis(){
     axisLayer.textContent = '';
@@ -143,7 +141,9 @@ export function createJourney(opts){
     render(){
       computeFit();                          // 必须先计算 worldH/worldHalfH，否则首次 drawNodes 把所有节点算到 y=0 堆叠
       drawBg(); drawAxis(); drawNodes();
-      if (!rendered){ initView(); rendered = true; }
+      if (!rendered){ initView(); rendered = true; lastH = mount.clientHeight; }
+      // 容器尺寸相对上次变化（首次布局完成 / 激活 subtab 由隐藏变可见）：重置到该主题起点视图
+      else if (mount.clientHeight !== lastH){ lastH = mount.clientHeight; initView(); }
       else apply();
     },
     reset,

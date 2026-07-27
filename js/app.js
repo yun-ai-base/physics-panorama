@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { esc, buildEdges, relatedSet } from './utils.js';
-import { ERAS, ERA_ORDER, UI_LABELS } from './config.js';
+import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js';
 import { computeLayout } from './views.js';
 import { initRenderer, renderGraph, applyState } from './renderer.js';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
@@ -264,6 +264,27 @@ function buildEraTabs() {
     ERA_ORDER.map(e => `<button class="era-tab" data-era="${e}"><span class="swatch" style="background:${ERAS[e].raw}"></span>${en ? ERAS[e].nameEn : ERAS[e].name}</button>`).join('');
 }
 
+// A.4 阅读路径：按读者背景生成的预设路线 tab
+function buildPathTabs() {
+  const en = state.lang === 'en';
+  const pathTabs = document.getElementById('pathTabs');
+  if (!pathTabs) return;
+  const activeId = activePathId();
+  pathTabs.innerHTML = READER_PATHS.map(p => {
+    const on = activeId === p.id ? ' is-active' : '';
+    const label = en ? p.nameEn : p.name;
+    return `<button class="path-tab${on}" data-path="${p.id}" title="${p.desc}"><span class="path-tab__dot"></span>${label}</button>`;
+  }).join('');
+}
+// 当前激活路径 id（state.pathIds 与某条 READER_PATHS 完全匹配时）
+function activePathId() {
+  if (!state.pathIds) return null;
+  for (const p of READER_PATHS) {
+    if (p.nodeIds.length === state.pathIds.size && p.nodeIds.every(id => state.pathIds.has(id))) return p.id;
+  }
+  return null;
+}
+
 // 切换界面语言：重绘画布 + 顶栏纪元标签 + 重渲侧栏头部 + 刷新所有静态 UI 文案
 function applyLang() {
   const en = state.lang === 'en';
@@ -272,6 +293,7 @@ function applyLang() {
   document.documentElement.lang = en ? 'en' : 'zh';
   renderGraph(state.view, currentLayout);
   buildEraTabs();
+  buildPathTabs();
   applyUILanguage();
   if (state.selected) openNode(state.selected);
   // 切语言时重渲染思维导图（mindmap.js 内部按 state.lang 取 nameEn/labelEn/nameEn）
@@ -399,6 +421,23 @@ function wireUI() {
     }
     reflectEraActive(); applyState(); updateURL();
   });
+
+  const pathTabs = document.getElementById('pathTabs');
+  if (pathTabs) {
+    buildPathTabs();
+    pathTabs.addEventListener('click', e => {
+      const b = e.target.closest('.path-tab'); if (!b) return;
+      const id = b.dataset.path;
+      const p = READER_PATHS.find(x => x.id === id);
+      // 再次点击同一路径 → 取消
+      if (state.pathIds && activePathId() === id) {
+        state.pathIds = null;
+      } else {
+        state.pathIds = new Set(p.nodeIds);
+      }
+      reflectPathActive(); applyState(); updateURL();
+    });
+  }
 
   document.getElementById('onlyCore').addEventListener('change', e => { state.onlyCore = e.target.checked; applyState(); updateURL(); });
   // 关闭侧栏只收起面板，保留选中节点与关联高亮——关掉后应能在画布上看到关联节点（移动端侧栏全屏遮挡，尤为关键）
@@ -650,6 +689,14 @@ function reflectEraActive() {
     const on = era === 'all' ? (!state.activeEra && !state.filterEra)
                              : (state.activeEra === era || state.filterEra === era);
     t.classList.toggle('is-active', on);
+  });
+}
+
+// A.4 阅读路径激活态：反映路径 tab 的高亮
+function reflectPathActive() {
+  const id = activePathId();
+  document.querySelectorAll('.path-tab').forEach(t => {
+    t.classList.toggle('is-active', t.dataset.path === id);
   });
 }
 // 时间线纪元大字点击：轻量激活（高亮 + 综述，不改筛选）；再次点击同纪元取消

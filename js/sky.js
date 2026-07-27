@@ -179,7 +179,7 @@ export function initSky(mount){
 }
 
 export function renderSky(){
-  if (controller) controller.render();
+  if (controller){ controller.render(); requestAnimationFrame(() => controller.render()); }
 }
 
 export function refreshSkyLang(){

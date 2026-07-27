@@ -11,6 +11,7 @@ export const state = {
   activeEra: null,         // 当前激活/选中的纪元（顶部导航或时间线标签点击，UI 高亮 + 综述）
   activeScale: null,       // 当前激活/选中的尺度维度（尺度视图标签点击，UI 高亮 + 概念解析面板）
   onlyCore: true,          // 仅显示主干
+  pathIds: null,           // 阅读路径（READER_PATHS id）筛选集合；非 null 时仅显示该集合节点并高亮
   view: 'timeline',        // 当前视图
   tour: null,              // 漫游模式
   sidebarOpen: false,
