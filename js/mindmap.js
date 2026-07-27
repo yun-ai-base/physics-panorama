@@ -313,18 +313,25 @@ function drawNode(p, parent) {
     mk('text', { x: p.x + p.w / 2 - 13, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--toggle' }, g).textContent = open ? '−' : '+';
   }
 }
+// 把维度里的数组元素安全转成字符串（兼容 字符串 / {latex,desc,name,...} 等形态）
+function safeDimItem(x) {
+  if (typeof x === 'string') return x;
+  if (x == null) return '';
+  if (typeof x === 'object') return x.latex || x.desc || x.name || x.title || x.label || '';
+  return String(x);
+}
 // 取维度具体内容摘要（去 markdown 标记后截断），用于在维度条内显示「第五级内容」
 function dimSummaryText(node, key) {
   let raw = '';
   if (node.deepContent && typeof node.deepContent[key] === 'string') {
     raw = node.deepContent[key];
   } else if (key === 'terms') {
-    raw = (node.terms || []).slice(0, 6).join('、');
+    raw = (node.terms || []).slice(0, 6).map(safeDimItem).filter(Boolean).join('、');
   } else if (key === 'formula') {
-    raw = (node.formula || []).slice(0, 4).join('，');
+    raw = (node.formula || []).slice(0, 4).map(safeDimItem).filter(Boolean).join('，');
   } else if (key === 'particles') {
     const gs = (node.particles && node.particles.groups) || [];
-    raw = gs.slice(0, 4).map(x => typeof x === 'string' ? x : (x && x.name) || '').filter(Boolean).join('、');
+    raw = gs.slice(0, 4).map(safeDimItem).filter(Boolean).join('、');
   }
   if (!raw) return '';
   raw = raw.replace(/\*\*/g, '').replace(/[*_`>#]/g, '').replace(/\s+/g, ' ').trim();
