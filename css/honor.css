@@ -33,6 +33,42 @@
   letter-spacing: 0.02em;
   color: var(--gold-dark);      /* #8B6914 深金，比原 #9a948a 灰更醒目 */
 }
+.honor-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.honor-search {
+  width: 200px;
+  max-width: 46vw;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--ink, #2A2620);
+  background: #fff;
+  border: 1px solid rgba(184, 137, 59, .4);
+  border-radius: 999px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.honor-search:focus {
+  border-color: var(--gold, #B8893B);
+  box-shadow: 0 0 0 3px rgba(184, 137, 59, .15);
+}
+.honor-navbtn {
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: var(--gold-dark, #8B6914);
+  background: #fff;
+  border: 1px solid rgba(184, 137, 59, .4);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.honor-navbtn:hover { background: rgba(184, 137, 59, .12); }
 
 .honor-timeline {
   flex: 1 1 auto;
@@ -62,6 +98,30 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
+
+/* 年代标尺：淡金分隔标签 + 浅色分隔线 */
+.honor-decade {
+  fill: var(--gold-dark, #8B6914);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.62;
+  pointer-events: none;
+  font-family: var(--font-serif, serif);
+}
+.honor-decade-line {
+  stroke: rgba(184, 137, 59, .22);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  pointer-events: none;
+}
+/* 搜索命中高亮 */
+.honor-node.is-match .honor-dot {
+  fill: #2E8B57;
+  stroke: #fff;
+  stroke-width: 3;
+}
+.honor-node.is-match .honor-year { fill: #2E8B57; font-weight: 700; }
 
 .honor-node { cursor: pointer; outline: none; }
 .honor-dot {
@@ -154,9 +214,28 @@
   stroke-dasharray: 6 4;
 }
 
-/* ── 旧详情面板已废弃，改用 tooltip ── */
-.honor-detail {
-  display: none !important;
+/* ── 旧详情面板已废弃，改为跟随式 popover（见 .honor-pop）── */
+
+/* 触屏：底部抽屉式 popover */
+.honor-pop--sheet {
+  left: 50% !important;
+  right: auto;
+  top: auto !important;
+  bottom: 0;
+  width: min(440px, calc(100vw - 24px));
+  border-radius: 16px 16px 0 0;
+  border-bottom: none;
+  max-height: 72vh;
+  overflow-y: auto;
+  transform: translateX(-50%) translateY(100%);
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.honor-pop--sheet.is-visible {
+  transform: translateX(-50%) translateY(0);
+}
+@media (max-width: 768px) {
+  .honor-search { width: 150px; }
+  .honor-tools { gap: 6px; }
 }
 
 /* ── 跟随式悬浮面罩（popover）────────────────────────────── */

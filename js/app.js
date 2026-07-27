@@ -8,7 +8,7 @@ import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js';
-import { renderHonor, refreshHonorLang, closeHonorPop } from './honor.js';
+import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, focusHonorYear, scrollHonorToOldest, scrollHonorToNewest } from './honor.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -270,6 +270,8 @@ function applyLang() {
   }
   // 切语言时刷新荣誉殿堂（重建时间线 + 刷新当前面板内容，避免面板仍显示旧语言）
   if (state.view === 'void' && voidTab === 'honor') { renderHonor(); refreshHonorLang(); }
+  const hs = document.getElementById('honorSearch');
+  if (hs) hs.placeholder = en ? 'Search laureate or year…' : '搜索获奖者或年份…';
   updateURL();
 }
 
@@ -333,6 +335,25 @@ function wireUI() {
   // 全屏浮动退出按钮（右上角固定）
   const mmExitFsBtn = document.getElementById('mmExitFs');
   if (mmExitFsBtn) mmExitFsBtn.addEventListener('click', () => toggleMindmapFullscreen());
+
+  // 荣誉殿堂：搜索 / 年份导航
+  const honorSearch = document.getElementById('honorSearch');
+  if (honorSearch) {
+    let deb;
+    honorSearch.addEventListener('input', () => {
+      if (voidTab !== 'honor') return;
+      clearTimeout(deb);
+      deb = setTimeout(() => {
+        const n = searchHonor(honorSearch.value);
+        honorSearch.classList.toggle('is-empty', honorSearch.value.trim() !== '' && n === 0);
+      }, 200);
+    });
+    honorSearch.addEventListener('keydown', e => { if (e.key === 'Escape') { honorSearch.value = ''; searchHonor(''); } });
+  }
+  const honorToOldest = document.getElementById('honorToOldest');
+  if (honorToOldest) honorToOldest.addEventListener('click', () => scrollHonorToOldest());
+  const honorToNewest = document.getElementById('honorToNewest');
+  if (honorToNewest) honorToNewest.addEventListener('click', () => scrollHonorToNewest());
   // 思维导图导出（PNG / SVG 下拉菜单）
   const mmExportBtn = document.getElementById('mmExport');
   const mmExportMenu = document.getElementById('mmExportMenu');
