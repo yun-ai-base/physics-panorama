@@ -118,10 +118,12 @@
 .particle-overlay {
   position: absolute; inset: 0; z-index: 8;
   background: rgba(8,6,14,0.92); backdrop-filter: blur(3px);
-  display: flex; flex-direction: column;
+  flex-direction: column;
   animation: jcIn .22s ease both;
   pointer-events: auto;
+  display: none;                 /* 默认隐藏：必须显式控制，否则 [hidden] 被 display:flex 覆盖 */
 }
+.particle-overlay:not([hidden]) { display: flex; }
 .particle-overlay__head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 20px; border-bottom: 1px solid rgba(200,180,140,0.18);
