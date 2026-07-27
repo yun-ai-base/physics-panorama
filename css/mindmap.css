@@ -60,6 +60,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow-x: hidden;                       /* 防止宽画布 SVG / 导出菜单撑出水平滚动条 */
 }
 .void-mindmap[hidden] { display: none !important; }
 
@@ -267,14 +268,24 @@ body.mm-fs .mindmap-toolbar {
 }
 
 /* ── 导出菜单（PNG / SVG 下拉） ── */
-.mm-export-wrap { position: relative; display: inline-flex; }
-.mindmap-reset.mm-export-toggle::after { content: ''; }
+.mm-export-wrap { position: relative; display: inline-flex; overflow: visible; }
+#mmExport {
+  border: 1px solid rgba(184, 137, 59, .4);
+  background: #fff;
+  color: var(--gold-dark, #8B6914);
+  padding: 5px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12.5px;
+  transition: background .2s;
+}
+#mmExport:hover { background: var(--gold-tint, rgba(184, 137, 59, .12)); }
 .mm-export-menu {
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
+  right: 0;                              /* 右对齐按钮，避免右侧溢出 */
   z-index: 50;
-  min-width: 118px;
+  min-width: 120px;
   background: #fff;
   border: 1px solid rgba(184, 137, 59, .4);
   border-radius: 10px;
