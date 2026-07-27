@@ -80,6 +80,10 @@ async function boot() {
   try { initSky(document.getElementById('voidSky')); } catch (err) { console.error('[sky] init failed', err); }
   try { initMicro(document.getElementById('voidMicro')); } catch (err) { console.error('[micro] init failed', err); }
 
+  // sky/micro 内的「返回图景」按钮 → 切换回虚无-图景默认子视图（意境）
+  document.getElementById('voidSky')?.addEventListener('journey:back', () => activateVoidTab('poem'));
+  document.getElementById('voidMicro')?.addEventListener('journey:back', () => activateVoidTab('poem'));
+
   const node = readURL();
   const restoreTab = state.sidebarTab;
   const restoreTerm = state.termFocus;

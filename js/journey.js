@@ -32,10 +32,24 @@ export function createJourney(opts){
   const readout = document.createElement('div'); readout.className = 'journey-readout';
   ctrl.append(btnIn, btnOut, btnReset, readout); mount.appendChild(ctrl);
 
-  // 操作提示
-  const hint = document.createElement('div'); hint.className = 'journey-hint';
+  // 操作提示 + 返回按钮（包裹在同一行容器中）
+  const hintBar = document.createElement('div');
+  hintBar.className = 'journey-hint-bar';
+  const hint = document.createElement('div');
+  hint.className = 'journey-hint';
   hint.textContent = theme === 'sky' ? '滚轮缩放 · 拖拽平移 · 点击天体看简介' : '滚轮缩放 · 拖拽平移 · 点击层级看简介';
-  mount.appendChild(hint);
+
+  const backBtn = document.createElement('button');
+  backBtn.type = 'button';
+  backBtn.className = 'journey-back-btn';
+  backBtn.textContent = theme === 'sky' ? '← 返回图景' : '← 返回图景';
+  backBtn.addEventListener('click', () => {
+    mount.dispatchEvent(new CustomEvent('journey:back', { bubbles: true }));
+  });
+
+  hintBar.appendChild(hint);
+  hintBar.appendChild(backBtn);
+  mount.appendChild(hintBar);
 
   let k = 1, tx = 0, ty = 0, fitK = 1, worldH = 0, worldHalfH = 0;
   let down = false, moved = false, lastX = 0, lastY = 0, rendered = false, pinchD = 0;
