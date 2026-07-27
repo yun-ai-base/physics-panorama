@@ -11,6 +11,7 @@ import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNod
 import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, focusHonorYear, scrollHonorToOldest, scrollHonorToNewest } from './honor.js';
 import { initSky, renderSky, refreshSkyLang } from './sky.js';
 import { initMicro, renderMicro, refreshMicroLang } from './micro.js';
+import { initGlossary, renderGlossary } from './glossary.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -61,6 +62,7 @@ async function boot() {
 
   initRenderer(NODES, EDGES, SUMMARIES);
   initSidebar(NODES, SUMMARIES);
+  initGlossary(NODES);
   initInteraction();
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
@@ -161,7 +163,7 @@ function applyUILanguage() {
 
   // 顶栏视图 tab（主标题 + 副标题分层更新，避免 textContent 清空副标题）
   document.querySelectorAll('#viewTabs .view-tab').forEach(btn => {
-    const map = { timeline: 'viewTimeline', unification: 'viewUnification', scale: 'viewScale', people: 'viewPeople', void: 'viewVoid' };
+    const map = { timeline: 'viewTimeline', unification: 'viewUnification', scale: 'viewScale', people: 'viewPeople', void: 'viewVoid', glossary: 'viewGlossary' };
     const k = map[btn.dataset.view];
     const main = btn.querySelector('.view-tab__main');
     if (main && k) main.textContent = t(k);
@@ -303,6 +305,8 @@ function applyLang() {
     const pg = document.getElementById('peopleGrid');
     if (pg) renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
   }
+  // 切语言时重渲染全局术语表（glossary.js 内部按 state.lang 取 nameEn/labelEn）
+  if (state.view === 'glossary') renderGlossary();
   // 切语言时刷新荣誉殿堂（重建时间线 + 刷新当前面板内容，避免面板仍显示旧语言）
   if (state.view === 'void' && voidTab === 'honor') { renderHonor(); refreshHonorLang(); }
   if (state.view === 'void' && voidTab === 'sky') refreshSkyLang();
@@ -769,15 +773,18 @@ function setView(v) {
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === v));
   const isPeople = v === 'people';
   const isVoid = v === 'void';
-  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people','view-void');
+  const isGlossary = v === 'glossary';
+  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people','view-void','view-glossary');
   document.body.classList.add(`view-${v}`);
   const stageEl = document.getElementById('stage');
   const pv = document.getElementById('peopleView');
   const vv = document.getElementById('voidView');
+  const gv = document.getElementById('glossaryView');
   const smb = document.getElementById('scaleMapBar');
-  if (stageEl) stageEl.style.visibility = (isPeople || isVoid) ? 'hidden' : '';
+  if (stageEl) stageEl.style.visibility = (isPeople || isVoid || isGlossary) ? 'hidden' : '';
   if (pv) pv.hidden = !isPeople;
   if (vv) vv.hidden = !isVoid;
+  if (gv) gv.hidden = !isGlossary;
   if (smb) smb.hidden = (v !== 'scale');
   const eraNav = document.getElementById('eraNav');
   if (eraNav) eraNav.style.display = isVoid ? 'none' : '';
@@ -790,6 +797,9 @@ function setView(v) {
   } else if (isVoid) {
     closeSidebar();
     activateVoidTab(voidTab);
+  } else if (isGlossary) {
+    closeSidebar();
+    renderGlossary();
   } else {
     renderCurrent(); fit();
   }

@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/mindmap.css" />
   <link rel="stylesheet" href="css/honor.css" />
   <link rel="stylesheet" href="css/void-views.css" />
+  <link rel="stylesheet" href="css/glossary.css" />
 </head>
 <body>
   <div id="app">
@@ -36,6 +37,7 @@
           <button class="view-tab" data-view="scale"><span class="view-tab__main">尺度维度</span><span class="view-tab__sub" data-navsub="navScaleSub">普朗克到宇宙尺度</span></button>
           <button class="view-tab" data-view="people"><span class="view-tab__main">人物索引</span><span class="view-tab__sub" data-navsub="navPeopleSub">三百年物理学家</span></button>
           <button class="view-tab" data-view="void"><span class="view-tab__main">虚无-图景</span><span class="view-tab__sub" data-navsub="navVoidSub">物理·哲学·意境</span></button>
+          <button class="view-tab" data-view="glossary"><span class="view-tab__main">术语表</span><span class="view-tab__sub" data-navsub="navGlossarySub">全站术语检索</span></button>
         </nav>
         <div class="search" id="searchBox">
           <input id="searchInput" type="search" placeholder="搜索学说 / 人名 / 关键词…" autocomplete="off" />
@@ -230,6 +232,24 @@
 
         <!-- 选项五：探幽识微（微观尺度之旅 + 标准模型粒子家族） -->
         <div class="void-micro" id="voidMicro" hidden></div>
+      </div>
+
+      <!-- 全局术语表视图（A.9） -->
+      <div class="glossary-view" id="glossaryView" hidden>
+        <div class="glossary-bar">
+          <input id="glossarySearch" class="glossary-search" type="search" placeholder="搜索术语或释义…" aria-label="搜索术语" />
+          <select id="glossarySort" class="glossary-sort" aria-label="排序">
+            <option value="name">按名称</option>
+            <option value="difficulty">按难度</option>
+          </select>
+          <select id="glossaryDiff" class="glossary-diff" aria-label="难度筛选">
+            <option value="all">全部难度</option>
+            <option value="basic">基础</option>
+            <option value="intermediate">进阶</option>
+            <option value="advanced">专业</option>
+          </select>
+        </div>
+        <div class="glossary-grid" id="glossaryGrid"></div>
       </div>
 
       <!-- 详情侧边栏 -->

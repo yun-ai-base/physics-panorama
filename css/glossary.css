@@ -1,0 +1,43 @@
+/* A.9 全局术语表视图 */
+.glossary-view {
+  position: absolute; inset: 0; overflow: auto;
+  background: var(--bg);
+  padding: 18px 24px 40px;
+  z-index: 5;
+}
+.glossary-bar {
+  display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.glossary-search {
+  flex: 1 1 260px; min-width: 200px; padding: 9px 14px; font-size: 14px;
+  border-radius: 999px; border: 1px solid rgba(42,38,32,.16);
+  background: var(--bg-2); color: var(--ink);
+}
+.glossary-sort, .glossary-diff {
+  padding: 9px 12px; font-size: 13px; border-radius: 10px;
+  border: 1px solid rgba(42,38,32,.16); background: var(--bg-2); color: var(--ink);
+}
+.glossary-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
+}
+.gterm {
+  background: var(--bg-2); border: 1px solid rgba(42,38,32,.1);
+  border-left: 4px solid var(--gold); border-radius: 12px;
+  padding: 14px 16px; transition: transform .12s, box-shadow .12s;
+}
+.gterm:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,.12); }
+.gterm--mid { border-left-color: #3FA7C4; }
+.gterm--adv { border-left-color: #9B6BD6; }
+.gterm__head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.gterm__icon { font-size: 20px; line-height: 1; }
+.gterm__name { font-family: var(--font-serif, serif); font-size: 16px; font-weight: 700; color: var(--ink); }
+.gterm__diff {
+  margin-left: auto; font-size: 11px; padding: 2px 9px; border-radius: 999px;
+  background: rgba(184,137,59,.14); color: #9a7b2e; font-weight: 600;
+}
+.gterm--mid .gterm__diff { background: rgba(63,167,196,.16); color: #2c7d92; }
+.gterm--adv .gterm__diff { background: rgba(155,107,214,.16); color: #6f4aa0; }
+.gterm__def { font-size: 13px; line-height: 1.65; color: var(--ink-2); }
+.gterm__detail { font-size: 12px; line-height: 1.6; color: var(--ink-3); margin-top: 6px; }
+.gterm__src { font-size: 11px; color: var(--ink-3); margin-top: 8px; opacity: .8; }
+.glossary-empty { padding: 40px; text-align: center; color: var(--ink-3); }
