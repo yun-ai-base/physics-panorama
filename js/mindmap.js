@@ -622,7 +622,23 @@ async function buildExportSVG() {
   return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
 }
 export async function exportMindmap(format) {
-  const svgStr = await buildExportSVG();
+  // 临时全展开所有维度，确保第三级（维度叶子）一并导出；导出后还原页面状态
+  const prevExpandAll = expandAll;
+  const prevExpanded = new Set(expanded);
+  expandAll = true; expanded.clear();
+  computeLayout();
+  render();
+  let svgStr, fullVbW = 0, fullVbH = 0;
+  try {
+    svgStr = await buildExportSVG();
+    const fb = bounds();               // 此时仍是全展开布局
+    const pad = 40;
+    fullVbW = (fb.maxX - fb.minX) + pad * 2;
+    fullVbH = (fb.maxY - fb.minY) + pad * 2;
+  } finally {
+    expandAll = prevExpandAll; expanded = prevExpanded;
+    computeLayout(); render();         // 还原用户原本的展开/折叠状态
+  }
   if (!svgStr) { console.warn('[mindmap] 导出失败：导图尚未渲染'); return; }
   const lang = state.lang || 'zh';
   const base = `physics-mindmap-${lang}`;
@@ -631,20 +647,16 @@ export async function exportMindmap(format) {
     triggerDownload(dataUrl, `${base}.svg`);
     return;
   }
-  // PNG：把 SVG 画到高分辨率 canvas 再导出
-  const b = bounds();
-  const pad = 40;
-  const vbW = (b.maxX - b.minX) + pad * 2;
-  const vbH = (b.maxY - b.minY) + pad * 2;
-  const scale = 2;
+  // PNG：把 SVG 画到高分辨率 canvas 再导出（自适应缩放，避免全展开后画布超限）
+  const scale = Math.min(2, 16384 / Math.max(fullVbW, fullVbH, 1));
   const img = new Image();
   img.onload = () => {
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(vbW * scale));
-    canvas.height = Math.max(1, Math.round(vbH * scale));
+    canvas.width = Math.max(1, Math.round(fullVbW * scale));
+    canvas.height = Math.max(1, Math.round(fullVbH * scale));
     const ctx = canvas.getContext('2d');
     ctx.scale(scale, scale);
-    ctx.drawImage(img, 0, 0, vbW, vbH);
+    ctx.drawImage(img, 0, 0, fullVbW, fullVbH);
     try {
       triggerDownload(canvas.toDataURL('image/png'), `${base}.png`);
     } catch (e) {
