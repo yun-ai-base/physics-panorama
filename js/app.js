@@ -8,7 +8,7 @@ import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode } from './mindmap.js';
-import { renderHonor } from './honor.js';
+import { renderHonor, refreshHonorLang } from './honor.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -268,8 +268,8 @@ function applyLang() {
     const pg = document.getElementById('peopleGrid');
     if (pg) renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
   }
-  // 切语言时重渲染荣誉殿堂（按钮/标题已随 applyUILanguage 切换，此处确保视图状态一致）
-  if (state.view === 'void' && voidTab === 'honor') renderHonor();
+  // 切语言时刷新荣誉殿堂（重建时间线 + 刷新当前面板内容，避免面板仍显示旧语言）
+  if (state.view === 'void' && voidTab === 'honor') { renderHonor(); refreshHonorLang(); }
   updateURL();
 }
 

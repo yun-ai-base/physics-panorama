@@ -1,67 +1,91 @@
 // 荣誉殿堂：诺贝尔物理学奖蛇形时间线
-// 数据来源 js/data/nobel-physics.js（1901–2025 完整列表）
+// 数据来源 js/data/nobel-physics.js（1901–2025 英文官方原文）
+// 中文补充：js/data/nobel-physics-zh.js（中文字段，按年份索引）
 import { NOBEL_PHYSICS } from './data/nobel-physics.js';
+import { NOBEL_PHYSICS_ZH } from './data/nobel-physics-zh.js';
+import { state } from './state.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 
-/* ── tooltip 浮层 ─────────────────────────────────────── */
-let tooltipEl = null;
+/* ── 独立介绍面板层（右侧滑出 / 移动端底部抽屉）────────────── */
+let panelEl = null;
+let panelBody = null;
+let panelCur = null;      // 当前展示的节点数据
+let hoverTimer = null;
 
-function ensureTooltip() {
-  if (tooltipEl) return tooltipEl;
-  tooltipEl = document.createElement('div');
-  tooltipEl.className = 'honor-tooltip';
-  tooltipEl.setAttribute('role', 'tooltip');
-  document.body.appendChild(tooltipEl);
-  // 点击页面其他区域关闭（移动端友好）
-  const dismiss = (e) => {
-    if (!tooltipEl.contains(e.target) && !e.target.closest('.honor-node')) {
-      hideTooltip();
-      document.removeEventListener('pointerdown', dismiss);
-    }
-  };
-  // 延迟绑定，避免打开瞬间立刻触发关闭
-  setTimeout(() => document.addEventListener('pointerdown', dismiss), 10);
-  return tooltipEl;
+function ensurePanel() {
+  if (panelEl) return panelEl;
+  panelEl = document.createElement('aside');
+  panelEl.className = 'honor-panel';
+  panelEl.setAttribute('role', 'dialog');
+  panelEl.setAttribute('aria-label', '诺贝尔物理学奖介绍');
+
+  const close = document.createElement('button');
+  close.className = 'honor-panel__close';
+  close.type = 'button';
+  close.setAttribute('aria-label', '关闭');
+  close.textContent = '×';
+  close.addEventListener('click', hidePanel);
+  panelEl.appendChild(close);
+
+  panelBody = document.createElement('div');
+  panelBody.className = 'honor-panel__body';
+  panelEl.appendChild(panelBody);
+
+  document.body.appendChild(panelEl);
+  return panelEl;
 }
 
-function showTooltip(d, nodeEl) {
-  const el = ensureTooltip();
+// 按当前语言生成面板内容（中文模式附英文原文作参考）
+function panelContent(d) {
+  const zh = NOBEL_PHYSICS_ZH[d.year];
+  const en = state.lang === 'en';
+  const names = en
+    ? d.names
+    : (zh && zh.namesZh && zh.namesZh.length ? zh.namesZh : d.names);
+  const mot = en
+    ? d.motivation
+    : (zh && zh.motivationZh ? zh.motivationZh : d.motivation);
+
+  let html = `<div class="honor-panel__year">${d.year}</div>`;
   if (!d.names || d.names.length === 0) {
-    el.innerHTML =
-      `<div class="honor-tt__year">${d.year}</div>` +
-      `<div class="honor-tt__none">本年未颁奖</div>`;
+    const none = en
+      ? 'No prize awarded this year'
+      : (zh && zh.motivationZh ? zh.motivationZh : '本年未颁奖');
+    html += `<div class="honor-panel__none">${none}</div>`;
   } else {
-    el.innerHTML =
-      `<div class="honor-tt__year">${d.year}</div>` +
-      d.names.map(nm => `<div class="honor-tt__name">${nm}</div>`).join('') +
-      `<div class="honor-tt__mot">${d.motivation}</div>`;
+    html += names.map(nm => `<div class="honor-panel__name">${nm}</div>`).join('');
+    html += `<div class="honor-panel__mot">${mot}</div>`;
+    // 中文模式下附英文官方原文（文献资料保留英文）
+    if (!en && d.motivation) {
+      html += `<div class="honor-panel__orig"><span class="honor-panel__orig-label">英文原文</span>${d.motivation}</div>`;
+    }
   }
+  return html;
+}
+
+function showPanel(d) {
+  const el = ensurePanel();
+  panelCur = d;
+  panelBody.innerHTML = panelContent(d);
   el.hidden = false;
-  positionTooltip(nodeEl);
+  requestAnimationFrame(() => el.classList.add('is-open'));
 }
 
-function hideTooltip() {
-  if (tooltipEl) tooltipEl.hidden = true;
+function hidePanel() {
+  if (!panelEl) return;
+  panelEl.classList.remove('is-open');
+  panelCur = null;
+  setTimeout(() => {
+    if (!panelEl.classList.contains('is-open')) panelEl.hidden = true;
+  }, 200);
 }
 
-function positionTooltip(nodeEl) {
-  if (!tooltipEl || !nodeEl) return;
-  const rect = nodeEl.getBoundingClientRect();
-  // tooltip 放在节点右上方，不超出视口
-  let left = rect.right + 10;
-  let top = rect.top - 10;
-  // 右边界检测
-  const ttW = 280; // 预估最大宽度
-  if (left + ttW > window.innerWidth - 12) {
-    left = rect.left - ttW - 10;
+// 切换语言时刷新当前面板内容（applyLang 调用）
+export function refreshHonorLang() {
+  if (panelEl && panelCur && !panelEl.hidden) {
+    panelBody.innerHTML = panelContent(panelCur);
   }
-  // 上边界检测
-  if (top < 8) {
-    top = rect.bottom + 8;
-  }
-  tooltipEl.style.left = left + 'px';
-  tooltipEl.style.top = top + 'px';
 }
 
 export function renderHonor() {
@@ -131,7 +155,8 @@ export function renderHonor() {
     g.setAttribute('transform', `translate(${p.x},${p.y})`);
     g.setAttribute('tabindex', '0');
     g.setAttribute('role', 'button');
-    g.setAttribute('aria-label', `${d.year} ${d.names && d.names.length ? d.names.join('、') : '未颁奖'}`);
+    const zhName = (NOBEL_PHYSICS_ZH[d.year] && NOBEL_PHYSICS_ZH[d.year].namesZh) || d.names;
+    g.setAttribute('aria-label', `${d.year} ${(zhName && zhName.length) ? zhName.join('、') : '未颁奖'}`);
 
     const circle = document.createElementNS(NS, 'circle');
     circle.setAttribute('r', nodeR);
@@ -145,26 +170,28 @@ export function renderHonor() {
     t.textContent = d.year;
     g.appendChild(t);
 
-    const onShow = () => showTooltip(d, g);
-    const onHide = () => hideTooltip();
-    // 桌面：悬停显示；移动端：点击 toggle
-    g.addEventListener('mouseenter', onShow);
-    g.addEventListener('mouseleave', onHide);
+    // 桌面：悬停（轻微延迟防抖）显示；点击切换；移动端点击亦可
+    g.addEventListener('mouseenter', () => {
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => showPanel(d), 120);
+    });
+    g.addEventListener('mouseleave', () => {
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => { if (panelCur === d) hidePanel(); }, 220);
+    });
     g.addEventListener('click', e => {
       e.stopPropagation();
-      if (tooltipEl && !tooltipEl.hidden) {
-        hideTooltip();
-      } else {
-        showTooltip(d, g);
-      }
+      clearTimeout(hoverTimer);
+      if (panelCur === d && panelEl && !panelEl.hidden) hidePanel();
+      else showPanel(d);
     });
-    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showTooltip(d, g); } });
+    g.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPanel(d); }
+    });
     svg.appendChild(g);
   });
 
   host.appendChild(svg);
-
-  // tooltip 按需显示，不再默认展开
 
   const meta = document.getElementById('honorMeta');
   if (meta) {

@@ -25,11 +25,13 @@
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #e9e3d6;
+  color: var(--ink);            /* #2A2620 深褐，浅背景上清晰可见 */
 }
 .honor-meta {
   font-size: 12.5px;
-  color: #9a948a;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gold-dark);      /* #8B6914 深金，比原 #9a948a 灰更醒目 */
 }
 
 .honor-timeline {
@@ -104,51 +106,98 @@
   display: none !important;
 }
 
-/* ── tooltip 浮层 ─────────────────────────────────────── */
-.honor-tooltip {
+/* ── 独立介绍面板层（右侧滑出 / 移动端底部抽屉）────────────── */
+.honor-panel {
   position: fixed;
+  top: 0;
+  right: 0;
+  width: 340px;
+  max-width: 86vw;
+  height: 100%;
+  padding: 22px 24px;
+  box-sizing: border-box;
+  background: rgba(255, 252, 245, 0.98);
+  border-left: 1px solid rgba(201, 162, 78, 0.3);
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.12);
+  overflow-y: auto;
   z-index: 1000;
-  width: max(220px, min(300px, calc(100vw - 24px)));
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: rgba(255, 252, 245, 0.96);
-  border: 1px solid rgba(201, 162, 78, 0.35);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  font-size: 13px;
-  line-height: 1.5;
-  color: #3d3830;
-  pointer-events: auto;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
 }
-.honor-tooltip:not([hidden]) {
-  opacity: 1;
-  transform: translateY(0);
+.honor-panel[hidden] { display: none; }
+.honor-panel.is-open { transform: translateX(0); }
+.honor-panel__close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  color: #b8b2a6;
+  cursor: pointer;
+  border-radius: 6px;
 }
-.honor-tt__year {
+.honor-panel__close:hover { color: #6b6560; background: rgba(0, 0, 0, 0.04); }
+.honor-panel__year {
+  font-size: 24px;
+  font-weight: 800;
+  color: #b8860b;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+.honor-panel__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d2820;
+  line-height: 1.6;
+}
+.honor-panel__mot {
+  margin-top: 12px;
   font-size: 14px;
-  font-weight: 700;
+  line-height: 1.75;
+  color: #4a443c;
+}
+.honor-panel__orig {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(201, 162, 78, 0.3);
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8a8478;
+  font-style: italic;
+}
+.honor-panel__orig-label {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.08em;
   color: #b8860b;
   margin-bottom: 4px;
 }
-.honor-tt__name {
-  color: #2d2820;
-}
-.honor-tt__mot {
-  margin-top: 6px;
-  font-size: 12.5px;
-  color: #6b6560;
-  border-top: 1px solid rgba(201, 162, 78, 0.18);
-  padding-top: 6px;
-}
-.honor-tt__none {
+.honor-panel__none {
+  font-size: 14px;
   font-style: italic;
   color: #9a948a;
 }
 
-/* 移动端：节点间距略缩 */
+/* 移动端：面板改为底部抽屉 */
 @media (max-width: 768px) {
   .honor-caption { font-size: 15px; }
-  .honor-tooltip { max-width: calc(100vw - 24px); }
+  .honor-panel {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 52vh;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    border-left: none;
+    border-top: 1px solid rgba(201, 162, 78, 0.3);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(100%);
+  }
+  .honor-panel.is-open { transform: translateY(0); }
 }
