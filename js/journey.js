@@ -98,7 +98,7 @@ export function createJourney(opts){
   }
   function apply(){ vp.setAttribute('transform', `translate(${tx} ${ty}) scale(${k})`); updateReadout(); }
   function updateReadout(){ const wy = (H()/2 - ty)/k; const L = logOfY(wy); readout.textContent = '当前视角尺度 · ' + fmtScale(Math.round(L)); }
-  function computeFit(){ worldH = Math.max(H()*0.9, Math.abs(axis.maxLog-axis.minLog)*118 + 220); worldHalfH = worldH/2; fitK = clamp(H()/worldH, 0.04, 4); }
+  function computeFit(){ worldH = Math.max(H()*0.9, Math.abs(axis.maxLog-axis.minLog)*160 + 260); worldHalfH = worldH/2; fitK = clamp(H()/worldH, 0.3, 4); }
   function reset(){ computeFit(); k = fitK; tx = W()/2; ty = H()/2; apply(); }
   function initView(){ computeFit(); k = 1; tx = W()/2; ty = H()/2 - yOf(axis.minLog); apply(); } // 从最小尺度端（底部）起步
   function zoomAt(sx, sy, factor){ const wx=(sx-tx)/k, wy=(sy-ty)/k; k = clamp(k*factor, fitK, 9); tx = sx - wx*k; ty = sy - wy*k; apply(); }
