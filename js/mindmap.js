@@ -27,7 +27,7 @@ const X_DIM  = 1210;
 const ROOT_W = 196, ROOT_H = 58;
 const ERA_W  = 176, ERA_H = 50;
 const NODE_W = 236, NODE_H = 44;
-const DIM_W  = 244, DIM_H = 27;
+const DIM_W  = 244, DIM_H = 27, DIM_H_DESC = 48;  // DIM_H_DESC：带内容摘要的维度节点高度
 const GAP_Y = 16;       // 同纪元内节点纵向间隔
 const BLOCK_GAP = 64;   // 纪元块之间间隔
 
@@ -121,7 +121,7 @@ function computeLayout() {
     if (!list.length) { eraCenters.push({ era: blk.era, y: yCursor }); continue; }
     const occ = list.map(n => {
       const dimCount = (expandAll || expanded.has(n.id)) ? nodeDims(n).length : 0;
-      return Math.max(NODE_H, dimCount * DIM_H + 16);
+      return Math.max(NODE_H, dimCount * DIM_H_DESC + 16);
     });
     const blockH = occ.reduce((s, h) => s + h, 0) + GAP_Y * (list.length - 1);
     const eraY = yCursor + blockH / 2;
@@ -136,9 +136,9 @@ function computeLayout() {
       if (expandAll || expanded.has(n.id)) {
         const dims = nodeDims(n);
         dims.forEach((d, di) => {
-          const dy = ny + (di - (dims.length - 1) / 2) * DIM_H;
+          const dy = ny + (di - (dims.length - 1) / 2) * DIM_H_DESC;
           posMap.set(n.id + ':dim:' + d.key, {
-            x: X_DIM, y: dy, w: DIM_W, h: DIM_H,
+            x: X_DIM, y: dy, w: DIM_W, h: DIM_H_DESC,
             kind: 'dim', dimKey: d.key, dimLabel: d.label, nodeId: n.id, nodeName: n.name,
           });
         });
@@ -313,15 +313,38 @@ function drawNode(p, parent) {
     mk('text', { x: p.x + p.w / 2 - 13, y: p.y + 6, 'text-anchor': 'middle', class: 'mm-text mm-text--toggle' }, g).textContent = open ? '−' : '+';
   }
 }
+// 取维度具体内容摘要（去 markdown 标记后截断），用于在维度条内显示「第五级内容」
+function dimSummaryText(node, key) {
+  let raw = '';
+  if (node.deepContent && typeof node.deepContent[key] === 'string') {
+    raw = node.deepContent[key];
+  } else if (key === 'terms') {
+    raw = (node.terms || []).slice(0, 6).join('、');
+  } else if (key === 'formula') {
+    raw = (node.formula || []).slice(0, 4).join('，');
+  } else if (key === 'particles') {
+    const gs = (node.particles && node.particles.groups) || [];
+    raw = gs.slice(0, 4).map(x => (x && (x.name || x)) || '').filter(Boolean).join('、');
+  }
+  if (!raw) return '';
+  raw = raw.replace(/\*\*/g, '').replace(/[*_`>#]/g, '').replace(/\s+/g, ' ').trim();
+  const MAX = 24;
+  return raw.length > MAX ? raw.slice(0, MAX) + '…' : raw;
+}
 function drawDim(p, parent) {
   const dimDef = DIMENSIONS.find(d => d.key === p.dimKey);
   const dimLabel = dimDef ? (state.lang === 'en' ? (dimDef.labelEn || dimDef.label) : dimDef.label) : (p.dimLabel || '');
-  const nodeName = p.nodeName ? (state.lang === 'en' ? ((byIdMM?.get(p.nodeName)?.nameEn) || p.nodeName) : p.nodeName) : (state.lang === 'en' ? 'Node' : '该节点');
-  const label = nodeName + (state.lang === 'en' ? ' · ' : ' 的 ') + dimLabel;
-  const ariaOpen = state.lang === 'en' ? 'Open ' : '打开 ';
-  const g = mk('g', { class: 'mm-node mm-dim', 'data-kind': 'dim', 'data-id': p.nodeId, 'data-dim': p.dimKey, tabindex: '0', role: 'button', 'aria-label': ariaOpen + label }, parent);
+  const node = MM_BY_ID.get(p.nodeId);
+  const ariaLabel = (state.lang === 'en' ? 'Open ' : '打开 ') + dimLabel;
+  const g = mk('g', { class: 'mm-node mm-dim', 'data-kind': 'dim', 'data-id': p.nodeId, 'data-dim': p.dimKey, tabindex: '0', role: 'button', 'aria-label': ariaLabel }, parent);
   mk('rect', { x: p.x - p.w / 2, y: p.y - p.h / 2, width: p.w, height: p.h, rx: 7, class: 'mm-rect mm-rect--dim' }, g);
-  mk('text', { x: p.x - p.w / 2 + 12, y: p.y + 4, class: 'mm-text mm-text--dim' }, g).textContent = dimLabel;
+  // 第一行：维度名
+  mk('text', { x: p.x - p.w / 2 + 12, y: p.y - p.h / 2 + 17, class: 'mm-text mm-text--dim' }, g).textContent = dimLabel;
+  // 第二行：内容摘要（第五级内容的精简呈现）
+  const summary = node ? dimSummaryText(node, p.dimKey) : '';
+  if (summary) {
+    mk('text', { x: p.x - p.w / 2 + 12, y: p.y - p.h / 2 + 34, class: 'mm-text mm-text--dim-desc' }, g).textContent = summary;
+  }
 }
 
 // ── 交互：缩放 / 拖拽 / 点击（Pointer Events，兼容鼠标 + 触屏 + 双指缩放） ──

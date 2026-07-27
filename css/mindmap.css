@@ -194,7 +194,8 @@ body.mm-fs .mindmap-toolbar {
 .mm-text--era  { font-family: var(--font-serif, serif); font-size: 16px; font-weight: 700; fill: #fff; letter-spacing: .04em; }
 .mm-text--node { font-size: 13px; fill: var(--ink, #2A2620); }
 .mm-text--toggle { font-size: 15px; font-weight: 700; fill: var(--gold, #B8893B); }
-.mm-text--dim  { font-size: 12px; fill: var(--ink-2, #6B6253); }
+.mm-text--dim  { font-size: 12px; fill: var(--ink-2, #6B6253); font-weight: 600; }
+.mm-text--dim-desc { font-size: 10px; fill: var(--ink-3, #9A8F7E); }
 
 .mm-rect--root { fill: var(--gold, #B8893B); stroke: #8B6914; stroke-width: 1.5; }
 .mm-rect--era  { stroke: rgba(255, 255, 255, .6); stroke-width: 1; }
