@@ -3,30 +3,65 @@
 import { NOBEL_PHYSICS } from './data/nobel-physics.js';
 
 const NS = 'http://www.w3.org/2000/svg';
-let selectedIdx = -1;
 
-function showDetail(d, idx) {
-  const el = document.getElementById('honorDetail');
-  if (!el) return;
-  el.hidden = false;
-  if (selectedIdx >= 0) {
-    const prev = document.querySelector('.honor-node.is-selected');
-    if (prev) prev.classList.remove('is-selected');
-  }
-  selectedIdx = idx;
-  const cur = document.querySelector(`.honor-node[data-idx="${idx}"]`);
-  if (cur) cur.classList.add('is-selected');
+/* ── tooltip 浮层 ─────────────────────────────────────── */
+let tooltipEl = null;
 
+function ensureTooltip() {
+  if (tooltipEl) return tooltipEl;
+  tooltipEl = document.createElement('div');
+  tooltipEl.className = 'honor-tooltip';
+  tooltipEl.setAttribute('role', 'tooltip');
+  document.body.appendChild(tooltipEl);
+  // 点击页面其他区域关闭（移动端友好）
+  const dismiss = (e) => {
+    if (!tooltipEl.contains(e.target) && !e.target.closest('.honor-node')) {
+      hideTooltip();
+      document.removeEventListener('pointerdown', dismiss);
+    }
+  };
+  // 延迟绑定，避免打开瞬间立刻触发关闭
+  setTimeout(() => document.addEventListener('pointerdown', dismiss), 10);
+  return tooltipEl;
+}
+
+function showTooltip(d, nodeEl) {
+  const el = ensureTooltip();
   if (!d.names || d.names.length === 0) {
     el.innerHTML =
-      `<div class="honor-detail__year">${d.year}</div>` +
-      `<div class="honor-detail__none">本年未颁奖</div>`;
-    return;
+      `<div class="honor-tt__year">${d.year}</div>` +
+      `<div class="honor-tt__none">本年未颁奖</div>`;
+  } else {
+    el.innerHTML =
+      `<div class="honor-tt__year">${d.year}</div>` +
+      d.names.map(nm => `<div class="honor-tt__name">${nm}</div>`).join('') +
+      `<div class="honor-tt__mot">${d.motivation}</div>`;
   }
-  el.innerHTML =
-    `<div class="honor-detail__year">${d.year}</div>` +
-    d.names.map(nm => `<div class="honor-detail__name">${nm}</div>`).join('') +
-    `<div class="honor-detail__mot">${d.motivation}</div>`;
+  el.hidden = false;
+  positionTooltip(nodeEl);
+}
+
+function hideTooltip() {
+  if (tooltipEl) tooltipEl.hidden = true;
+}
+
+function positionTooltip(nodeEl) {
+  if (!tooltipEl || !nodeEl) return;
+  const rect = nodeEl.getBoundingClientRect();
+  // tooltip 放在节点右上方，不超出视口
+  let left = rect.right + 10;
+  let top = rect.top - 10;
+  // 右边界检测
+  const ttW = 280; // 预估最大宽度
+  if (left + ttW > window.innerWidth - 12) {
+    left = rect.left - ttW - 10;
+  }
+  // 上边界检测
+  if (top < 8) {
+    top = rect.bottom + 8;
+  }
+  tooltipEl.style.left = left + 'px';
+  tooltipEl.style.top = top + 'px';
 }
 
 export function renderHonor() {
@@ -110,16 +145,26 @@ export function renderHonor() {
     t.textContent = d.year;
     g.appendChild(t);
 
-    const onShow = () => showDetail(d, i);
-    g.addEventListener('click', onShow);
-    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onShow(); } });
+    const onShow = () => showTooltip(d, g);
+    const onHide = () => hideTooltip();
+    // 桌面：悬停显示；移动端：点击 toggle
+    g.addEventListener('mouseenter', onShow);
+    g.addEventListener('mouseleave', onHide);
+    g.addEventListener('click', e => {
+      e.stopPropagation();
+      if (tooltipEl && !tooltipEl.hidden) {
+        hideTooltip();
+      } else {
+        showTooltip(d, g);
+      }
+    });
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showTooltip(d, g); } });
     svg.appendChild(g);
   });
 
   host.appendChild(svg);
 
-  // 默认展示最新一届
-  showDetail(data[n - 1], n - 1);
+  // tooltip 按需显示，不再默认展开
 
   const meta = document.getElementById('honorMeta');
   if (meta) {

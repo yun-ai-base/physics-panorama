@@ -99,43 +99,56 @@
   stroke: #aaa;
 }
 
+/* ── 旧详情面板已废弃，改用 tooltip ── */
 .honor-detail {
-  flex: 0 0 auto;
-  margin-top: 12px;
-  padding: 14px 18px;
-  border-radius: 10px;
-  background: rgba(28, 26, 22, 0.82);
-  border: 1px solid rgba(201, 162, 78, 0.28);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
-  max-height: 30vh;
-  overflow: auto;
+  display: none !important;
 }
-.honor-detail__year {
-  font-size: 15px;
-  font-weight: 700;
-  color: #f0c969;
-  margin-bottom: 6px;
-  letter-spacing: 0.04em;
+
+/* ── tooltip 浮层 ─────────────────────────────────────── */
+.honor-tooltip {
+  position: fixed;
+  z-index: 1000;
+  width: max(220px, min(300px, calc(100vw - 24px)));
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 252, 245, 0.96);
+  border: 1px solid rgba(201, 162, 78, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3d3830;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
-.honor-detail__name {
-  font-size: 15px;
-  color: #ece6d9;
-  line-height: 1.55;
+.honor-tooltip:not([hidden]) {
+  opacity: 1;
+  transform: translateY(0);
 }
-.honor-detail__mot {
-  margin-top: 8px;
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: #b8b2a6;
-}
-.honor-detail__none {
+.honor-tt__year {
   font-size: 14px;
-  color: #9a948a;
+  font-weight: 700;
+  color: #b8860b;
+  margin-bottom: 4px;
+}
+.honor-tt__name {
+  color: #2d2820;
+}
+.honor-tt__mot {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: #6b6560;
+  border-top: 1px solid rgba(201, 162, 78, 0.18);
+  padding-top: 6px;
+}
+.honor-tt__none {
   font-style: italic;
+  color: #9a948a;
 }
 
 /* 移动端：节点间距略缩 */
 @media (max-width: 768px) {
   .honor-caption { font-size: 15px; }
-  .honor-detail { max-height: 36vh; }
+  .honor-tooltip { max-width: calc(100vw - 24px); }
 }
