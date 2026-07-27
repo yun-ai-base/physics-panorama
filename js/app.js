@@ -7,7 +7,7 @@ import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, op
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
-import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode } from './mindmap.js';
+import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js';
 import { renderHonor, refreshHonorLang } from './honor.js';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
@@ -333,6 +333,23 @@ function wireUI() {
   // 全屏浮动退出按钮（右上角固定）
   const mmExitFsBtn = document.getElementById('mmExitFs');
   if (mmExitFsBtn) mmExitFsBtn.addEventListener('click', () => toggleMindmapFullscreen());
+  // 思维导图导出（PNG / SVG 下拉菜单）
+  const mmExportBtn = document.getElementById('mmExport');
+  const mmExportMenu = document.getElementById('mmExportMenu');
+  if (mmExportBtn && mmExportMenu) {
+    mmExportBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      mmExportMenu.hidden = !mmExportMenu.hidden;
+    });
+    mmExportMenu.querySelectorAll('button[data-fmt]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        mmExportMenu.hidden = true;
+        const fmt = btn.getAttribute('data-fmt');
+        if (fmt === 'png' || fmt === 'svg') exportMindmap(fmt);
+      });
+    });
+    document.addEventListener('click', () => { if (mmExportMenu) mmExportMenu.hidden = true; });
+  }
 
   const eraTabs = document.getElementById('eraTabs');
   buildEraTabs();

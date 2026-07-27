@@ -563,3 +563,98 @@ function bind() {
   SVG.addEventListener('click', onClick);   // 监听器必须绑在 SVG（节点的祖先）：setPointerCapture 会把 click.target 重定向到 SVG，且不经过 #mmViewport
   SVG.addEventListener('keydown', onKeyDown);
 }
+
+// ── 导出：整张思维导图存为 PNG 位图 / SVG 矢量 ──
+// 导出的是「完整全景」——以画布坐标直接包裹全树，不受当前缩放/平移影响。
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+const FALLBACK_VARS = {
+  '--gold': '#B8893B', '--gold-dark': '#8B6914', '--gold-tint': 'rgba(184,137,59,.12)',
+  '--ink': '#2A2620', '--ink-2': '#6B6253', '--ink-3': '#9A8F7E',
+  '--bg': '#FBF9F4', '--bg-2': '#F6F2EA',
+  '--font-serif': 'serif', '--font-sans': 'system-ui, sans-serif',
+};
+function rootVarStyle() {
+  const decl = Object.keys(FALLBACK_VARS)
+    .map(n => `${n}:${cssVar(n) || FALLBACK_VARS[n]};`).join('');
+  return `:root{${decl}}`;
+}
+function triggerDownload(href, filename) {
+  const a = document.createElement('a');
+  a.href = href;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+// 构建内联样式的完整 SVG 字符串（导出两种格式共用）
+async function buildExportSVG() {
+  const b = bounds();
+  if (!isFinite(b.minX)) return null;
+  const pad = 40;
+  const vbX = b.minX - pad, vbY = b.minY - pad;
+  const vbW = (b.maxX - b.minX) + pad * 2;
+  const vbH = (b.maxY - b.minY) + pad * 2;
+  const clone = SVG.cloneNode(true);
+  clone.setAttribute('xmlns', SVGNS);
+  clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+  clone.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+  clone.setAttribute('width', String(vbW));
+  clone.setAttribute('height', String(vbH));
+  const vp = clone.querySelector('#mmViewport');
+  if (vp) vp.removeAttribute('transform');           // 内容已是画布坐标，去掉屏幕缩放/平移
+  const branches = clone.querySelector('.mm-branches');
+  if (branches) branches.classList.remove('is-focusing');  // 去掉悬浮聚焦淡出态
+  clone.querySelectorAll('.is-focus').forEach(e => e.classList.remove('is-focus'));
+  // 背景矩形（SVG 自身无 .mindmap-svg 的背景）
+  const bgRect = document.createElementNS(SVGNS, 'rect');
+  bgRect.setAttribute('x', String(vbX)); bgRect.setAttribute('y', String(vbY));
+  bgRect.setAttribute('width', String(vbW)); bgRect.setAttribute('height', String(vbH));
+  bgRect.setAttribute('fill', cssVar('--bg') || FALLBACK_VARS['--bg']);
+  clone.insertBefore(bgRect, clone.firstChild);
+  // 把 :root 变量 + 思维导图样式内联进 SVG（否则导出图无颜色/字体）
+  let cssText = '';
+  try { cssText = await (await fetch('css/mindmap.css')).text(); } catch (e) { /* 离线时不致命 */ }
+  const styleEl = document.createElementNS(SVGNS, 'style');
+  styleEl.textContent = rootVarStyle() + '\n' + cssText;
+  clone.insertBefore(styleEl, clone.firstChild);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
+}
+export async function exportMindmap(format) {
+  const svgStr = await buildExportSVG();
+  if (!svgStr) { console.warn('[mindmap] 导出失败：导图尚未渲染'); return; }
+  const lang = state.lang || 'zh';
+  const base = `physics-mindmap-${lang}`;
+  const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+  if (format === 'svg') {
+    triggerDownload(dataUrl, `${base}.svg`);
+    return;
+  }
+  // PNG：把 SVG 画到高分辨率 canvas 再导出
+  const b = bounds();
+  const pad = 40;
+  const vbW = (b.maxX - b.minX) + pad * 2;
+  const vbH = (b.maxY - b.minY) + pad * 2;
+  const scale = 2;
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(vbW * scale));
+    canvas.height = Math.max(1, Math.round(vbH * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0, vbW, vbH);
+    try {
+      triggerDownload(canvas.toDataURL('image/png'), `${base}.png`);
+    } catch (e) {
+      console.error('[mindmap] PNG 导出失败', e);
+      window.alert('PNG 导出失败（可能因浏览器安全限制），请改用 SVG 格式。');
+    }
+  };
+  img.onerror = () => {
+    console.error('[mindmap] SVG 转图片失败');
+    window.alert('PNG 导出失败，请改用 SVG 格式。');
+  };
+  img.src = dataUrl;
+}
