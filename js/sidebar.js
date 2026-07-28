@@ -565,13 +565,13 @@ function particlesHTML(data) {
 /* ── 术语卡片 ─────────────────────────────────────────── */
 function termsHTML(terms) {
   if (!terms || !terms.length) return `<p class="sb-empty">${t('termsEmpty')}</p>`;
-  return terms.map((t, idx) => {
-    const icon = esc(t.icon || '🧩');
-    const name = esc(t.name || t(`termFallback`, idx + 1));
-    const def = esc(t.definition || '');
-    const details = parseContent(t.details || '');
-    const img = t.image ? `<img class="sb-term__img" src="${esc(t.image)}" alt="${name}" loading="lazy">` : '';
-    const targetId = t.target || '';
+  return terms.map((term, idx) => {
+    const icon = esc(term.icon || '🧩');
+    const name = esc(term.name || t(`termFallback`, idx + 1));
+    const def = esc(term.definition || '');
+    const details = parseContent(term.details || '');
+    const img = term.image ? `<img class="sb-term__img" src="${esc(term.image)}" alt="${name}" loading="lazy">` : '';
+    const targetId = term.target || '';
     let linkCls = '', jump = '';
     if (targetId) {
       const tName = byId.get(targetId)?.name || targetId;
