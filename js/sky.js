@@ -195,7 +195,7 @@ const SKY_BG = [
   { id:'earth',     log:6.8,  img:'assets/sky/sky_earth.jpg' },         // 蓝色弹珠（NASA Blue Marble）
   { id:'solar',     log:16,   img:'assets/sky/sky_solarsystem.jpg' },   // 太阳系（NASA）
   { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.png' },        // 银河系·棒旋星系（NASA-JPL / Caltech / ESO / R.Hurt 结构图，真实科学可视化）
-  { id:'group',     log:23,   img:'assets/sky/sky_group.svg' },         // 本星系群（程序化 SVG）
+  { id:'group',     log:23,   img:'assets/sky/sky_group.jpg' },         // 本星系群（ESA/Hubble M81/M82 星系群真实照）
   { id:'virgo',     log:24,   img:'assets/sky/sky_virgo.svg' },         // 室女座超星系团·扁平薄饼（程序化 SVG）
   { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.svg' },      // 拉尼亚凯亚超星系团·宇宙纤维网（程序化 SVG）
   { id:'cmb',       log:26.9, img:'assets/sky/sky_cmb.jpg' },           // 普朗克 CMB 全天图（ESA）
