@@ -204,8 +204,12 @@
   background-size: cover; background-position: center; background-repeat: no-repeat;
   opacity: 0;
   filter: brightness(0.62) saturate(1.08);
-  transition: opacity .35s ease;
+  transition: opacity .35s ease, filter .4s ease;
   will-change: opacity;
+}
+/* 类型筛选激活时：进一步压暗背景，突出高亮天体节点 */
+.sky-filtering .sky-bg__layer {
+  filter: brightness(0.28) saturate(0.6);
 }
 /* 暗角蒙版：压暗背景、保证天体节点与文字可读，并制造纵深 */
 .sky-bg__scrim {

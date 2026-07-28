@@ -110,6 +110,24 @@ const SKY_NODES = [
     paramZh:'质量 5–100 M☉；事件视界半径（史瓦西半径）≈3 km×(M/M☉)；可带自旋。',
     obsZh:'恒星级黑洞与伴星组成 X 射线双星（如 Cygnus X-1）；LIGO 探测到双黑洞并合引力波。',
     theories:['广义相对论','黑洞物理','引力波'], phenomena:['X 射线双星','事件视界'] },
+  { id:'pulsar', logSize:4.3, zh:'脉冲星', en:'Pulsar', subZh:'~10 km · 快速自转', subEn:'~10 km, spinning',
+    category:'compact', color:'#B8F0FF', r:10, image:'assets/sky/obj_pulsar.jpg',
+    imgCredit:'NASA/CXC/ASU/J. Hester et al.（钱德拉 X 射线 + 哈勃光学 · 蟹状脉冲星）',
+    descZh:'快速自转、磁场极强的中子星，两极射出的辐射束像宇宙灯塔一样周期性扫过地球，形成精准的脉冲信号。',
+    descEn:'A rapidly rotating, highly magnetized neutron star whose radiation beams sweep past Earth like a cosmic lighthouse.',
+    formZh:'超新星核心坍缩形成中子星时角动量守恒使其自转急剧加快（周期毫秒–秒级），磁轴与自转轴不重合即产生灯塔效应。',
+    paramZh:'自转周期 1.4 ms–数秒；磁场 10⁸–10¹³ G；蟹状脉冲星每秒自转约 30 次，周期稳定度堪比原子钟。',
+    obsZh:'1967 年贝尔与休伊什用射电望远镜首次发现（PSR B1919+21）；毫秒脉冲星被用作引力波探测的"脉冲星计时阵列"。',
+    theories:['中子星物理','电动力学','引力波'], phenomena:['灯塔效应','脉冲星风云'] },
+  { id:'magnetar', logSize:3.7, zh:'磁星', en:'Magnetar', subZh:'~10 km · 极端磁场', subEn:'~10 km, extreme B-field',
+    category:'compact', color:'#8FD8E8', r:10, image:'assets/sky/obj_magnetar.jpg',
+    imgCredit:'ESO/L. Calçada（Westerlund 1 磁星艺术印象）',
+    descZh:'磁场强度冠绝宇宙的中子星——比普通中子星强千倍，磁场衰减驱动的星震可释放出银河系可见的伽马射线巨耀发。',
+    descEn:'A neutron star with the strongest magnetic fields in the universe, powering giant gamma-ray flares.',
+    formZh:'可能源于快速自转+强对流的原中子星发电机机制放大磁场；仅约 10% 的中子星诞生为磁星。',
+    paramZh:'磁场 10¹⁴–10¹⁵ G（地球磁场的万亿倍）；自转周期 2–12 s；活动期数千年后磁能耗尽。',
+    obsZh:'1979 年 SGR 0526-66 巨耀发首次记录；2004 年 SGR 1806-20 耀发亮度超满月（距 5 万光年）；部分快速射电暴（FRB）已被证认源自磁星。',
+    theories:['中子星物理','磁流体力学'], phenomena:['软伽马重复暴','快速射电暴'] },
   { id:'smbh', logSize:13.0, zh:'超大质量黑洞', en:'Supermassive Black Hole', subZh:'10⁶–10¹⁰ M☉', subEn:'10⁶–10¹⁰ M☉',
     category:'compact', color:'#5FB8FF', r:14, image:'assets/sky/obj_smbh.jpg',
     imgCredit:'Event Horizon Telescope Collaboration（M87* 首张黑洞照片）',
@@ -119,6 +137,15 @@ const SKY_NODES = [
     paramZh:'质量 10⁶–10¹⁰ M☉；M87* 约 6.5×10⁹ M☉，事件视界阴影直径约 40 微角秒。',
     obsZh:'2019 年事件视界望远镜（EHT）发布 M87* 首张黑洞阴影照片；银心人马座 A* 亦被成像。',
     theories:['广义相对论','黑洞物理','星系演化'], phenomena:['吸积盘','相对论喷流'] },
+  { id:'quasar', logSize:15.0, zh:'类星体', en:'Quasar', subZh:'中央引擎 ~0.1 ly', subEn:'central engine ~0.1 ly',
+    category:'compact', color:'#7FC8FF', r:13, image:'assets/sky/obj_quasar.jpg',
+    imgCredit:'ESA/Hubble & NASA（3C 273——首个被证认的类星体，右下可见喷流）',
+    descZh:'宇宙中最明亮的持续光源——超大质量黑洞疯狂吸积气体，中央引擎不足一光年却能亮过整个千亿恒星的星系。',
+    descEn:'The most luminous persistent objects in the universe—supermassive black holes devouring gas at galactic centers.',
+    formZh:'星系中心超大质量黑洞高速吸积，吸积盘摩擦加热至数十万度并发出强辐射，常伴随近光速相对论喷流。',
+    paramZh:'光度可达 10¹³–10¹⁴ L☉（银河系的数百倍）；中央引擎 <1 光年；3C 273 红移 z=0.158，喷流长约 20 万光年。',
+    obsZh:'1963 年施密特证认 3C 273 的"奇异发射线"为高红移氢线——首个类星体；如今已发现百万计，最远红移 z>7.6。',
+    theories:['黑洞物理','活动星系核','宇宙学'], phenomena:['吸积盘','相对论喷流','宽发射线区'] },
 
   // ===== 爆发与高能 =====
   { id:'supernova', logSize:11.6, zh:'超新星遗迹', en:'Supernova Remnant', subZh:'~数–数十 ly', subEn:'~few–tens ly',
@@ -355,6 +382,7 @@ function updateTabActive(){
 function setCategoryFilter(cat){
   if (activeCat === cat){ clearCategoryFilter(); return; }
   activeCat = cat;
+  if (skyMount) skyMount.classList.toggle('sky-filtering', !!cat);  // 筛选时压暗背景突出节点
   updateTabActive();
   applyCategoryFilter();
   buildCatList(cat);
@@ -362,6 +390,7 @@ function setCategoryFilter(cat){
 
 function clearCategoryFilter(){
   activeCat = null;
+  if (skyMount) skyMount.classList.remove('sky-filtering');
   updateTabActive();
   applyCategoryFilter();
   closeCatList();
