@@ -13,6 +13,7 @@ export const state = {
   onlyCore: true,          // 仅显示主干
   pathIds: null,           // 阅读路径（READER_PATHS id）筛选集合；非 null 时仅显示该集合节点并高亮
   view: 'timeline',        // 当前视图
+  glossaryEra: 'classical', // 术语表当前选中的纪元（classical/relativity/quantum/standard-model/frontier）
   tour: null,              // 漫游模式
   sidebarOpen: false,
   sidebarTab: null,        // 当前打开的侧边栏标签

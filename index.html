@@ -230,19 +230,10 @@
       <!-- 全局术语表视图（A.9） -->
       <div class="glossary-view" id="glossaryView" hidden>
         <div class="glossary-bar">
-          <input id="glossarySearch" class="glossary-search" type="search" placeholder="搜索术语或释义…" aria-label="搜索术语" />
-          <select id="glossarySort" class="glossary-sort" aria-label="排序">
-            <option value="name">按名称</option>
-            <option value="difficulty">按难度</option>
-          </select>
-          <select id="glossaryDiff" class="glossary-diff" aria-label="难度筛选">
-            <option value="all">全部难度</option>
-            <option value="basic">基础</option>
-            <option value="intermediate">进阶</option>
-            <option value="advanced">专业</option>
-          </select>
+          <div class="glossary-tabs" id="glossaryTabs" role="tablist" aria-label="按纪元浏览术语"></div>
+          <input id="glossarySearch" class="glossary-search" type="search" placeholder="搜索术语…" aria-label="搜索术语" />
         </div>
-        <div class="glossary-grid" id="glossaryGrid"></div>
+        <div class="glossary-rail" id="glossaryRail"></div>
       </div>
 
       <!-- 详情侧边栏 -->

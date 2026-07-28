@@ -1,4 +1,4 @@
-// A.9 全局术语表：聚合全站 nodes.json 的 terms，按纪元分组展示，支持搜索 / 排序 / 难度筛选
+// A.9 全局术语表：聚合全站 nodes.json 的 terms，按纪元分组（顶部五选项 + 横向图片式展示框），支持搜索
 import { state } from './state.js';
 import { esc } from './utils.js';
 
@@ -19,7 +19,7 @@ const DIFF_LABEL = {
 };
 const ERA_LABEL = {
   zh: { classical: '经典物理', relativity: '相对论', quantum: '量子论', 'standard-model': '标准模型', frontier: '前沿探索' },
-  en: { classical: 'Classical Physics', relativity: 'Relativity', quantum: 'Quantum Theory', 'standard-model': 'Standard Model', frontier: 'Frontier' },
+  en: { classical: 'Classical', relativity: 'Relativity', quantum: 'Quantum', 'standard-model': 'Standard Model', frontier: 'Frontier' },
 };
 // 纪元显示顺序
 const ERA_ORDER = ['classical', 'relativity', 'quantum', 'standard-model', 'frontier'];
@@ -28,30 +28,22 @@ const ERA_ORDER = ['classical', 'relativity', 'quantum', 'standard-model', 'fron
 function md(s) {
   if (!s) return '';
   const t = esc(s);
-  // 按 **xxx** 分割为 [前缀, 标题1, 内容1, 标题2, 内容2, ...]
   const parts = t.split(/(\*\*.+?\*\*)/);
   const out = [];
   let buf = '';
   for (let i = 0; i < parts.length; i++) {
     const p = parts[i];
     if (/\*\*.+?\*\*/.test(p)) {
-      // 遇到 **标题**：先 flush 缓冲区，再输出标题
       if (buf.trim()) out.push('<p>' + buf.trim() + '</p>');
       buf = '';
       out.push('<strong class="gterm__sub">' + p.replace(/\*\*/g, '') + '</strong>');
     } else {
-      // 普通文本：遇到双换行则分段
       const segs = p.split(/\n\s*\n/);
       for (let j = 0; j < segs.length; j++) {
         const trimmed = segs[j].trim();
         if (!trimmed) continue;
-        // 如果缓冲区非空且新段不以标点结尾（说明是连续文本），合并
-        if (buf && !/[。！？.]$/.test(buf.trim())) {
-          buf += trimmed;
-        } else {
-          if (buf.trim()) out.push('<p>' + buf.trim() + '</p>');
-          buf = trimmed;
-        }
+        if (buf && !/[。！？.!?]$/.test(buf.trim())) buf += trimmed;
+        else { if (buf.trim()) out.push('<p>' + buf.trim() + '</p>'); buf = trimmed; }
       }
     }
   }
@@ -84,19 +76,33 @@ function bindGlossaryUI() {
   const view = document.getElementById('glossaryView');
   if (!view) return;
   const search = view.querySelector('#glossarySearch');
-  const sort = view.querySelector('#glossarySort');
-  const diff = view.querySelector('#glossaryDiff');
   if (search) search.addEventListener('input', renderGlossary);
-  if (sort) sort.addEventListener('change', renderGlossary);
-  if (diff) diff.addEventListener('change', renderGlossary);
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('glossaryTabs');
+  if (!tabs) return;
+  const lang = state.lang === 'en' ? 'en' : 'zh';
+  tabs.innerHTML = ERA_ORDER.map(era =>
+    `<button type="button" class="glossary-tab${state.glossaryEra === era ? ' is-active' : ''}" data-era="${era}" role="tab">${esc(ERA_LABEL[lang][era] || era)}</button>`
+  ).join('');
+  tabs.querySelectorAll('.glossary-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.glossaryEra = btn.dataset.era;
+      renderTabs();
+      renderGlossary();
+    });
+  });
 }
 
 function termCard(t, lang) {
   const cls = t.diffKey === 'advanced' ? 'gterm--adv' : t.diffKey === 'intermediate' ? 'gterm--mid' : 'gterm--basic';
   return `<div class="gterm ${cls}">
     <div class="gterm__head"><span class="gterm__icon">${t.icon || ''}</span><span class="gterm__name">${esc(t.name)}</span><span class="gterm__diff">${esc(DIFF_LABEL[lang][t.diffKey])}</span></div>
-    <div class="gterm__def">${md(t.definition)}</div>
-    ${t.details ? `<div class="gterm__detail">${md(t.details)}</div>` : ''}
+    <div class="gterm__body">
+      <div class="gterm__def">${md(t.definition)}</div>
+      ${t.details ? `<div class="gterm__detail">${md(t.details)}</div>` : ''}
+    </div>
     <div class="gterm__src">来源：${esc(t.nodeName)}</div>
   </div>`;
 }
@@ -105,47 +111,22 @@ export function renderGlossary() {
   if (!glossaryReady) return;
   const view = document.getElementById('glossaryView');
   if (!view) return;
-  const grid = view.querySelector('#glossaryGrid');
-  if (!grid) return;
+  const rail = view.querySelector('#glossaryRail');
+  if (!rail) return;
   const lang = state.lang === 'en' ? 'en' : 'zh';
   const q = (view.querySelector('#glossarySearch')?.value || '').trim().toLowerCase();
-  const sortBy = view.querySelector('#glossarySort')?.value || 'name';
-  const diffF = view.querySelector('#glossaryDiff')?.value || 'all';
 
-  let list = ALL_TERMS.slice();
+  // 顶部五选项随语言刷新
+  renderTabs();
+
+  let list = ALL_TERMS.filter(t => t.era === state.glossaryEra);
   if (q) list = list.filter(t => t.name.toLowerCase().includes(q) || t.definition.toLowerCase().includes(q));
-  if (diffF !== 'all') list = list.filter(t => t.diffKey === diffF);
-  if (sortBy === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'zh'));
-  else list.sort((a, b) => diffRank(a.diffKey) - diffRank(b.diffKey));
 
   if (!list.length) {
-    grid.innerHTML = '<div class="glossary-empty">' + (lang === 'en' ? 'No matching terms' : '无匹配术语') + '</div>';
+    rail.innerHTML = '<div class="glossary-empty">' + (lang === 'en' ? 'No matching terms' : '无匹配术语') + '</div>';
     return;
   }
-
-  // 按纪元分组（保持 ERA_ORDER 顺序）
-  const groups = new Map();
-  for (const t of list) {
-    if (!groups.has(t.era)) groups.set(t.era, []);
-    groups.get(t.era).push(t);
-  }
-
-  let html = '';
-  for (const era of ERA_ORDER) {
-    const items = groups.get(era);
-    if (!items) continue;
-    html += '<div class="glossary-group"><h3 class="glossary-group__title">' + esc(ERA_LABEL[lang][era] || era) + '</h3>';
-    html += '<div class="glossary-grid">' + items.map(t => termCard(t, lang)).join('') + '</div></div>';
-  }
-
-  // 兜底：不在已知纪元的术语归入"其他"
-  for (const [era, items] of groups) {
-    if (ERA_ORDER.includes(era)) continue;
-    html += '<div class="glossary-group"><h3 class="glossary-group__title">' + esc(era) + '</h3>';
-    html += '<div class="glossary-grid">' + items.map(t => termCard(t, lang)).join('') + '</div></div>';
-  }
-
-  grid.innerHTML = html;
+  rail.innerHTML = list.map(t => termCard(t, lang)).join('');
 }
 
 function diffRank(k) { return k === 'basic' ? 0 : k === 'intermediate' ? 1 : 2; }
