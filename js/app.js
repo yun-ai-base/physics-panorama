@@ -787,7 +787,7 @@ function setView(v) {
   if (gv) gv.hidden = !isGlossary;
   if (smb) smb.hidden = (v !== 'scale');
   const eraNav = document.getElementById('eraNav');
-  if (eraNav) eraNav.style.display = isVoid ? 'none' : '';
+  if (eraNav) eraNav.style.display = (isVoid || isGlossary) ? 'none' : '';
   if (isPeople) {
     const pg = document.getElementById('peopleGrid');
     renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
