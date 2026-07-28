@@ -20,6 +20,12 @@
 .glossary-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;
 }
+.glossary-group { margin-bottom: 28px; }
+.glossary-group__title {
+  font-size: 15px; font-weight: 700; color: var(--ink);
+  margin: 0 0 12px; padding-bottom: 8px;
+  border-bottom: 2px solid rgba(184,137,59,.25); letter-spacing: .5px;
+}
 .gterm {
   background: var(--bg-2); border: 1px solid rgba(42,38,32,.08);
   border-left: 4px solid var(--gold); border-radius: 14px;
@@ -38,6 +44,9 @@
 .gterm--mid .gterm__diff { background: rgba(63,167,196,.12); color: #2c7d92; }
 .gterm--adv .gterm__diff { background: rgba(155,107,214,.12); color: #6f4aa0; }
 .gterm__def { font-size: 13.5px; line-height: 1.7; color: var(--ink-2); margin-bottom: 4px; }
+.gterm__def strong, .gterm__detail strong {
+  color: var(--ink); font-weight: 700;
+}
 .gterm__detail { font-size: 12.5px; line-height: 1.65; color: var(--ink-3); margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(42,38,32,.08); }
 .gterm__src { font-size: 11px; color: var(--ink-3); margin-top: 10px; opacity: .55; font-style: italic; }
 .glossary-empty { padding: 48px; text-align: center; color: var(--ink-3); }
