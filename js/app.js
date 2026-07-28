@@ -90,7 +90,9 @@ async function boot() {
   const restoreTab = state.sidebarTab;
   const restoreTerm = state.termFocus;
   setView(state.view); // 统一走视图切换逻辑（激活 tab、body class、尺度关联条显隐等）
-  if (node && byId.has(node)) {
+  // 仅在有节点图的视图下才根据 URL hash 自动选中节点并打开侧栏
+  const nodeViews = new Set(['timeline', 'scale', 'unification']);
+  if (node && byId.has(node) && nodeViews.has(state.view)) {
     selectNode(node);
     if (restoreTab) openSidebarTab(restoreTab);
     if (restoreTerm) focusTerm(restoreTerm);
@@ -626,12 +628,13 @@ function wireUI() {
     focusTerm(termName);
   });
 
-  // 浏览器回退：恢复跳转前的节点与标签
+  // 浏览器回退：恢复跳转前的节点与标签（仅节点图视图才恢复侧栏）
   window.addEventListener('popstate', e => {
     const back = e.state?.ppBack;
     if (!back) return;
     state.termFocus = null;
-    if (!back.node || !byId.has(back.node)) {
+    const nodeViews = new Set(['timeline', 'scale', 'unification']);
+    if (!back.node || !byId.has(back.node) || !nodeViews.has(state.view)) {
       closeSidebar();
       state.selected = null;
       state.highlight = new Set();
