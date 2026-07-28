@@ -120,3 +120,24 @@
   flex: 1 1 100%; display: flex; align-items: center; justify-content: center;
   color: var(--ink-3); font-size: 14px;
 }
+
+/* 术语标签栏：图片框下方，当前纪元全部术语名以小标签展示 */
+.glossary-tags {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  padding: 10px 4px 6px; justify-content: center; align-items: center;
+  flex-shrink: 0; max-height: 120px; overflow-y: auto;
+}
+.glossary-tag {
+  padding: 3px 12px; font-size: 11.5px; font-weight: 500; cursor: pointer;
+  border-radius: 999px; border: 1px solid rgba(42,38,32,.13);
+  background: var(--bg-2); color: var(--ink-2);
+  transition: background .18s, color .18s, border-color .18s, transform .15s;
+  white-space: nowrap; user-select: none;
+}
+.glossary-tag:hover {
+  background: var(--gold); border-color: var(--gold); color: #fff;
+  transform: translateY(-1px);
+}
+
+/* 术语表视图激活时隐藏全站底栏（释放空间给标签栏） */
+body:has(#glossaryView:not([hidden])) .bottombar { display: none !important; }

@@ -165,6 +165,25 @@ export function renderGlossary() {
     g.style.animationDelay = (i * 0.06) + 's';
     g.style.animationDuration = (0.45 + Math.min(i, 6) * 0.02) + 's';
   });
+
+  /* ---- 术语标签栏（图片框下方）---- */
+  const tagsEl = document.getElementById('glossaryTags');
+  if (tagsEl) {
+    tagsEl.innerHTML = list.map((t, i) =>
+      `<button type="button" class="glossary-tag" data-gidx="${i}">${esc(t.name)}</button>`
+    ).join('');
+    tagsEl.querySelectorAll('.glossary-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        const idx = parseInt(tag.dataset.gidx, 10);
+        const card = rail.querySelectorAll('.gterm')[idx];
+        if (!card) return;
+        // 滚动到卡片居中：(卡片左偏移 + 卡片宽度/2) - 容器可视宽度/2
+        const target = card.offsetLeft + card.offsetWidth / 2 - rail.clientWidth / 2;
+        rail.scrollTo({ left: target, behavior: 'smooth' });
+      });
+    });
+  }
+
   // 渲染后启动自动向左滚动（鼠标悬停时由 bindGlossaryUI 暂停）
   startAutoScroll(rail);
 }
