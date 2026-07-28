@@ -127,6 +127,11 @@ export function renderGlossary() {
     return;
   }
   rail.innerHTML = list.map(t => termCard(t, lang)).join('');
+  // 依次进场：每张卡片延迟一点，形成从左到右的波浪淡入
+  rail.querySelectorAll('.gterm').forEach((g, i) => {
+    g.style.animationDelay = (i * 0.06) + 's';
+    g.style.animationDuration = (0.45 + Math.min(i, 6) * 0.02) + 's';
+  });
 }
 
 function diffRank(k) { return k === 'basic' ? 0 : k === 'intermediate' ? 1 : 2; }
