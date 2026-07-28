@@ -24,10 +24,39 @@ const ERA_LABEL = {
 // 纪元显示顺序
 const ERA_ORDER = ['classical', 'relativity', 'quantum', 'standard-model', 'frontier'];
 
-/** 轻量 Markdown → HTML（仅处理 **粗体**） */
+/** 轻量 Markdown → HTML：**粗体** 作为小节标题独占一行，段落自动分隔 */
 function md(s) {
   if (!s) return '';
-  return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const t = esc(s);
+  // 按 **xxx** 分割为 [前缀, 标题1, 内容1, 标题2, 内容2, ...]
+  const parts = t.split(/(\*\*.+?\*\*)/);
+  const out = [];
+  let buf = '';
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i];
+    if (/\*\*.+?\*\*/.test(p)) {
+      // 遇到 **标题**：先 flush 缓冲区，再输出标题
+      if (buf.trim()) out.push('<p>' + buf.trim() + '</p>');
+      buf = '';
+      out.push('<strong class="gterm__sub">' + p.replace(/\*\*/g, '') + '</strong>');
+    } else {
+      // 普通文本：遇到双换行则分段
+      const segs = p.split(/\n\s*\n/);
+      for (let j = 0; j < segs.length; j++) {
+        const trimmed = segs[j].trim();
+        if (!trimmed) continue;
+        // 如果缓冲区非空且新段不以标点结尾（说明是连续文本），合并
+        if (buf && !/[。！？.]$/.test(buf.trim())) {
+          buf += trimmed;
+        } else {
+          if (buf.trim()) out.push('<p>' + buf.trim() + '</p>');
+          buf = trimmed;
+        }
+      }
+    }
+  }
+  if (buf.trim()) out.push('<p>' + buf.trim() + '</p>');
+  return out.join('\n');
 }
 
 export function initGlossary(NODES) {
