@@ -4,6 +4,8 @@ import { esc } from './utils.js';
 
 let ALL_TERMS = [];
 let glossaryReady = false;
+let autoScrollRAF = null;   // 自动滚动（marquee）句柄
+const AUTO_SPEED = 0.4;     // 每帧滚动像素（约 24px/秒，缓慢）
 
 // 难度按术语所属节点的纪元粗略分级
 const ERA_DIFF_KEY = {
@@ -77,6 +79,30 @@ function bindGlossaryUI() {
   if (!view) return;
   const search = view.querySelector('#glossarySearch');
   if (search) search.addEventListener('input', renderGlossary);
+  // 鼠标进入展示框时暂停自动滚动，离开后恢复
+  const rail = view.querySelector('#glossaryRail');
+  if (rail) {
+    rail.addEventListener('mouseenter', stopAutoScroll);
+    rail.addEventListener('mouseleave', () => startAutoScroll(rail));
+  }
+}
+
+/** 自动向左缓慢滚动；内容未溢出则不动；到末尾回到开头 */
+function startAutoScroll(rail) {
+  stopAutoScroll();
+  if (!rail || rail.offsetParent === null) return;   // 视图隐藏时不滚动
+  if (rail.scrollWidth - rail.clientWidth <= 4) return;
+  let last = performance.now();
+  function step(now) {
+    const dt = now - last; last = now;
+    rail.scrollLeft += AUTO_SPEED * (dt / 16.67);
+    if (rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1) rail.scrollLeft = 0;
+    autoScrollRAF = requestAnimationFrame(step);
+  }
+  autoScrollRAF = requestAnimationFrame(step);
+}
+function stopAutoScroll() {
+  if (autoScrollRAF) { cancelAnimationFrame(autoScrollRAF); autoScrollRAF = null; }
 }
 
 function renderTabs() {
@@ -124,6 +150,7 @@ export function renderGlossary() {
 
   if (!list.length) {
     rail.innerHTML = '<div class="glossary-empty">' + (lang === 'en' ? 'No matching terms' : '无匹配术语') + '</div>';
+    stopAutoScroll();
     return;
   }
   rail.innerHTML = list.map(t => termCard(t, lang)).join('');
@@ -132,6 +159,8 @@ export function renderGlossary() {
     g.style.animationDelay = (i * 0.06) + 's';
     g.style.animationDuration = (0.45 + Math.min(i, 6) * 0.02) + 's';
   });
+  // 渲染后启动自动向左滚动（鼠标悬停时由 bindGlossaryUI 暂停）
+  startAutoScroll(rail);
 }
 
 function diffRank(k) { return k === 'basic' ? 0 : k === 'intermediate' ? 1 : 2; }

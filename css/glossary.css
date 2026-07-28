@@ -42,9 +42,12 @@
   padding: 10px 2px 18px; scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
-.glossary-rail::-webkit-scrollbar { height: 9px; }
-.glossary-rail::-webkit-scrollbar-thumb { background: rgba(42,38,32,.18); border-radius: 999px; }
-.glossary-rail::-webkit-scrollbar-track { background: transparent; }
+.glossary-rail { scrollbar-width: thin; scrollbar-color: rgba(184,137,59,.45) transparent; }
+.glossary-rail::-webkit-scrollbar { height: 5px; }
+.glossary-rail::-webkit-scrollbar-track { background: transparent; margin: 0 4px; border-radius: 10px; }
+.glossary-rail::-webkit-scrollbar-thumb { background: rgba(184,137,59,.45); border-radius: 10px; min-height: 32px; }
+.glossary-rail::-webkit-scrollbar-thumb:hover { background: rgba(184,137,59,.75); }
+.glossary-rail::-webkit-scrollbar-corner { background: transparent; }
 
 /* 术语卡片：像一张图片（加宽到 340，更方正；带进场与悬停动效） */
 .gterm {
