@@ -6,6 +6,8 @@
   z-index: 5;
   display: flex; flex-direction: column;
 }
+/* 必须显式压过上面的 display:flex，否则 hidden 属性失效、视图永远可见 */
+.glossary-view[hidden] { display: none; }
 
 /* 顶部：五个纪元选项整体居中 */
 .glossary-bar {

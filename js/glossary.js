@@ -87,19 +87,25 @@ function bindGlossaryUI() {
   }
 }
 
-/** 自动向左缓慢滚动；内容未溢出则不动；到末尾回到开头 */
+/** 自动向左缓慢滚动；内容未溢出则不动；到末尾回到开头。
+ *  用 rAF 延迟一帧启动：setView 同步 unhide 后浏览器尚未完成 layout，
+ *  同步读 scrollWidth 会得到 0 → 误判未溢出而不滚动。延迟一帧确保测量准确。 */
 function startAutoScroll(rail) {
   stopAutoScroll();
-  if (!rail || rail.offsetParent === null) return;   // 视图隐藏时不滚动
-  if (rail.scrollWidth - rail.clientWidth <= 4) return;
-  let last = performance.now();
-  function step(now) {
-    const dt = now - last; last = now;
-    rail.scrollLeft += AUTO_SPEED * (dt / 16.67);
-    if (rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1) rail.scrollLeft = 0;
+  if (!rail) return;
+  autoScrollRAF = requestAnimationFrame(() => {
+    if (!rail.isConnected) { autoScrollRAF = null; return; }
+    // 隐藏或被 CSS 折叠时 scrollWidth≈clientWidth，自然不启动
+    if (rail.scrollWidth - rail.clientWidth <= 4) { autoScrollRAF = null; return; }
+    let last = performance.now();
+    const step = (now) => {
+      const dt = now - last; last = now;
+      rail.scrollLeft += AUTO_SPEED * (dt / 16.67);
+      if (rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1) rail.scrollLeft = 0;
+      autoScrollRAF = requestAnimationFrame(step);
+    };
     autoScrollRAF = requestAnimationFrame(step);
-  }
-  autoScrollRAF = requestAnimationFrame(step);
+  });
 }
 function stopAutoScroll() {
   if (autoScrollRAF) { cancelAnimationFrame(autoScrollRAF); autoScrollRAF = null; }
