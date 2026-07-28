@@ -126,3 +126,9 @@
 /* miniCard 已禁用 —— 悬停白卡为视觉噪音 */
 .mini-card{display:none !important;}
 
+/* A.5 统一之路「统一程度」台阶组件（仅在 unification 视图由 renderer.js 绘制） */
+.unif-ladder{ pointer-events:none; }
+.unif-rung{ }
+.unif-rung--filled{ fill: var(--gold); }
+.unif-rung--empty{ fill: rgba(42,38,32,.13); }
+.unif-rung--aspirational{ fill: rgba(184,137,59,.32); }
