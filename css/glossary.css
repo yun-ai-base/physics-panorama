@@ -39,6 +39,7 @@
 
 /* 横向图片式展示框（左右留白由 .glossary-view 的 padding 提供，首尾卡片不贴屏边） */
 .glossary-rail {
+  position: relative;   /* 让卡片 offsetLeft 以 rail 内容坐标为基准，点击标签居中计算才准确 */
   flex: 1 1 auto; overflow-x: auto; overflow-y: hidden;
   display: flex; gap: 22px; align-items: stretch;
   padding: 10px 2px 18px;

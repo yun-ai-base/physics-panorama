@@ -177,9 +177,11 @@ export function renderGlossary() {
         const idx = parseInt(tag.dataset.gidx, 10);
         const card = rail.querySelectorAll('.gterm')[idx];
         if (!card) return;
-        // 滚动到卡片居中：(卡片左偏移 + 卡片宽度/2) - 容器可视宽度/2
+        // 暂停 marquee 自动滚动，避免与本次跳转竞争（否则 scrollTo 目标会被每帧 scrollLeft+= 覆盖）
+        stopAutoScroll();
+        // 滚动到卡片居中：(卡片内容坐标左偏移 + 卡片宽度/2) - 容器可视宽度/2
         const target = card.offsetLeft + card.offsetWidth / 2 - rail.clientWidth / 2;
-        rail.scrollTo({ left: target, behavior: 'smooth' });
+        rail.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
       });
     });
   }
