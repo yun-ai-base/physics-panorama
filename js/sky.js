@@ -197,7 +197,7 @@ const SKY_BG = [
   { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.png' },        // 银河系·NGC 6744（ESA/Hubble 银河系"双胞胎"正面旋涡真照）
   { id:'group',     log:23,   img:'assets/sky/sky_group.jpg' },         // 本星系群（ESA/Hubble M81/M82 星系群真实照）
   { id:'virgo',     log:24,   img:'assets/sky/sky_virgo.jpg' },         // 室女座超星系团·NGC 4414 旋涡星系（ESA/Hubble potw2444a 无水印真照）
-  { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.svg' },      // 拉尼亚凯亚超星系团·宇宙纤维网（程序化 SVG）
+  { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.jpg' },      // 拉尼亚凯亚超星系团·宇宙纤维网（ESA/Hubble opo0820b 无水印真图）
   { id:'cmb',       log:26.9, img:'assets/sky/sky_cmb.jpg' },           // 普朗克 CMB 全天图（ESA）
 ];
 
