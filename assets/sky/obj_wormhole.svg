@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="whBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0c1226"/>
+      <stop offset="100%" stop-color="#04060d"/>
+    </radialGradient>
+    <radialGradient id="whThroat" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#dff3ff" stop-opacity="0.96"/>
+      <stop offset="38%" stop-color="#5aa9ff" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#5aa9ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="whFunnel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b2540"/>
+      <stop offset="100%" stop-color="#0a0e1a"/>
+    </linearGradient>
+    <radialGradient id="whStar" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#whBg)"/>
+  <g fill="url(#whStar)">
+    <circle cx="80" cy="70" r="1.6"/><circle cx="180" cy="40" r="1.1"/><circle cx="300" cy="90" r="1.3"/>
+    <circle cx="520" cy="50" r="1.2"/><circle cx="640" cy="100" r="1.6"/><circle cx="720" cy="60" r="1.1"/>
+    <circle cx="120" cy="520" r="1.4"/><circle cx="260" cy="560" r="1.1"/><circle cx="430" cy="540" r="1.3"/>
+    <circle cx="600" cy="560" r="1.5"/><circle cx="710" cy="520" r="1.1"/><circle cx="380" cy="150" r="1.0"/>
+    <circle cx="420" cy="450" r="1.0"/><circle cx="240" cy="300" r="0.9"/><circle cx="560" cy="300" r="0.9"/>
+  </g>
+  <!-- 上方引力漏斗 -->
+  <path d="M110 20 Q110 240 400 300 Q690 240 690 20 Z" fill="url(#whFunnel)" stroke="#3c4d72" stroke-width="2"/>
+  <!-- 下方引力漏斗（镜像） -->
+  <path d="M110 580 Q110 360 400 300 Q690 360 690 580 Z" fill="url(#whFunnel)" stroke="#3c4d72" stroke-width="2"/>
+  <!-- 喉部光环 -->
+  <circle cx="400" cy="300" r="48" fill="url(#whThroat)"/>
+  <circle cx="400" cy="300" r="48" fill="none" stroke="#dff3ff" stroke-width="2" opacity="0.85"/>
+  <!-- 弯曲光线（时空隧道示意） -->
+  <path d="M60 15 Q300 255 400 300 Q500 345 740 585" fill="none" stroke="#9fd0ff" stroke-width="1.6" opacity="0.65" stroke-dasharray="7 7"/>
+  <path d="M740 15 Q500 255 400 300 Q300 345 60 585" fill="none" stroke="#9fd0ff" stroke-width="1.6" opacity="0.45" stroke-dasharray="7 7"/>
+</svg>
