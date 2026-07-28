@@ -39,7 +39,7 @@
 .glossary-rail {
   flex: 1 1 auto; overflow-x: auto; overflow-y: hidden;
   display: flex; gap: 22px; align-items: stretch;
-  padding: 10px 2px 18px; scroll-snap-type: x mandatory;
+  padding: 10px 2px 18px;
   -webkit-overflow-scrolling: touch;
 }
 .glossary-rail { scrollbar-width: thin; scrollbar-color: rgba(184,137,59,.45) transparent; }
@@ -52,7 +52,7 @@
 /* 术语卡片：像一张图片（加宽到 340，更方正；带进场与悬停动效） */
 .gterm {
   position: relative; overflow: hidden;
-  flex: 0 0 340px; width: 340px; scroll-snap-align: start;
+  flex: 0 0 340px; width: 340px;
   background: var(--bg-2); border: 1px solid rgba(42,38,32,.08);
   border-top: 4px solid var(--gold); border-radius: 18px;
   padding: 20px 20px 16px; display: flex; flex-direction: column;
