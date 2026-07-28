@@ -357,6 +357,9 @@ function hideNodePreview() { const pv = document.getElementById('nodePreview'); 
 function wireUI() {
   document.getElementById('viewTabs').addEventListener('click', e => {
     const b = e.target.closest('.view-tab'); if (!b) return;
+    // 主动点顶栏导航进入虚无-图景时，回到默认意境引导页（poem），
+    // 不被 URL 残留的 vtab 劫持（刷新页面仍由 readURL 保留上次子页）
+    if (b.dataset.view === 'void') voidTab = 'poem';
     setView(b.dataset.view);
   });
 
