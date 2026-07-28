@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <radialGradient id="space" cx="50%" cy="46%" r="82%">
+      <stop offset="0%" stop-color="#0c1226"/>
+      <stop offset="60%" stop-color="#070b1a"/>
+      <stop offset="100%" stop-color="#03050d"/>
+    </radialGradient>
+    <pattern id="stars" width="140" height="140" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="22" r="1.0" fill="#dde6ff" opacity="0.7"/>
+      <circle cx="70" cy="80" r="1.5" fill="#ffffff" opacity="0.9"/>
+      <circle cx="110" cy="35" r="0.8" fill="#bcd" opacity="0.6"/>
+      <circle cx="40" cy="110" r="0.9" fill="#fff" opacity="0.55"/>
+      <circle cx="125" cy="118" r="0.7" fill="#cdd" opacity="0.5"/>
+    </pattern>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cfe0ff" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#8fb4ff" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#8fb4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff4cf"/>
+      <stop offset="60%" stop-color="#ffd27a" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffd27a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#space)"/>
+  <rect width="1600" height="1000" fill="url(#stars)"/>
+
+  <!-- 矮星系晕（弥散背景成员） -->
+  <g filter="url(#soft)" opacity="0.5">
+    <ellipse cx="560" cy="500" rx="240" ry="160" fill="url(#halo)"/>
+    <ellipse cx="1060" cy="500" rx="210" ry="150" fill="url(#halo)"/>
+  </g>
+
+  <!-- 两个主星系：银河系（左）与仙女座（右） -->
+  <g>
+    <ellipse cx="560" cy="500" rx="120" ry="44" fill="url(#core)" transform="rotate(-22 560 500)"/>
+    <circle cx="560" cy="500" r="34" fill="#fff3d2"/>
+    <ellipse cx="1060" cy="500" rx="135" ry="50" fill="url(#core)" transform="rotate(18 1060 500)"/>
+    <circle cx="1060" cy="500" r="38" fill="#fff0c8"/>
+  </g>
+
+  <!-- 疏散的矮星系（小点） -->
+  <g fill="#dfe8ff">
+    <circle cx="380" cy="430" r="2.4" opacity="0.85"/>
+    <circle cx="430" cy="600" r="1.8" opacity="0.7"/>
+    <circle cx="500" cy="660" r="2.0" opacity="0.75"/>
+    <circle cx="640" cy="380" r="1.6" opacity="0.65"/>
+    <circle cx="700" cy="560" r="2.2" opacity="0.8"/>
+    <circle cx="610" cy="700" r="1.7" opacity="0.65"/>
+    <circle cx="340" cy="540" r="1.9" opacity="0.7"/>
+    <circle cx="760" cy="470" r="1.5" opacity="0.6"/>
+    <circle cx="470" cy="350" r="1.7" opacity="0.65"/>
+    <circle cx="900" cy="430" r="2.3" opacity="0.8"/>
+    <circle cx="960" cy="600" r="1.8" opacity="0.7"/>
+    <circle cx="1020" cy="670" r="2.0" opacity="0.75"/>
+    <circle cx="1140" cy="380" r="1.6" opacity="0.65"/>
+    <circle cx="1200" cy="560" r="2.2" opacity="0.8"/>
+    <circle cx="1110" cy="700" r="1.7" opacity="0.65"/>
+    <circle cx="880" cy="540" r="1.9" opacity="0.7"/>
+    <circle cx="1240" cy="470" r="1.5" opacity="0.6"/>
+    <circle cx="980" cy="350" r="1.7" opacity="0.65"/>
+    <circle cx="1300" cy="520" r="1.6" opacity="0.6"/>
+    <circle cx="300" cy="500" r="1.7" opacity="0.65"/>
+  </g>
+
+  <!-- 两主星系间的物质桥（暗示引力联接） -->
+  <path d="M620 500 C 760 470, 900 470, 980 500" stroke="#9fb6ff" stroke-width="3" fill="none" opacity="0.28" stroke-dasharray="2 7"/>
+</svg>

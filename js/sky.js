@@ -73,14 +73,19 @@ function chips(arr){
   return (arr||[]).map(x => `<span class="jc-chip">${esc(x)}</span>`).join('');
 }
 
-// 仰望星空 · 随尺度淡入淡出的真实科学背景图（各阶段中心对应一个天体节点）
-// 图片来源：NASA 公共领域（银河 / 黑色弹珠·城市灯火 / 蓝色弹珠 / 太阳系）· ESA Planck CMB（CC BY-SA 3.0 IGO）
+// 仰望星空 · 随尺度淡入淡出的背景图（各阶段中心对应一个天体节点）
+// 真实科学图：NASA 公共领域（银河 / 黑色弹珠·城市灯火 / 蓝色弹珠 / 太阳系）· ESA Planck CMB（CC BY-SA 3.0 IGO）
+// 程序化科学可视化（无实拍照，与微观侧同原则）：银河系 / 本星系群 / 室女座超星系团 / 拉尼亚凯亚超星系团
 const SKY_BG = [
-  { id:'observer', log:0,    img:'assets/sky/sky_observer.jpg' },     // 你仰望的银河（NASA-JPL）
-  { id:'city',     log:3,    img:'assets/sky/sky_city.jpg' },          // 城市灯火·地球之夜（NASA Black Marble）
-  { id:'earth',    log:6.8,  img:'assets/sky/sky_earth.jpg' },         // 蓝色弹珠（NASA Blue Marble）
-  { id:'solar',    log:16,   img:'assets/sky/sky_solarsystem.jpg' },   // 太阳系（NASA）
-  { id:'cmb',      log:26.9, img:'assets/sky/sky_cmb.jpg' },           // 普朗克 CMB 全天图（ESA）
+  { id:'observer',  log:0,    img:'assets/sky/sky_observer.jpg' },     // 你仰望的银河（NASA-JPL）
+  { id:'city',      log:3,    img:'assets/sky/sky_city.jpg' },          // 城市灯火·地球之夜（NASA Black Marble）
+  { id:'earth',     log:6.8,  img:'assets/sky/sky_earth.jpg' },         // 蓝色弹珠（NASA Blue Marble）
+  { id:'solar',     log:16,   img:'assets/sky/sky_solarsystem.jpg' },   // 太阳系（NASA）
+  { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.svg' },        // 银河系·棒旋星系（程序化 SVG）
+  { id:'group',     log:23,   img:'assets/sky/sky_group.svg' },         // 本星系群（程序化 SVG）
+  { id:'virgo',     log:24,   img:'assets/sky/sky_virgo.svg' },         // 室女座超星系团·扁平薄饼（程序化 SVG）
+  { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.svg' },      // 拉尼亚凯亚超星系团·宇宙纤维网（程序化 SVG）
+  { id:'cmb',       log:26.9, img:'assets/sky/sky_cmb.jpg' },           // 普朗克 CMB 全天图（ESA）
 ];
 
 let bgLayers = [];
@@ -105,24 +110,29 @@ function buildSkyBg(mount){
 
   bgCredit = document.createElement('div');
   bgCredit.className = 'sky-credit';
-  bgCredit.innerHTML = '背景图：NASA（蓝色弹珠 / 黑色弹珠·城市灯火 / 银河 / 太阳系）· ESA Planck（CMB 全天图，CC BY-SA 3.0 IGO）';
+  bgCredit.innerHTML = '背景图：NASA（蓝色弹珠 / 黑色弹珠·城市灯火 / 银河 / 太阳系）· ESA Planck（CMB 全天图，CC BY-SA 3.0 IGO）· 银河系 / 本星系群 / 室女座 / 拉尼亚凯亚为程序化科学可视化';
   mount.appendChild(bgCredit);                   // 署名条，压在交互层之上、提示之下
 }
 
 // 给定当前视角中心对数尺度 c，返回每层不透明度。
 // 模型：相邻图在各自中点之间平滑交叉；窗口外最近图全显 —— 任意尺度都恰好有背景，无空白死区。
+// 过渡半宽逐区间计算：t_i = min(1.5, 间隔_i/2 × 0.9)，保证 t_i ≤ 间隔_i/2，
+// 各区间交叉窗口互不重叠，每个节点中心都能满显（避免负值/不满显的旧坑）。
 function bgOpacities(c){
   const logs = SKY_BG.map(s => s.log);
   const mids = [];
-  for (let i = 0; i < logs.length - 1; i++) mids.push((logs[i] + logs[i+1]) / 2);
-  const t = 1.5;                                 // 过渡半宽（对数单位，须 ≤ 最小间隔的一半=1.5，否则节点中心无法满显）
+  const half = [];
+  for (let i = 0; i < logs.length - 1; i++){
+    mids.push((logs[i] + logs[i+1]) / 2);
+    half.push(Math.min(1.5, (logs[i+1] - logs[i]) / 2 * 0.9));
+  }
   const ops = logs.map(() => 0);
   let nearest = 0;
   for (let i = 0; i < logs.length; i++)
     if (Math.abs(c - logs[i]) < Math.abs(c - logs[nearest])) nearest = i;
   ops[nearest] = 1;
   for (let i = 0; i < mids.length; i++){
-    const bm = mids[i];
+    const bm = mids[i], t = half[i];
     if (Math.abs(c - bm) < t){
       const f = Math.max(0, Math.min(1, (c - (bm - t)) / (2 * t)));  // 0→1：左图淡出、右图淡入（钳制避免负值）
       ops[i] = 1 - f;
