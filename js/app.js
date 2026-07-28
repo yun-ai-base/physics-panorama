@@ -776,6 +776,7 @@ document.addEventListener('keydown', e => {
 // 统一视图切换（含人物索引与虚无-图景覆盖层）
 function setView(v) {
   state.view = v;
+  closeHonorPop();   // 切换任何视图时都清除残留的诺贝尔奖 popover（防止从荣誉殿堂切走后浮层残留在其他页）
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === v));
   const isPeople = v === 'people';
   const isVoid = v === 'void';
