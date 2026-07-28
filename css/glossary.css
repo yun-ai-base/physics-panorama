@@ -51,7 +51,7 @@
 .glossary-rail::-webkit-scrollbar-thumb:hover { background: rgba(184,137,59,.75); }
 .glossary-rail::-webkit-scrollbar-corner { background: transparent; }
 
-/* 术语卡片：像一张图片（加宽到 340，更方正；带进场与悬停动效） */
+/* 术语卡片：像一张图片（加宽到 340，更方正；带持续呼吸 + 悬停动效） */
 .gterm {
   position: relative; overflow: hidden;
   flex: 0 0 340px; width: 340px;
@@ -59,12 +59,18 @@
   border-top: 4px solid var(--gold); border-radius: 18px;
   padding: 20px 20px 16px; display: flex; flex-direction: column;
   box-shadow: 0 4px 18px rgba(0,0,0,.07);
-  transition: transform .22s ease, box-shadow .22s ease;
-  animation: gtermIn .5s cubic-bezier(.2,.7,.3,1) both;
+  transition: box-shadow .22s ease;
+  animation: gtermIn .5s cubic-bezier(.2,.7,.3,1) both,
+             gtermFloat 3.5s ease-in-out 1s both infinite;
 }
 @keyframes gtermIn {
   from { opacity: 0; transform: translateY(22px) scale(.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* 持续微呼吸浮动：让卡片"活"起来 */
+@keyframes gtermFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
 }
 /* 光泽扫过 */
 .gterm::after {
@@ -74,6 +80,7 @@
   transform: skewX(-18deg); transition: left .65s ease; pointer-events: none;
 }
 .gterm:hover {
+  animation: none; /* 悬停时停止呼吸浮动 */
   transform: translateY(-6px); box-shadow: 0 16px 38px rgba(0,0,0,.14);
 }
 .gterm:hover::after { left: 130%; }
@@ -90,7 +97,12 @@
 }
 .gterm--mid .gterm__diff { background: rgba(63,167,196,.12); color: #2c7d92; }
 .gterm--adv .gterm__diff { background: rgba(155,107,214,.12); color: #6f4aa0; }
-.gterm__body { flex: 1 1 auto; overflow-y: auto; }
+.gterm__body { flex: 1 1 auto; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: rgba(184,137,59,.3) transparent;
+}
+.gterm__body::-webkit-scrollbar { width: 4px; }
+.gterm__body::-webkit-scrollbar-track { background: transparent; }
+.gterm__body::-webkit-scrollbar-thumb { background: rgba(184,137,59,.3); border-radius: 10px; }
 .gterm__def { font-size: 13.5px; line-height: 1.7; color: var(--ink-2); }
 .gterm__def > p { margin: 0 0 8px; }
 .gterm__def > p:last-child { margin-bottom: 0; }

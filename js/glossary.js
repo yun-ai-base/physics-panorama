@@ -5,7 +5,7 @@ import { esc } from './utils.js';
 let ALL_TERMS = [];
 let glossaryReady = false;
 let autoScrollRAF = null;   // 自动滚动（marquee）句柄
-const AUTO_SPEED = 0.5;     // 每帧滚动像素（约 30px/秒，缓慢）
+const AUTO_SPEED = 1.8;     // 每帧滚动像素（约 108px/秒，明显可见）
 
 // 难度按术语所属节点的纪元粗略分级
 const ERA_DIFF_KEY = {
