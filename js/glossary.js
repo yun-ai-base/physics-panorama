@@ -130,7 +130,7 @@ function renderTabs() {
 function termCard(t, lang) {
   const cls = t.diffKey === 'advanced' ? 'gterm--adv' : t.diffKey === 'intermediate' ? 'gterm--mid' : 'gterm--basic';
   return `<div class="gterm ${cls}">
-    <div class="gterm__head"><span class="gterm__icon">${t.icon || ''}</span><span class="gterm__name">${esc(t.name)}</span><span class="gterm__diff">${esc(DIFF_LABEL[lang][t.diffKey])}</span></div>
+    <div class="gterm__head"><span class="gterm__icon">${t.icon || ''}</span><span class="gterm__name">${esc(lang === 'en' ? (t.nameEn || t.name) : t.name)}</span><span class="gterm__diff">${esc(DIFF_LABEL[lang][t.diffKey])}</span></div>
     <div class="gterm__body">
       <div class="gterm__def">${md(t.definition)}</div>
       ${t.details ? `<div class="gterm__detail">${md(t.details)}</div>` : ''}
@@ -152,7 +152,7 @@ export function renderGlossary() {
   renderTabs();
 
   let list = ALL_TERMS.filter(t => t.era === state.glossaryEra);
-  if (q) list = list.filter(t => t.name.toLowerCase().includes(q) || t.definition.toLowerCase().includes(q));
+  if (q) list = list.filter(t => t.name.toLowerCase().includes(q) || (t.nameEn && t.nameEn.toLowerCase().includes(q)) || t.definition.toLowerCase().includes(q));
 
   if (!list.length) {
     rail.innerHTML = '<div class="glossary-empty">' + (lang === 'en' ? 'No matching terms' : '无匹配术语') + '</div>';
@@ -170,7 +170,7 @@ export function renderGlossary() {
   const tagsEl = document.getElementById('glossaryTags');
   if (tagsEl) {
     tagsEl.innerHTML = list.map((t, i) =>
-      `<button type="button" class="glossary-tag" data-gidx="${i}">${esc(t.name)}</button>`
+      `<button type="button" class="glossary-tag" data-gidx="${i}">${esc(lang === 'en' ? (t.nameEn || t.name) : t.name)}</button>`
     ).join('');
     tagsEl.querySelectorAll('.glossary-tag').forEach(tag => {
       tag.addEventListener('click', () => {
