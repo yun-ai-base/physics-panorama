@@ -114,6 +114,22 @@
 .sb-fm__tex::-webkit-scrollbar{display:none;}
 .sb-fm__plain{font-size:12px; color:var(--ink-2); margin-top:8px; line-height:1.6;}
 
+/* A.10 公式「一句话解释」常显小字块 */
+.sb-fm__brief{
+  display:flex; align-items:flex-start; gap:6px;
+  margin-top:7px; padding:6px 10px;
+  font-size:12px; line-height:1.55; color:var(--ink-1);
+  background:linear-gradient(180deg, rgba(184,137,59,.07), rgba(184,137,59,.04));
+  border-left:3px solid var(--gold);
+  border-radius:0 6px 6px 0;
+}
+.sb-fm__brief-tag{
+  flex:0 0 auto; font-size:10px; font-weight:700; letter-spacing:.05em;
+  color:#fff; background:var(--gold);
+  padding:1px 6px; border-radius:4px; margin-top:1px; white-space:nowrap;
+}
+.sb-fm__brief-text{ flex:1 1 auto; min-width:0; }
+
 /* 应用拓展按钮 */
 .sb-fm__app-btn{flex:0 0 auto; display:inline-flex; align-items:center; gap:5px; border:1px solid var(--gold); background:#fff; color:var(--gold); border-radius:999px; padding:5px 11px; font-size:11.5px; font-weight:700; cursor:pointer; transition:.18s; white-space:nowrap; box-shadow:0 1px 3px rgba(184,137,59,.08);}
 .sb-fm__app-btn:hover{background:var(--gold); color:#fff;}

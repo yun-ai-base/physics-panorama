@@ -47,14 +47,20 @@
       </div>
     </header>
 
-    <!-- 纪元导航 -->
+    <!-- 纪元导航（A.2：筛选组 / 显示组 视觉分组） -->
     <div class="era-nav" id="eraNav">
-      <div class="era-tabs" id="eraTabs"></div>
-      <div class="path-tabs" id="pathTabs"></div>
-      <label class="only-core">
-        <input type="checkbox" id="onlyCore" checked />
-        <span>仅显示主干</span>
-      </label>
+      <div class="nav-group nav-group--filter">
+        <span class="nav-group__label" data-i18n="groupFilter">筛选</span>
+        <div class="era-tabs" id="eraTabs"></div>
+        <div class="path-tabs" id="pathTabs"></div>
+      </div>
+      <div class="nav-group nav-group--display">
+        <span class="nav-group__label" data-i18n="groupDisplay">显示</span>
+        <label class="only-core">
+          <input type="checkbox" id="onlyCore" checked />
+          <span>仅显示主干</span>
+        </label>
+      </div>
     </div>
 
     <!-- 尺度维度关联图（仅在尺度视图显示） -->

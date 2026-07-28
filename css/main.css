@@ -105,6 +105,25 @@ button{font-family:inherit; cursor:pointer;}
 .only-core{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--ink-2); cursor:pointer; user-select:none;}
 .only-core input{accent-color:var(--gold); width:15px; height:15px;}
 
+/* A.2 顶部操作区视觉分组：左「筛选」组（纪元+路径）/ 右「显示」组（仅主干开关） */
+.nav-group{display:flex; align-items:center; gap:8px; min-width:0;}
+.nav-group__label{
+  flex:0 0 auto; font-size:10.5px; font-weight:700; letter-spacing:.14em;
+  color:var(--ink-3); opacity:.75; text-transform:uppercase;
+  padding:2px 8px; border:1px solid rgba(42,38,32,.14); border-radius:999px;
+  user-select:none; pointer-events:none;
+}
+.nav-group--filter{flex:1 1 auto; flex-wrap:wrap;}
+.nav-group--display{
+  flex:0 0 auto; margin-left:16px; padding:4px 12px;
+  background:rgba(184,137,59,.06); border:1px solid rgba(184,137,59,.18);
+  border-radius:999px;
+}
+@media (max-width: 768px){
+  .nav-group__label{display:none;}          /* 小屏隐藏组标签，避免挤占空间 */
+  .nav-group--display{margin-left:8px; padding:3px 9px;}
+}
+
 /* 尺度维度关联图导航条（仅 scale 视图显示） */
 .scale-map-bar{
   display:none; flex:0 0 auto; align-items:center; justify-content:center;

@@ -616,7 +616,8 @@ function renderDim(node, key) {
       const appPanel = appText
         ? `<div class="sb-fm__app-panel" id="fm-app-${node.id}-${idx}" hidden><div class="sb-fm__app-title">${t('appExpandTitle')}</div><div class="sb-fm__app-body">${parseContent(appText)}</div></div>`
         : '';
-      return `<div class="sb-fm" data-fm-wrap="${node.id}-${idx}">${nameTag}<div class="sb-fm__row"><div class="sb-fm__tex">${tex}</div>${appBtn}</div><div class="sb-fm__plain">${esc(f.plain || '')}</div>${appPanel}</div>`;
+      const brief = f.appBrief ? `<div class="sb-fm__brief"><span class="sb-fm__brief-tag">${t('oneLine')}</span><span class="sb-fm__brief-text">${esc(f.appBrief)}</span></div>` : '';
+      return `<div class="sb-fm" data-fm-wrap="${node.id}-${idx}">${nameTag}<div class="sb-fm__row"><div class="sb-fm__tex">${tex}</div>${appBtn}</div><div class="sb-fm__plain">${esc(f.plain || '')}</div>${brief}${appPanel}</div>`;
     }).join('');
   }
 
