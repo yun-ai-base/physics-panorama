@@ -75,13 +75,13 @@ function chips(arr){
 
 // 仰望星空 · 随尺度淡入淡出的背景图（各阶段中心对应一个天体节点）
 // 真实科学图：NASA 公共领域（银河 / 黑色弹珠·城市灯火 / 蓝色弹珠 / 太阳系）· ESA Planck CMB（CC BY-SA 3.0 IGO）
-// 程序化科学可视化（无实拍照，与微观侧同原则）：银河系 / 本星系群 / 室女座超星系团 / 拉尼亚凯亚超星系团
+// 程序化科学可视化（无实拍照，与微观侧同原则）：本星系群 / 室女座超星系团 / 拉尼亚凯亚超星系团
 const SKY_BG = [
   { id:'observer',  log:0,    img:'assets/sky/sky_observer.jpg' },     // 你仰望的银河（NASA-JPL）
   { id:'city',      log:3,    img:'assets/sky/sky_city.jpg' },          // 城市灯火·地球之夜（NASA Black Marble）
   { id:'earth',     log:6.8,  img:'assets/sky/sky_earth.jpg' },         // 蓝色弹珠（NASA Blue Marble）
   { id:'solar',     log:16,   img:'assets/sky/sky_solarsystem.jpg' },   // 太阳系（NASA）
-  { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.svg' },        // 银河系·棒旋星系（程序化 SVG）
+  { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.png' },        // 银河系·棒旋星系（NASA-JPL / Caltech / ESO / R.Hurt 结构图，真实科学可视化）
   { id:'group',     log:23,   img:'assets/sky/sky_group.svg' },         // 本星系群（程序化 SVG）
   { id:'virgo',     log:24,   img:'assets/sky/sky_virgo.svg' },         // 室女座超星系团·扁平薄饼（程序化 SVG）
   { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.svg' },      // 拉尼亚凯亚超星系团·宇宙纤维网（程序化 SVG）
@@ -110,7 +110,7 @@ function buildSkyBg(mount){
 
   bgCredit = document.createElement('div');
   bgCredit.className = 'sky-credit';
-  bgCredit.innerHTML = '背景图：NASA（蓝色弹珠 / 黑色弹珠·城市灯火 / 银河 / 太阳系）· ESA Planck（CMB 全天图，CC BY-SA 3.0 IGO）· 银河系 / 本星系群 / 室女座 / 拉尼亚凯亚为程序化科学可视化';
+  bgCredit.innerHTML = '背景图：NASA（蓝色弹珠 / 黑色弹珠·城市灯火 / 银河 / 太阳系 / 银河系结构图）· ESA Planck（CMB 全天图，CC BY-SA 3.0 IGO）· 本星系群 / 室女座 / 拉尼亚凯亚为程序化科学可视化';
   mount.appendChild(bgCredit);                   // 署名条，压在交互层之上、提示之下
 }
 
