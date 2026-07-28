@@ -259,10 +259,11 @@ function drawEdges(layer) {
 // A.5 统一之路「统一程度」可视化：在 unification 视图下，为带 unifyLevel 的节点
 // 绘制一个 5 级台阶小组件（L1 分立 -> L5 万有理论）。其他视图不绘制，零影响。
 function drawUnifyLadder(g, level, r, isLarge) {
-  const N = 5, RW = 7, RH = 11, GAP = 2.5;
+  const N = 5, RW = 10, RH = 14, GAP = 3;
   const totalW = N * RW + (N - 1) * GAP;
   const startX = -totalW / 2;
-  const y0 = isLarge ? r + 14 : r + 50;
+  // 大节点(core/hub)标签在圆内 → 台阶紧贴圆下方；小节点标签在圆外 → 台阶在标签之下
+  const y0 = isLarge ? r + 18 : r + 56;
   const lg = el('g', { class: 'unif-ladder', transform: `translate(0,${y0})` }, g);
   for (let i = 0; i < N; i++) {
     const x = startX + i * (RW + GAP);

@@ -365,9 +365,26 @@ body.view-people .hint{display:none;}
   -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
   display: none;
   font-size: 12px; color: var(--ink-1);
+  transition: width .25s ease, padding .25s ease;
 }
 body.view-unification .unif-legend{ display: block; }
-.unif-legend__title{ font-size: 13px; font-weight: 800; letter-spacing:.04em; color: var(--gold-dark); margin-bottom: 8px; }
+.unif-legend__head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.unif-legend__title{ font-size: 13px; font-weight: 800; letter-spacing:.04em; color: var(--gold-dark); }
+.unif-legend__close{
+  flex:0 0 auto; width:24px; height:24px; border:none; border-radius:6px;
+  background:rgba(42,38,32,.08); color:var(--ink-2); font-size:16px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .15s;
+}
+.unif-legend__close:hover{ background:rgba(42,38,32,.16); color:var(--ink-1); }
+/* 收起状态：缩为小药丸，仅显示标题 + 展开按钮 */
+.unif-legend.is-closed{ width:auto; padding:6px 10px; cursor:pointer; }
+.unif-legend.is-closed .unif-legend__head{ margin-bottom:0; }
+.unif-legend.is-closed .unif-legend__close{ display:none; }
+.unif-legend.is-closed .unif-legend__scale,
+.unif-legend.is-closed .unif-legend__list,
+.unif-legend.is-closed .unif-legend__note{ display:none; }
+.unif-legend.is-closed::after{ content:attr(data-collapsed-label); font-size:11px; font-weight:700; color:var(--gold-dark); letter-spacing:.03em; }
 .unif-legend__scale{ display:flex; gap:3px; margin-bottom:10px; }
 .unif-legend__scale .lr{ width:34px; height:12px; border-radius:2px; }
 .unif-legend__scale .lr--on{ background: var(--gold); }
