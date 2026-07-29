@@ -67,32 +67,7 @@ async function boot() {
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
   wireUI();
 
-  // A.5 统一之路图例：关闭/展开交互（localStorage 记忆，跨会话保持）
-  (function initUnifLegend() {
-    const el = document.getElementById('unifLegend');
-    const btn = document.getElementById('unifLegendClose');
-    if (!el || !btn) return;
-    const KEY = 'pp-unif-legend-closed';
-    function apply(closed) {
-      el.classList.toggle('is-closed', closed);
-      const label = state.lang === 'en' ? '▶ Unification Level' : '▶ 统一程度';
-      el.setAttribute('data-collapsed-label', closed ? label : '');
-    }
-    // 恢复状态：首次访问（无key）默认收起，不遮挡视图；仅用户主动展开过才恢复展开
-    try { apply(localStorage.getItem(KEY) !== '0'); } catch(e) {}
-    // 关闭 → 收起
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      apply(true);
-      try { localStorage.setItem(KEY, '1'); } catch(e) {}
-    });
-    // 收起状态点击药丸 → 展开
-    el.addEventListener('click', () => {
-      if (!el.classList.contains('is-closed')) return;
-      apply(false);
-      try { localStorage.setItem(KEY, '0'); } catch(e) {}
-    });
-  })();
+  // A.5 统一之路图例：纯 CSS hover tooltip，无需 JS 状态管理
 
   // 思维导图模块初始化（仅缓存数据与绑定事件，渲染推迟到首次进入 void→思维导图）
   try {
