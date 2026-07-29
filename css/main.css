@@ -378,7 +378,7 @@ body.view-unification .unif-legend{ display: block; }
 }
 .unif-legend__close:hover{ background:rgba(42,38,32,.16); color:var(--ink-1); }
 /* 收起状态：缩为小药丸，仅显示标题 + 展开按钮 */
-.unif-legend.is-closed{ width:auto; padding:6px 10px; cursor:pointer; }
+.unif-legend.is-closed{ width:auto; padding:6px 10px; cursor:pointer; bottom:52px; }
 .unif-legend.is-closed .unif-legend__head{ margin-bottom:0; }
 .unif-legend.is-closed .unif-legend__close{ display:none; }
 .unif-legend.is-closed .unif-legend__scale,
