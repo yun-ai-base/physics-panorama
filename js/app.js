@@ -78,8 +78,8 @@ async function boot() {
       const label = state.lang === 'en' ? '▶ Unification Level' : '▶ 统一程度';
       el.setAttribute('data-collapsed-label', closed ? label : '');
     }
-    // 恢复状态
-    try { apply(localStorage.getItem(KEY) === '1'); } catch(e) {}
+    // 恢复状态：首次访问（无key）默认收起，不遮挡视图；仅用户主动展开过才恢复展开
+    try { apply(localStorage.getItem(KEY) !== '0'); } catch(e) {}
     // 关闭 → 收起
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -90,7 +90,7 @@ async function boot() {
     el.addEventListener('click', () => {
       if (!el.classList.contains('is-closed')) return;
       apply(false);
-      try { localStorage.removeItem(KEY); } catch(e) {}
+      try { localStorage.setItem(KEY, '0'); } catch(e) {}
     });
   })();
 

@@ -353,9 +353,9 @@ body.view-people .hint{display:none;}
 .site-footer a:hover{text-decoration:underline;}
 .site-footer__sep{margin:0 8px; opacity:.5;}
 
-/* A.5 统一之路「统一程度」图例浮层（仅 unification 视图显示） */
+/* A.5 统一之路「统一程度」图例浮层（仅 unification 视图显示，右下角避免遮挡左侧节点） */
 .unif-legend{
-  position: fixed; left: 18px; bottom: 18px; z-index: 60;
+  position: fixed; right: 18px; bottom: 18px; z-index: 60;
   width: 290px; max-width: calc(100vw - 36px);
   padding: 14px 16px 12px;
   background: rgba(255,253,248,.94);
@@ -378,7 +378,7 @@ body.view-unification .unif-legend{ display: block; }
 }
 .unif-legend__close:hover{ background:rgba(42,38,32,.16); color:var(--ink-1); }
 /* 收起状态：缩为小药丸，仅显示标题 + 展开按钮（移到右下角避免遮挡左侧日志/操作栏） */
-.unif-legend.is-closed{ width:auto; padding:6px 10px; cursor:pointer; bottom:52px; left:auto; right:18px; }
+.unif-legend.is-closed{ width:auto; padding:6px 10px; cursor:pointer; left:auto; right:18px; }
 .unif-legend.is-closed .unif-legend__head{ margin-bottom:0; }
 .unif-legend.is-closed .unif-legend__close{ display:none; }
 .unif-legend.is-closed .unif-legend__scale,
