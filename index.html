@@ -80,25 +80,6 @@
         </div>
       </div>
 
-    <!-- A.5 统一之路「统一程度」图例（仅 unification 视图显示） -->
-    <div class="unif-legend is-closed" id="unifLegend">
-      <div class="unif-legend__head">
-        <div class="unif-legend__title" data-i18n="unifLegendTitle">统一程度</div>
-        <button type="button" class="unif-legend__close" id="unifLegendClose" aria-label="关闭图例">&times;</button>
-      </div>
-      <div class="unif-legend__scale" aria-hidden="true">
-        <span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--dash"></span>
-      </div>
-      <ol class="unif-legend__list">
-        <li><b>L1</b> <span data-i18n="unifL1">分立：四力各自为政（以牛顿力学为代表）</span></li>
-        <li><b>L2</b> <span data-i18n="unifL2">电磁合一：电与磁统一为电磁力（麦克斯韦方程组）</span></li>
-        <li><b>L3</b> <span data-i18n="unifL3">电弱统一：电磁力与弱力统一（电弱统一理论）</span></li>
-        <li><b>L4</b> <span data-i18n="unifL4">标准模型：强力 + 电弱，三力归一（标准模型 / 大统一理论）</span></li>
-        <li><b>L5</b> <span data-i18n="unifL5">万有理论：四力归一，含引力（弦论 / 圈量子引力，理论假设中）</span></li>
-      </ol>
-      <div class="unif-legend__note" data-i18n="unifNote">金色台阶越高，表示越多基本相互作用被纳入同一理论框架；L5 为含引力的万有理论，目前仍属理论假设（虚线）。</div>
-    </div>
-
     <!-- 主舞台 -->
     <main class="stage-wrap">
       <div class="stage" id="stage">
@@ -136,6 +117,24 @@
             <g id="layer-scale-labels"></g>
           </g>
         </svg>
+        <!-- A.5 统一之路「统一程度」图例（内嵌 stage 容器，absolute 定位不遮挡外部） -->
+        <div class="unif-legend is-closed" id="unifLegend">
+          <div class="unif-legend__head">
+            <span class="unif-legend__title" data-i18n="unifLegendTitle">统一程度</span>
+            <button type="button" class="unif-legend__close" id="unifLegendClose" aria-label="关闭">&times;</button>
+          </div>
+          <div class="unif-legend__scale" aria-hidden="true">
+            <span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--dash"></span>
+          </div>
+          <ol class="unif-legend__list">
+            <li><b>L1</b> <span data-i18n="unifL1">分立：四力各自为政</span></li>
+            <li><b>L2</b> <span data-i18n="unifL2">电磁合一：电→磁统一为电磁力</span></li>
+            <li><b>L3</b> <span data-i18n="unifL3">电弱统一：电磁+弱力统一</span></li>
+            <li><b>L4</b> <span data-i18n="unifL4">标准模型：三力归一</span></li>
+            <li><b>L5</b> <span data-i18n="unifL5">万有理论：四力归一含引力（假设）</span></li>
+          </ol>
+          <div class="unif-legend__note" data-i18n="unifNote">金色台阶越高，表示越多基本相互作用被纳入同一理论框架；L5 虚线表示目前仍属理论假设。</div>
+        </div>
         <div class="hint" id="zoomHint">拖拽/单指平移 · 滚轮/双指缩放 · 点击深入 · Esc 返回</div>
       </div>
 

@@ -353,43 +353,50 @@ body.view-people .hint{display:none;}
 .site-footer a:hover{text-decoration:underline;}
 .site-footer__sep{margin:0 8px; opacity:.5;}
 
-/* A.5 统一之路「统一程度」图例浮层（仅 unification 视图显示，右下角避免遮挡左侧节点） */
+/* A.5 统一之路「统一程度」图例 —— 内嵌 #stage 容器，absolute 定位，不遮挡任何外部组件 */
 .unif-legend{
-  position: fixed; right: 18px; bottom: 18px; z-index: 60;
-  width: 290px; max-width: calc(100vw - 36px);
-  padding: 14px 16px 12px;
-  background: rgba(255,253,248,.94);
-  border: 1px solid rgba(184,137,59,.35);
-  border-radius: 14px;
-  box-shadow: 0 8px 28px rgba(42,38,32,.16);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  position: absolute; top: 10px; right: 10px; z-index: 15;
+  width: 260px; max-width: calc(100% - 20px);
+  padding: 0;
+  background: rgba(255,253,248,.92);
+  border: 1px solid rgba(184,137,59,.30);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(42,38,32,.12);
+  font-size: 11.5px; color: var(--ink-1);
   display: none;
-  font-size: 12px; color: var(--ink-1);
-  transition: width .25s ease, padding .25s ease;
+  overflow: hidden;
 }
 body.view-unification .unif-legend{ display: block; }
-.unif-legend__head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-.unif-legend__title{ font-size: 13px; font-weight: 800; letter-spacing:.04em; color: var(--gold-dark); }
-.unif-legend__close{
-  flex:0 0 auto; width:24px; height:24px; border:none; border-radius:6px;
-  background:rgba(42,38,32,.08); color:var(--ink-2); font-size:16px; line-height:1;
-  cursor:pointer; display:flex; align-items:center; justify-content:center;
-  transition:background .15s;
+/* 收起默认状态：单行药丸 */
+.unif-legend.is-closed{
+  width: auto; padding: 5px 11px;
+  cursor:pointer; border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(42,38,32,.10);
 }
-.unif-legend__close:hover{ background:rgba(42,38,32,.16); color:var(--ink-1); }
-/* 收起状态：缩为小药丸，仅显示标题 + 展开按钮（移到右下角避免遮挡左侧日志/操作栏） */
-.unif-legend.is-closed{ width:auto; padding:6px 10px; cursor:pointer; left:auto; right:18px; }
 .unif-legend.is-closed .unif-legend__head{ margin-bottom:0; }
 .unif-legend.is-closed .unif-legend__close{ display:none; }
 .unif-legend.is-closed .unif-legend__scale,
 .unif-legend.is-closed .unif-legend__list,
 .unif-legend.is-closed .unif-legend__note{ display:none; }
-.unif-legend.is-closed::after{ content:attr(data-collapsed-label); font-size:11px; font-weight:700; color:var(--gold-dark); letter-spacing:.03em; }
-.unif-legend__scale{ display:flex; gap:3px; margin-bottom:10px; }
-.unif-legend__scale .lr{ width:34px; height:12px; border-radius:2px; }
+.unif-legend.is-closed::after{
+  content:attr(data-collapsed-label); font-size:11px; font-weight:700;
+  color:var(--gold-dark); letter-spacing:.03em; white-space:nowrap;
+}
+/* 展开状态 */
+.unif-legend__head{ display:flex; align-items:center; justify-content:space-between; padding:7px 10px 5px; }
+.unif-legend__title{ font-size: 12px; font-weight:800; letter-spacing:.04em; color: var(--gold-dark); }
+.unif-legend__close{
+  flex:0 0 auto; width:22px; height:22px; border:none; border-radius:5px;
+  background:rgba(42,38,32,.07); color:var(--ink-2); font-size:15px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.unif-legend__close:hover{ background:rgba(42,38,32,.14); color:var(--ink-1); }
+.unif-legend__scale{ display:flex; gap:2.5px; padding:6px 10px 4px; }
+.unif-legend__scale .lr{ width:36px; height:10px; border-radius:2px; }
 .unif-legend__scale .lr--on{ background: var(--gold); }
-.unif-legend__scale .lr--dash{ background: rgba(184,137,59,.32); border:1px dashed var(--gold); box-sizing:border-box; }
-.unif-legend__list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
-.unif-legend__list li{ line-height:1.45; }
-.unif-legend__list b{ color: var(--gold-dark); margin-right:4px; }
+.unif-legend__scale .lr--dash{ background: rgba(184,137,59,.28); border:1px dashed var(--gold); box-sizing:border-box; }
+.unif-legend__list{ list-style:none; margin:0; padding:0 10px; display:flex; flex-direction:column; gap:4px; }
+.unif-legend__list li{ line-height:1.4; }
+.unif-legend__list b{ color: var(--gold-dark); margin-right:3px; font-size:11px; }
+.unif-legend__note{ margin:6px 10px 8px; padding-top:5px; border-top:1px solid rgba(42,38,32,.08); color: var(--ink-2); line-height:1.4; font-size:10.5px; }
 .unif-legend__note{ margin-top:10px; padding-top:8px; border-top:1px solid rgba(42,38,32,.1); color: var(--ink-2); line-height:1.5; }
