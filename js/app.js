@@ -24,8 +24,9 @@ const st = document.createElement('style');
 st.textContent = '.node.is-search .node__circle{stroke:var(--gold)!important;stroke-width:3.6!important;}';
 document.head.appendChild(st);
 
-// 移动端首页提醒：检测到移动设备后弹出，停留 2 秒自动淡出
+// 移动端首页提醒：已随移动端适配完成而禁用（原逻辑保留供参考）
 function maybeShowMobileNotice() {
+  /* 移动端适配完成后不再显示此提示
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
   if (!isMobile) return;
   const box = document.createElement('div');
@@ -40,6 +41,7 @@ function maybeShowMobileNotice() {
     box.classList.add('is-hide');
     setTimeout(() => box.remove(), 600);
   }, 2000);
+  */
 }
 
 async function boot() {

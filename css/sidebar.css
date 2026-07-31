@@ -45,10 +45,7 @@
 
 /* ── 内容面板 (sb-panel) ───────────────────────── */
 .sb-panel{min-height:60px;}
-.sb-mobile-tip{display:none;}
-@media (max-width:768px){
-  .sb-mobile-tip{display:block; padding:7px 10px; margin:6px 0 10px; background:rgba(200,159,94,.12); border:1px solid rgba(200,159,94,.32); border-radius:8px; color:var(--gold); font-size:12px; text-align:center; font-weight:500;}
-}
+.sb-mobile-tip{display:none;} /* 移动端适配完成后不再显示 */
 
 /* ── 分区卡片 (sb-section) ──────────────────────── */
 .sb-section{background:#fff; border:1px solid rgba(42,38,32,.07); border-radius:10px; padding:14px 16px; margin:10px 0; box-shadow:0 1px 3px rgba(42,38,32,.04);}
