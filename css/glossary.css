@@ -142,3 +142,9 @@
 
 /* 术语表视图激活时隐藏全站底栏（释放空间给标签栏） */
 body:has(#glossaryView:not([hidden])) .bottombar { display: none !important; }
+
+/* 移动端：术语卡片收窄，一次接近一屏宽，避免单卡几乎占满小屏 */
+@media (max-width:768px){
+  .gterm{flex:0 0 min(86vw,320px); width:min(86vw,320px);}
+  .glossary-search{width:min(46vw,200px);}
+}

@@ -811,8 +811,34 @@ function setView(v) {
     renderGlossary();
   } else {
     renderCurrent(); fit();
+    if (v === 'unification') renderUnifPanel();
   }
   updateURL();
+}
+
+// A.5 统一之路「统一程度」阶梯面板渲染（仅 view-unification 左侧列，零遮挡）
+function renderUnifPanel() {
+  const ladder = document.getElementById('unifLadder');
+  if (!ladder) return;
+  const steps = [
+    { t: 'unifStepT1', d: 'unifStepD1' },
+    { t: 'unifStepT2', d: 'unifStepD2' },
+    { t: 'unifStepT3', d: 'unifStepD3' },
+    { t: 'unifStepT4', d: 'unifStepD4' },
+    { t: 'unifStepT5', d: 'unifStepD5' },
+  ];
+  ladder.innerHTML = steps.map((s, i) => {
+    const lvl = i + 1;
+    const cls = lvl <= 4 ? 'unif-step--filled' : 'unif-step--aspirational';
+    return `<div class="unif-step ${cls}" style="--lvl:${lvl}">
+      <span class="unif-step__num">${lvl}</span>
+      <div class="unif-step__body">
+        <div class="unif-step__title" data-i18n="${s.t}"></div>
+        <div class="unif-step__desc" data-i18n="${s.d}"></div>
+      </div>
+    </div>`;
+  }).join('');
+  applyUILanguage();   // 立即填充 data-i18n 文本（语言切换时也会自动重跑）
 }
 function onPickPerson(name) {
   const p = PEOPLE_MAP.get(name);

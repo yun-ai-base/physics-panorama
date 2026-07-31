@@ -10,14 +10,25 @@
 
 @media (max-width:768px){
   .stage-wrap{flex-direction:column;}
+  /* 移动端裁掉「侧栏滑出 / 顶栏溢出」造成的整页横向滚动（根因：absolute 侧栏 translateX(100%) 被推到视口外 430px） */
+  #app{overflow-x:hidden;}
   .sidebar{position:absolute; right:0; top:0; bottom:0; width:100%; max-width:430px; z-index:40; border-left:none; box-shadow:-12px 0 40px rgba(0,0,0,.18);}
   .topbar{padding:10px 14px 8px; gap:8px;}
   .brand__title{font-size:20px;}
   .nav-row{flex-wrap:wrap; gap:8px;}
-  .views{width:100%; justify-content:center;}
-  .search{order:-1; width:100%; display:flex; justify-content:center; margin-bottom:2px;}
+  .views{width:100%; justify-content:flex-start; overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; -webkit-overflow-scrolling:touch;}
+  .views::-webkit-scrollbar{display:none;}
+  .search{order:-1; flex:1 1 auto; width:auto; max-width:none; display:flex; justify-content:center; margin-bottom:0;}
   .search input{width:100%; max-width:300px;}
-  .era-nav{flex-wrap:wrap; gap:8px; height:auto; padding:8px 14px;}
+  .lang-toggle{order:-1; flex:0 0 auto; margin-left:6px; white-space:nowrap;}
+  .people-view{padding:16px 14px 36px;}
+  .era-nav{flex-wrap:nowrap; gap:8px; height:auto; padding:8px 12px;}
+  .nav-group--filter{flex-wrap:nowrap; min-width:0; flex:1 1 auto;}
+  .era-tabs{overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; max-width:58%;}
+  .era-tabs::-webkit-scrollbar{display:none;}
+  .path-tabs{overflow-x:auto; flex-wrap:nowrap; flex:1 1 auto; padding-left:8px; margin-left:4px; scrollbar-width:none;}
+  .path-tabs::-webkit-scrollbar{display:none;}
+  .nav-group--display{flex:0 0 auto; margin-left:8px;}
   .hint{display:block; bottom:10px; font-size:0; color:transparent; white-space:nowrap;}
   .hint::after{content:var(--hint-mobile, "单指拖拽平移 · 双指捏合缩放 · 点击节点"); font-size:11px; color:var(--ink-3); letter-spacing:.5px;}
   .people-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; padding:0 4px;}

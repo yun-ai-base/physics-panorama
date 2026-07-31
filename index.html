@@ -82,6 +82,15 @@
 
     <!-- 主舞台 -->
     <main class="stage-wrap">
+      <!-- A.5 统一之路「统一程度」阶梯面板（仅 view-unification 左列固定，零遮挡） -->
+      <aside class="unif-panel" id="unifPanel">
+        <div class="unif-panel__head">
+          <h3 class="unif-panel__title" data-i18n="unifPanelTitle">统一之路 · 统一程度</h3>
+          <p class="unif-panel__sub" data-i18n="unifPanelSub">每个台阶代表「已统一的力」数量递增，越高越接近万物归一</p>
+        </div>
+        <div class="unif-panel__ladder" id="unifLadder"></div>
+        <div class="unif-panel__foot" data-i18n="unifPanelFoot">四力分立 ⟶ 四力统一</div>
+      </aside>
       <div class="stage" id="stage">
         <svg id="panorama" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
           <defs>
@@ -117,23 +126,7 @@
             <g id="layer-scale-labels"></g>
           </g>
         </svg>
-        <!-- A.5 统一之路「统一程度」图例（常驻小药丸 + hover tooltip，零遮挡） -->
-        <div class="unif-legend" id="unifLegend">
-          <span class="unif-legend__pill" data-i18n="unifLegendPill">统一程度 L1–L5</span>
-          <div class="unif-legend__tooltip">
-            <div class="unif-legend__scale" aria-hidden="true">
-              <span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--on"></span><span class="lr lr--dash"></span>
-            </div>
-            <ol class="unif-legend__list">
-              <li><b>L1</b> <span data-i18n="unifL1">分立：四力各自为政</span></li>
-              <li><b>L2</b> <span data-i18n="unifL2">电磁合一：电→磁统一为电磁力</span></li>
-              <li><b>L3</b> <span data-i18n="unifL3">电弱统一：电磁+弱力统一</span></li>
-              <li><b>L4</b> <span data-i18n="unifL4">标准模型：三力归一</span></li>
-              <li><b>L5</b> <span data-i18n="unifL5">万有理论：四力归一含引力（假设）</span></li>
-            </ol>
-            <div class="unif-legend__note" data-i18n="unifNote">金色台阶越高，表示越多基本相互作用被纳入同一理论框架；L5 虚线表示目前仍属理论假设。</div>
-          </div>
-        </div>
+        <!-- A.5 图例已迁移至左侧 unif-panel -->
         <div class="hint" id="zoomHint">拖拽/单指平移 · 滚轮/双指缩放 · 点击深入 · Esc 返回</div>
       </div>
 
