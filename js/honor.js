@@ -29,6 +29,14 @@ function ensurePop() {
   popEl.className = 'honor-pop';
   popEl.id = 'honorPop';
   popEl.setAttribute('role', 'dialog');
+  // 顶部拖拽手柄 + 关闭按钮（仅底部抽屉模式 .honor-pop--sheet 下显示）
+  const grip = document.createElement('button');
+  grip.type = 'button';
+  grip.className = 'honor-pop__close';
+  grip.setAttribute('aria-label', '关闭');
+  grip.innerHTML = '<span class="honor-pop__grip"></span>';
+  grip.addEventListener('click', () => hidePop());
+  popEl.appendChild(grip);
   popBody = document.createElement('div');
   popBody.className = 'honor-pop__body';
   popEl.appendChild(popBody);
@@ -143,8 +151,8 @@ function moveFocus(key) {
 
 function positionPop(nodeEl) {
   if (!popEl || !nodeEl) return;
-  // 触屏或小屏（≤600px）：统一使用底部抽屉式，避免 tooltip 超出视口
-  const isNarrow = window.innerWidth <= 600;
+  // 触屏或小屏（≤768px）：统一使用底部抽屉式，避免 tooltip 超出视口
+  const isNarrow = window.innerWidth <= 768;
   if (isTouch || isNarrow) {
     popEl.classList.add('honor-pop--sheet');
     popEl.style.top = '';
@@ -168,8 +176,10 @@ function positionPop(nodeEl) {
   if (top < 8) {
     top = rect.bottom + 8;
   }
-  // 下边界：底部不够则上移
-  if (top + H > window.innerHeight - 16) {
+  // 下边界：底部不够则上移；若内容过高（超过视口），强制置顶并允许内部滚动
+  if (H > window.innerHeight - 32) {
+    top = 16;
+  } else if (top + H > window.innerHeight - 16) {
     top = window.innerHeight - H - 16;
   }
 
