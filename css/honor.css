@@ -216,7 +216,7 @@
 
 /* ── 旧详情面板已废弃，改为跟随式 popover（见 .honor-pop）── */
 
-/* 触屏：底部抽屉式 popover */
+/* 触屏 / 小屏：底部抽屉式 popover */
 .honor-pop--sheet {
   left: 50% !important;
   right: auto;
@@ -225,10 +225,12 @@
   width: min(440px, calc(100vw - 24px));
   border-radius: 16px 16px 0 0;
   border-bottom: none;
-  max-height: 72vh;
+  max-height: 65vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   transform: translateX(-50%) translateY(100%);
   padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 2000;
 }
 .honor-pop--sheet.is-visible {
   transform: translateX(-50%) translateY(0);
@@ -236,6 +238,12 @@
 @media (max-width: 768px) {
   .honor-search { width: 150px; }
   .honor-tools { gap: 6px; }
+  /* 小屏抽屉更宽、更高 */
+  .honor-pop--sheet {
+    width: calc(100vw - 16px);
+    max-height: 60vh;
+    border-radius: 14px 14px 0 0;
+  }
 }
 
 /* ── 跟随式悬浮面罩（popover）────────────────────────────── */

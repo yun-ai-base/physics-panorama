@@ -143,8 +143,9 @@ function moveFocus(key) {
 
 function positionPop(nodeEl) {
   if (!popEl || !nodeEl) return;
-  // 触屏：底部抽屉式，定位交给 CSS（.honor-pop--sheet）
-  if (isTouch) {
+  // 触屏或小屏（≤600px）：统一使用底部抽屉式，避免 tooltip 超出视口
+  const isNarrow = window.innerWidth <= 600;
+  if (isTouch || isNarrow) {
     popEl.classList.add('honor-pop--sheet');
     popEl.style.top = '';
     popEl.style.left = '';
