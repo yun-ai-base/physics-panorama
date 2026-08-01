@@ -29,12 +29,17 @@ function ensurePop() {
   popEl.className = 'honor-pop';
   popEl.id = 'honorPop';
   popEl.setAttribute('role', 'dialog');
+  // 半透明遮罩（点击可关闭抽屉）
+  const overlay = document.createElement('div');
+  overlay.className = 'honor-pop__overlay';
+  overlay.addEventListener('click', () => hidePop());
+  popEl.appendChild(overlay);
   // 顶部拖拽手柄 + 关闭按钮（仅底部抽屉模式 .honor-pop--sheet 下显示）
   const grip = document.createElement('button');
   grip.type = 'button';
   grip.className = 'honor-pop__close';
   grip.setAttribute('aria-label', '关闭');
-  grip.innerHTML = '<span class="honor-pop__grip"></span>';
+  grip.innerHTML = '<span class="honor-pop__grip"></span><span class="honor-pop__close-text">点击此处或外部区域关闭</span>';
   grip.addEventListener('click', () => hidePop());
   popEl.appendChild(grip);
   popBody = document.createElement('div');

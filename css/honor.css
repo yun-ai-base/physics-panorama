@@ -228,7 +228,7 @@
   width: min(440px, calc(100vw - 24px));
   border-radius: 16px 16px 0 0;
   border-bottom: none;
-  max-height: 65vh !important;
+  max-height: 50vh !important;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   transform: translateY(100%);
@@ -238,32 +238,50 @@
 .honor-pop--sheet.is-visible {
   transform: translateY(0);
 }
+/* 抽屉打开时的半透明遮罩（点击可关闭）——遮罩是 .honor-pop 的子元素 */
+.honor-pop__overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: -1; /* 在抽屉内容下方 */
+}
+.honor-pop.is-visible .honor-pop__overlay {
+  display: block;
+}
 /* 抽屉顶部拖拽手柄 + 关闭按钮（仅抽屉模式显示） */
 .honor-pop__close {
   display: none;
   width: 100%;
   border: none;
   background: transparent;
-  padding: 8px 0 6px;
+  padding: 10px 0 8px;
   margin: -8px 0 4px;
   cursor: pointer;
+  position: relative;
 }
-.honor-pop--sheet .honor-pop__close { display: block; }
+.honor-pop--sheet .honor-pop__close { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .honor-pop__grip {
   display: block;
   width: 38px;
   height: 4px;
-  margin: 0 auto;
   border-radius: 999px;
   background: rgba(201, 162, 78, 0.35);
+  flex-shrink: 0;
+}
+.honor-pop__close-text {
+  font-size: 12px;
+  color: var(--gold, #c8a25e);
+  opacity: 0.6;
+  letter-spacing: 1px;
 }
 @media (max-width: 768px) {
   .honor-search { width: 150px; }
   .honor-tools { gap: 6px; }
-  /* 小屏抽屉更宽、更高 */
+  /* 小屏抽屉更宽、但高度控制在50vh以内避免遮挡太多内容 */
   .honor-pop--sheet {
     width: calc(100vw - 16px);
-    max-height: 60vh !important;
+    max-height: 48vh !important;
     border-radius: 14px 14px 0 0;
   }
 }
