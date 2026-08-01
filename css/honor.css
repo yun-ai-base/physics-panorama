@@ -217,23 +217,26 @@
 /* ── 旧详情面板已废弃，改为跟随式 popover（见 .honor-pop）── */
 
 /* 触屏 / 小屏：底部抽屉式 popover */
+/* 水平居中用 left:0;right:0;margin:auto，避免被 .honor-pop.is-visible 的 transform 覆盖 translateX(-50%) 导致右溢 */
 .honor-pop--sheet {
-  left: 50% !important;
-  right: auto;
+  left: 0 !important;
+  right: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
   top: auto !important;
   bottom: 0;
   width: min(440px, calc(100vw - 24px));
   border-radius: 16px 16px 0 0;
   border-bottom: none;
-  max-height: 65vh;
+  max-height: 65vh !important;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  transform: translateX(-50%) translateY(100%);
+  transform: translateY(100%);
   padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 2000;
 }
 .honor-pop--sheet.is-visible {
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 /* 抽屉顶部拖拽手柄 + 关闭按钮（仅抽屉模式显示） */
 .honor-pop__close {
@@ -260,7 +263,7 @@
   /* 小屏抽屉更宽、更高 */
   .honor-pop--sheet {
     width: calc(100vw - 16px);
-    max-height: 60vh;
+    max-height: 60vh !important;
     border-radius: 14px 14px 0 0;
   }
 }
