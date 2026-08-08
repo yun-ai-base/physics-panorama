@@ -3,10 +3,11 @@ import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js';
 import { computeLayout } from './views.js?v=20260808c';
 import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808c';
-import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
+import { initExperiments, renderExperiments, setExpEraFilter, setExpQuery, expCount, getExp } from './experiments.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js';
 import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, focusHonorYear, scrollHonorToOldest, scrollHonorToNewest } from './honor.js';
 import { initSky, renderSky, refreshSkyLang } from './sky.js';
@@ -67,6 +68,11 @@ async function boot() {
   initGlossary(NODES);
   initInteraction();
   PEOPLE_MAP = buildPeople(NODES).reduce((m, p) => m.set(p.name, p), new Map());
+  initExperiments(id => {
+    expOpen = id;
+    openExperiment(getExp(id), byId);
+    updateURL();
+  });
   wireUI();
 
   // A.5 统一之路图例：纯 CSS hover tooltip，无需 JS 状态管理
@@ -100,6 +106,11 @@ async function boot() {
     selectNode(node);
     if (restoreTab) openSidebarTab(restoreTab);
     if (restoreTerm) focusTerm(restoreTerm);
+  }
+  // URL 带 ?exp= 时恢复实验详情（理论·实验视图）
+  if (state.view === 'experiments' && expOpen) {
+    const e = getExp(expOpen);
+    if (e) openExperiment(e, byId);
   }
 
   // 若 URL 带 ?lang=en，启动即进入英文界面
@@ -188,7 +199,7 @@ function applyUILanguage() {
 
   // 顶栏视图 tab（主标题 + 副标题分层更新，避免 textContent 清空副标题）
   document.querySelectorAll('#viewTabs .view-tab').forEach(btn => {
-    const map = { timeline: 'viewTimeline', unification: 'viewUnification', scale: 'viewScale', people: 'viewPeople', void: 'viewVoid', glossary: 'viewGlossary' };
+    const map = { timeline: 'viewTimeline', unification: 'viewUnification', scale: 'viewScale', experiments: 'viewExperiments', people: 'viewPeople', void: 'viewVoid', glossary: 'viewGlossary' };
     const k = map[btn.dataset.view];
     const main = btn.querySelector('.view-tab__main');
     if (main && k) main.textContent = t(k);
@@ -244,6 +255,16 @@ function applyUILanguage() {
   if (peopleSub) peopleSub.textContent = t('peopleSubtitle');
   const peopleSearch = document.getElementById('peopleSearch');
   if (peopleSearch) peopleSearch.placeholder = t('peopleSearchPlaceholder');
+
+  // 理论·实验视图
+  const expSearch = document.getElementById('expSearch');
+  if (expSearch) expSearch.placeholder = t('expSearchPlaceholder');
+  // 实验计数副标题
+  const expSub = document.querySelector('.exp-view__sub');
+  if (expSub) expSub.textContent = t('expSubtitle');
+  // 重建纪元筛选 chips（语言切换时文案随 ERAS 变化）
+  const expTabsEl = document.getElementById('expTabs');
+  if (expTabsEl && expTabsEl.children.length === 0) buildExpTabs();
 
   // 面板标题
   // 导览按钮
@@ -329,6 +350,14 @@ function applyLang() {
   if (state.view === 'people') {
     const pg = document.getElementById('peopleGrid');
     if (pg) renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
+  }
+  // 切语言时重渲染理论·实验（纪元 chips 文案随语言变化；实验正文保持中文）
+  if (state.view === 'experiments') {
+    const expTabsEl = document.getElementById('expTabs');
+    if (expTabsEl) expTabsEl.innerHTML = '';
+    buildExpTabs();
+    renderExperiments(document.getElementById('expGrid'), byId);
+    if (expOpen) { const e = getExp(expOpen); if (e) openExperiment(e, byId); }
   }
   // 切语言时重渲染全局术语表（glossary.js 内部按 state.lang 取 nameEn/labelEn）
   if (state.view === 'glossary') renderGlossary();
@@ -473,7 +502,22 @@ function wireUI() {
 
   document.getElementById('onlyCore').addEventListener('change', e => { state.onlyCore = e.target.checked; applyState(); updateURL(); });
   // 关闭侧栏只收起面板，保留选中节点与关联高亮——关掉后应能在画布上看到关联节点（移动端侧栏全屏遮挡，尤为关键）
-  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); });
+  document.getElementById('sidebarClose').addEventListener('click', () => { closeSidebar(); if (state.view === 'experiments' && expOpen) { expOpen = null; updateURL(); } });
+
+  // 理论·实验：搜索框（200ms 防抖）
+  const expSearchEl = document.getElementById('expSearch');
+  if (expSearchEl) {
+    let expDeb;
+    expSearchEl.addEventListener('input', () => {
+      clearTimeout(expDeb);
+      expDeb = setTimeout(() => {
+        setExpQuery(expSearchEl.value, document.getElementById('expGrid'), byId);
+      }, 200);
+    });
+    expSearchEl.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { expSearchEl.value = ''; setExpQuery('', document.getElementById('expGrid'), byId); }
+    });
+  }
 
   stage.addEventListener('click', e => {
     if (consumeDrag()) return;
@@ -794,6 +838,29 @@ function reflectScaleActive() {
 // 虚无-图景子选项（意境 / 思维导图 / 仰望星空 / 探幽识微 / 荣誉殿堂）
 let voidTab = 'poem';
 const VOID_TABS = ['poem','mindmap','honor','sky','micro'];
+// 理论·实验视图状态
+let expEra = 'all';      // 纪元筛选
+let expOpen = null;      // 当前打开的实验 id（URL 分享用）
+
+// 纪元筛选 chips（全部 / 经典 / 相对论 / 量子 / 标准模型 / 前沿）
+function buildExpTabs() {
+  const wrap = document.getElementById('expTabs');
+  if (!wrap) return;
+  const en = state.lang === 'en';
+  const chips = [{ id: 'all', name: en ? 'All' : '全部' }].concat(
+    ERA_ORDER.map(e => ({ id: e, name: en ? ERAS[e].nameEn : ERAS[e].name }))
+  );
+  wrap.innerHTML = chips.map(c =>
+    `<button class="exp-chip${expEra === c.id ? ' is-active' : ''}" data-era="${c.id}" type="button">${en ? c.name : c.name}</button>`
+  ).join('');
+  wrap.querySelectorAll('.exp-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      expEra = btn.dataset.era;
+      wrap.querySelectorAll('.exp-chip').forEach(b => b.classList.toggle('is-active', b === btn));
+      setExpEraFilter(expEra, document.getElementById('expGrid'), byId);
+    });
+  });
+}
 function activateVoidTab(v) {
   if (!VOID_TABS.includes(v)) v = 'poem';   // 旧链接 / 未知 vtab 回退默认
   document.querySelectorAll('.void-subtab').forEach(t => t.classList.toggle('is-active', t.dataset.void === v));
@@ -844,21 +911,28 @@ function setView(v, push) {
   const isPeople = v === 'people';
   const isVoid = v === 'void';
   const isGlossary = v === 'glossary';
-  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people','view-void','view-glossary');
+  const isExp = v === 'experiments';
+  document.body.classList.remove('view-timeline','view-unification','view-scale','view-people','view-void','view-glossary','view-experiments');
   document.body.classList.add(`view-${v}`);
   const stageEl = document.getElementById('stage');
   const pv = document.getElementById('peopleView');
   const vv = document.getElementById('voidView');
   const gv = document.getElementById('glossaryView');
+  const ev = document.getElementById('experimentsView');
   const smb = document.getElementById('scaleMapBar');
-  if (stageEl) stageEl.style.visibility = (isPeople || isVoid || isGlossary) ? 'hidden' : '';
+  if (stageEl) stageEl.style.visibility = (isPeople || isVoid || isGlossary || isExp) ? 'hidden' : '';
   if (pv) pv.hidden = !isPeople;
   if (vv) vv.hidden = !isVoid;
   if (gv) gv.hidden = !isGlossary;
+  if (ev) ev.hidden = !isExp;
   if (smb) smb.hidden = (v !== 'scale');
   const eraNav = document.getElementById('eraNav');
-  if (eraNav) eraNav.style.display = (isVoid || isGlossary) ? 'none' : '';
-  if (isPeople) {
+  if (eraNav) eraNav.style.display = (isVoid || isGlossary || isExp) ? 'none' : '';
+  if (isExp) {
+    closeSidebar();
+    if (!document.getElementById('expTabs').children.length) buildExpTabs();
+    renderExperiments(document.getElementById('expGrid'), byId);
+  } else if (isPeople) {
     const pg = document.getElementById('peopleGrid');
     renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);
     const ps = document.getElementById('peopleSearch');
@@ -910,6 +984,7 @@ function updateURL(mode) {
   const p = new URLSearchParams();
   if (state.view !== 'timeline') p.set('view', state.view);
   if (state.view === 'void' && voidTab !== 'poem') p.set('vtab', voidTab);
+  if (state.view === 'experiments' && expOpen) p.set('exp', expOpen);
   if (state.filterEra) p.set('era', state.filterEra);
   if (!state.onlyCore) p.set('core', '0');
   if (state.selected) p.set('node', state.selected);
@@ -935,6 +1010,8 @@ function readURL() {
   state.activeEra = state.filterEra; // 激活态随筛选态恢复（刷新后保留高亮 + 综述）
   reflectEraActive();
   document.getElementById('onlyCore').checked = state.onlyCore;
+  const expId = p.get('exp');
+  if (expId) { const e = getExp(expId); if (e) expOpen = expId; }
   return p.get('node');
 }
 

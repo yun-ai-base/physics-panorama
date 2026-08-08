@@ -1007,6 +1007,57 @@ export function openPerson(name, nodeIds) {
   state.sidebarOpen = true;
 }
 
+/* ── 实验详情（理论·实验视图：著名实验 + 对应理论） ── */
+export function openExperiment(exp, nodeById) {
+  const sb = document.getElementById('sidebar');
+  const body = document.getElementById('sidebarBody');
+  if (!exp || !body) return;
+  const era = ERAS[exp.era];
+  const theory = exp.theoryId && nodeById ? nodeById.get(exp.theoryId) : null;
+  const theoryName = theory
+    ? (state.lang === 'en' ? (theory.nameEn || theory.name) : theory.name)
+    : exp.theoryId;
+  const eraName = state.lang === 'en' ? (era?.nameEn || era?.name || exp.era) : (era?.name || exp.era);
+  const figs = (exp.figures || []).map(f => `
+    <span class="sb-fig sb-fig--link" data-name="${esc(f)}">${avatarImg(f)}<span class="sb-fig__name">${esc(state.lang === 'en' ? personNameEn(f) : f)}</span></span>`).join('');
+
+  body.innerHTML = `
+    <div class="sb-head sb-head--person">
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${era ? era.raw : 'var(--gold)'}"></span>${esc(eraName)} · ${esc(String(exp.year))}</div>
+      <div class="sb-person-head">
+        <div class="sb-person-head__text">
+          <div class="sb-person-head__name">${esc(exp.name)}<small>${esc(exp.nameEn || '')}</small></div>
+          <div class="sb-person-head__meta">${exp.icon || '🧪'} ${t('expView')}</div>
+        </div>
+      </div>
+      <div class="sb-head__quote">${esc(exp.summary || '')}</div>
+    </div>
+    ${figs ? `<div class="sb-fig-row" style="display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 6px;">${figs}</div>` : ''}
+    <div class="sb-sec-label">${t('expDetail')}</div>
+    <div class="sb-bio"><div class="sb-bio__body">${parseContent(exp.detail || '')}</div></div>
+    ${theory ? `
+      <div class="sb-explore" style="margin-top:16px;">
+        <div class="sb-explore__title">📌 ${t('expTheoryTitle')}</div>
+        <button class="sb-exp-theory" data-id="${esc(theory.id)}" type="button">
+          <span class="sb-exp-theory__name">${esc(theoryName)}</span>
+          <span class="sb-exp-theory__go">→ ${t('expOpenTheory')}</span>
+        </button>
+      </div>` : ''}`;
+
+  bindAvatars(body);
+  // 人物行 → 打开人物详情（复用 figureNodeIds 聚合）
+  body.querySelectorAll('.sb-fig[data-name]').forEach(btn => {
+    btn.addEventListener('click', () => openPerson(btn.dataset.name, figureNodeIds(btn.dataset.name)));
+  });
+  // 对应理论按钮 → 打开理论节点侧栏
+  const thBtn = body.querySelector('.sb-exp-theory');
+  if (thBtn) thBtn.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: thBtn.dataset.id }));
+  });
+  sb.classList.add('is-open'); sb.setAttribute('aria-hidden', 'false');
+  state.sidebarOpen = true;
+}
+
 /* ── 侧边栏公共控制接口 ───────────────────────────────── */
 
 export function openSidebarTab(tabKey) {

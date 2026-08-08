@@ -25,15 +25,16 @@
   <!-- KaTeX（公式渲染，CDN 引入；加载失败时自动回退为原始 LaTeX 文本，不影响其余功能） -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="css/main.css?v=20260808f" />
-  <link rel="stylesheet" href="css/timeline.css?v=20260808f" />
-  <link rel="stylesheet" href="css/sidebar.css?v=20260808f" />
-  <link rel="stylesheet" href="css/responsive.css?v=20260808f" />
-  <link rel="stylesheet" href="css/tour.css?v=20260808f" />
-  <link rel="stylesheet" href="css/mindmap.css?v=20260808f" />
-  <link rel="stylesheet" href="css/honor.css?v=20260808f" />
-  <link rel="stylesheet" href="css/void-views.css?v=20260808f" />
-  <link rel="stylesheet" href="css/glossary.css?v=20260808f" />
+  <link rel="stylesheet" href="css/main.css?v=20260808g" />
+  <link rel="stylesheet" href="css/timeline.css?v=20260808g" />
+  <link rel="stylesheet" href="css/sidebar.css?v=20260808g" />
+  <link rel="stylesheet" href="css/responsive.css?v=20260808g" />
+  <link rel="stylesheet" href="css/tour.css?v=20260808g" />
+  <link rel="stylesheet" href="css/mindmap.css?v=20260808g" />
+  <link rel="stylesheet" href="css/honor.css?v=20260808g" />
+  <link rel="stylesheet" href="css/void-views.css?v=20260808g" />
+  <link rel="stylesheet" href="css/glossary.css?v=20260808g" />
+  <link rel="stylesheet" href="css/experiments.css?v=20260808g" />
 </head>
 <body>
   <!-- 首屏加载骨架屏（数据加载完成后由 app.js 移除；失败时切换为错误态+重试）
@@ -66,6 +67,7 @@
           <button class="view-tab" data-view="timeline"><span class="view-tab__main">时间线</span><span class="view-tab__sub" data-navsub="navTimelineSub">三百年物理重大事件</span></button>
           <button class="view-tab" data-view="unification"><span class="view-tab__main">统一之路</span><span class="view-tab__sub" data-navsub="navUnificationSub">从牛顿到标准模型</span></button>
           <button class="view-tab" data-view="scale"><span class="view-tab__main">尺度维度</span><span class="view-tab__sub" data-navsub="navScaleSub">普朗克到宇宙尺度</span></button>
+          <button class="view-tab" data-view="experiments"><span class="view-tab__main">理论·实验</span><span class="view-tab__sub" data-navsub="navExperimentsSub">著名实验 · 对应理论</span></button>
           <button class="view-tab" data-view="people"><span class="view-tab__main">人物索引</span><span class="view-tab__sub" data-navsub="navPeopleSub">三百年物理学家</span></button>
           <button class="view-tab" data-view="void"><span class="view-tab__main">虚无-图景</span><span class="view-tab__sub" data-navsub="navVoidSub">物理·哲学·意境</span></button>
           <button class="view-tab" data-view="glossary"><span class="view-tab__main">术语表</span><span class="view-tab__sub" data-navsub="navGlossarySub">全站术语检索</span></button>
@@ -163,6 +165,19 @@
 
       <!-- 手机端 <480px 竖排卡片列表（默认 hidden，仅超小屏显示，设计 4.4） -->
       <div class="mobile-list" id="mobileList" hidden></div>
+
+      <!-- 理论·实验视图（覆盖层：著名实验卡片 + 对应理论联动） -->
+      <div class="exp-view" id="experimentsView" hidden>
+        <div class="exp-view__head">
+          <h2 data-i18n="expView">理论 · 实验</h2>
+          <p class="exp-view__sub" data-i18n="expSubtitle">十六个改变物理学的著名实验 · 每个实验都对应一个理论节点</p>
+          <div class="exp-tools">
+            <div class="exp-tabs" id="expTabs" role="tablist" aria-label="按纪元筛选实验"></div>
+            <input id="expSearch" class="exp-search" type="search" placeholder="搜索实验 / 物理学家…" aria-label="搜索实验" />
+          </div>
+        </div>
+        <div class="exp-grid" id="expGrid"></div>
+      </div>
 
       <!-- 人物索引视图（覆盖层） -->
       <div class="people-view" id="peopleView" hidden>
@@ -322,8 +337,8 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=20260808f"></script>
-  <script type="module" src="js/poem.js?v=20260808f"></script>
-  <script defer src="js/changelog.js?v=20260808f"></script>
+  <script type="module" src="js/app.js?v=20260808g"></script>
+  <script type="module" src="js/poem.js?v=20260808g"></script>
+  <script defer src="js/changelog.js?v=20260808g"></script>
 </body>
 </html>
