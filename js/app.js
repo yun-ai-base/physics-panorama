@@ -1,8 +1,8 @@
 import { state } from './state.js';
 import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js';
-import { computeLayout } from './views.js?v=20260808d';
-import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808d';
+import { computeLayout } from './views.js?v=20260808e';
+import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808e';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
@@ -298,13 +298,17 @@ function buildEraTabs() {
     ERA_ORDER.map(e => `<button class="era-tab" data-era="${e}"><span class="swatch" style="background:${ERAS[e].raw}"></span>${en ? ERAS[e].nameEn : ERAS[e].name}</button>`).join('');
 }
 
-// A.4 阅读路径：按读者背景生成的预设路线 tab
+// A.4 阅读路径：按读者背景生成的预设路线 tab（含「全部」）
 function buildPathTabs() {
   const en = state.lang === 'en';
   const pathTabs = document.getElementById('pathTabs');
   if (!pathTabs) return;
   const activeId = activePathId();
-  pathTabs.innerHTML = READER_PATHS.map(p => {
+  const allOn = !state.pathIds ? ' is-active' : '';
+  const allLabel = t('pathAll') || '全部';
+  const allTitle = en ? 'Show all nodes' : '显示全部节点';
+  const allBtn = `<button class="path-tab${allOn}" data-path="all" title="${allTitle}"><span class="path-tab__dot"></span>${allLabel}</button>`;
+  pathTabs.innerHTML = allBtn + READER_PATHS.map(p => {
     const on = activeId === p.id ? ' is-active' : '';
     const label = en ? p.nameEn : p.name;
     return `<button class="path-tab${on}" data-path="${p.id}" title="${p.desc}"><span class="path-tab__dot"></span>${label}</button>`;
@@ -475,12 +479,17 @@ function wireUI() {
     pathTabs.addEventListener('click', e => {
       const b = e.target.closest('.path-tab'); if (!b) return;
       const id = b.dataset.path;
-      const p = READER_PATHS.find(x => x.id === id);
-      // 再次点击同一路径 → 取消
-      if (state.pathIds && activePathId() === id) {
+      if (id === 'all') {
+        // 「全部」：清除阅读路径筛选，显示全部节点
         state.pathIds = null;
       } else {
-        state.pathIds = new Set(p.nodeIds);
+        const p = READER_PATHS.find(x => x.id === id);
+        // 再次点击同一路径 → 取消
+        if (state.pathIds && activePathId() === id) {
+          state.pathIds = null;
+        } else {
+          state.pathIds = new Set(p.nodeIds);
+        }
       }
       reflectPathActive(); applyState(); updateURL();
     });
@@ -946,11 +955,12 @@ function reflectEraActive() {
   });
 }
 
-// A.4 阅读路径激活态：反映路径 tab 的高亮
+// A.4 阅读路径激活态：反映路径 tab 的高亮（「全部」= 未筛选时高亮）
 function reflectPathActive() {
   const id = activePathId();
   document.querySelectorAll('.path-tab').forEach(t => {
-    t.classList.toggle('is-active', t.dataset.path === id);
+    const on = t.dataset.path === 'all' ? !state.pathIds : t.dataset.path === id;
+    t.classList.toggle('is-active', on);
   });
 }
 // 时间线纪元大字点击：轻量激活（高亮 + 综述，不改筛选）；再次点击同纪元取消
