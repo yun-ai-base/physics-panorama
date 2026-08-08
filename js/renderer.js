@@ -263,10 +263,11 @@ function drawNodes(layer) {
   for (const n of NODES) {
     const p = POS[n.id];
     if (!p) continue;
-    let r = 18;
-    if (n.type === 'event') r = 14;
-    else     if (n.tier === 'core') r = 26;
-    else if (n.tier === 'hub') r = 22;
+    // 节点球半径：2026-08-08 调大约 22%（用户反馈球偏小、首屏识别不佳）
+    let r = 22;
+    if (n.type === 'event') r = 17;
+    else     if (n.tier === 'core') r = 32;
+    else if (n.tier === 'hub') r = 28;
     const g = el('g', {
       class: 'node', 'data-id': n.id, 'data-era': n.era,
       'data-maturity': n.maturity, 'data-type': n.type,
@@ -284,10 +285,10 @@ function drawNodes(layer) {
       }
     } else {
       // 圆圈外：名字和年份在正下方
-      const nameY = r + 20;
+      const nameY = r + 22;
       el('text', { class: 'node__label', x: 0, y: nameY, text: nameText }, g);
       if (typeof n.year === 'number') {
-        const yearY = r + 36;
+        const yearY = r + 40;
         el('text', { class: 'node__year', x: 0, y: yearY, text: String(n.year) }, g);
       }
     }

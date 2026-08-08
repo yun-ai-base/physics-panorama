@@ -1,8 +1,8 @@
 import { ERA_RANK, SCALE_RANK, SCALE_ORDER } from './config.js';
 
 const W = 2600; // 画布宽度
-const NODE_R = 32; // 节点碰撞半径（含标签）
-const MIN_DIST = NODE_R * 2.4; // 最小中心距 ≈ 77px
+const NODE_R = 38; // 节点碰撞半径（含标签；2026-08-08 随节点球调大 32→38 同步放大）
+const MIN_DIST = NODE_R * 2.4; // 最小中心距 ≈ 91px
 
 export function computeLayout(nodes, view) {
   let pos;

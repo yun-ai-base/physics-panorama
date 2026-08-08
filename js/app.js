@@ -1,8 +1,8 @@
 import { state } from './state.js';
 import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js';
-import { computeLayout } from './views.js';
-import { initRenderer, renderGraph, applyState } from './renderer.js';
+import { computeLayout } from './views.js?v=20260808c';
+import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808c';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';

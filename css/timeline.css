@@ -79,9 +79,10 @@
 .node__label{font-family:var(--font-sans); font-size:14px; font-weight:600; fill:var(--ink); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,1); stroke-width:6.5px; stroke-linejoin:round;}
 .node__year{font-size:11px; font-weight:500; fill:var(--ink-2); text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(247,243,234,1); stroke-width:5.5px; stroke-linejoin:round;}
 
-/* 大节点(core/hub)圆圈内标签：浅色圆底上用深色字+白描边才清晰（选中变深底时也保持深字，加亮描边隔离） */
-.node__label--inner{font-size:12px; font-weight:700; fill:#3A3228; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(255,255,255,.95); stroke-width:3.4px; stroke-linejoin:round; letter-spacing:.5px;}
-.node__year--inner{font-size:10px; font-weight:600; fill:#5A5147; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(255,255,255,.92); stroke-width:2.4px;}
+/* 大节点(core/hub)圆圈内标签：浅色圆底上用深色字+白描边才清晰（选中变深底时也保持深字，加亮描边隔离）
+   2026-08-08 节点球调大约22%（r 26→32），内文字号同步微增 12→13px */
+.node__label--inner{font-size:13px; font-weight:700; fill:#3A3228; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(255,255,255,.95); stroke-width:3.4px; stroke-linejoin:round; letter-spacing:.5px;}
+.node__year--inner{font-size:10.5px; font-weight:600; fill:#5A5147; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(255,255,255,.92); stroke-width:2.4px;}
 .node.is-selected .node__label--inner{stroke:rgba(255,255,255,1); stroke-width:4px;}
 .node.is-selected .node__year--inner{stroke:rgba(255,255,255,1); stroke-width:2.8px;}
 
