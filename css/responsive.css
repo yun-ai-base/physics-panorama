@@ -97,7 +97,10 @@
   /* 隐藏 SVG 舞台及其提示，彻底释放空间给卡片列表 */
   .stage{display:none !important;}
   #panorama{display:none;}
-  #mobileList{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; overflow-y:auto; padding:12px 14px 28px; -webkit-overflow-scrolling:touch;}
+  /* 仅图视图（时间线/统一/尺度）显示卡片列表；void/people/glossary/experiments 覆盖层保持独立 */
+  body.view-timeline #mobileList, body.view-unification #mobileList, body.view-scale #mobileList{
+    display:flex; flex-direction:column; flex:1 1 auto; min-height:0; overflow-y:auto; padding:12px 14px 28px; -webkit-overflow-scrolling:touch;
+  }
   #mobileList[hidden]{display:none;} /* 兜底：hidden 属性不被 display:flex 覆盖 */
   .ml-group{margin-bottom:18px;}
   .ml-group__title{font-family:var(--font-serif); font-size:15px; font-weight:700; letter-spacing:.12em; color:var(--ink); margin:2px 0 10px; padding-left:6px; border-left:3px solid currentColor;}

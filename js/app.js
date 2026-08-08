@@ -951,6 +951,9 @@ function wireUI() {
   function syncMobile() {
     if (!mobileList) return;
     const isMobile = window.matchMedia('(max-width:480px)').matches;
+    // 显式管理 hidden：≤480px 显示卡片列表（CSS #mobileList{display:flex} 生效），
+    // >480px 隐藏（配合 #mobileList[hidden]{display:none} 兜底，防止 display:flex 覆盖 hidden）
+    mobileList.hidden = !isMobile;
     if (isMobile && !_mobileBuilt) { renderMobileList(); _mobileBuilt = true; }
     else if (!isMobile && _mobileBuilt) { mobileList.innerHTML = ''; _mobileBuilt = false; }
   }
