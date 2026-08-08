@@ -45,6 +45,18 @@ export const PERSON_NAME_EN = {
   '托马斯·杨': 'Thomas Young',
   '奥古斯丁·菲涅尔': 'Augustin-Jean Fresnel',
   '克里斯蒂安·惠更斯': 'Christiaan Huygens',
+  '亨利·贝克勒尔': 'Henri Becquerel',
+  '路易·德布罗意': 'Louis de Broglie',
+  '约翰·巴丁': 'John Bardeen',
+  '利昂·库珀': 'Leon Cooper',
+  '罗伯特·施里弗': 'John Robert Schrieffer',
+  '阿诺·彭齐亚斯': 'Arno Penzias',
+  '罗伯特·威尔逊': 'Robert Woodrow Wilson',
+  '乔治·斯穆特': 'George Smoot',
+  '约翰·斯图尔特·贝尔': 'John Stewart Bell',
+  '阿兰·阿斯佩': 'Alain Aspect',
+  '小柴昌俊': 'Masatoshi Koshiba',
+  '弗雷德里克·莱因斯': 'Frederick Reines',
 
   // === 相对论革命 ===
   '阿尔伯特·爱因斯坦': 'Albert Einstein',

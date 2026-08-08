@@ -64,28 +64,28 @@ export const READER_PATHS = [
     name: '高中生',
     nameEn: 'High School',
     desc: '从日常现象出发，建立对经典与近代物理的直观印象',
-    nodeIds: ['newton-mechanics','thermodynamics','wave-optics','maxwell-em','michelson-morley','special-relativity','blackbody-radiation','planck-quantum','photoelectric','bohr-model','ligo'],
+    nodeIds: ['newton-mechanics','thermodynamics','wave-optics','maxwell-em','michelson-morley','special-relativity','blackbody-radiation','planck-quantum','photoelectric','nuclear-model','bohr-model','cmb','ligo'],
   },
   {
     id: 'popular',
     name: '科普读者',
     nameEn: 'Curious Reader',
     desc: '面向非专业的科学爱好者，按「故事性」串联关键突破',
-    nodeIds: ['newton-mechanics','maxwell-em','michelson-morley','special-relativity','general-relativity','planck-quantum','quantum-mechanics','solvay-conference','standard-model','higgs','dark-matter-energy','ligo','string-theory'],
+    nodeIds: ['newton-mechanics','maxwell-em','michelson-morley','special-relativity','general-relativity','planck-quantum','photoelectric','nuclear-model','quantum-mechanics','bell-entanglement','solvay-conference','standard-model','higgs','dark-matter-energy','cmb','neutrino-oscillation','ligo','string-theory'],
   },
   {
     id: 'undergrad',
     name: '大学生',
     nameEn: 'Undergrad',
     desc: '物理/相关专业的低年级路线，覆盖核心理论与数学框架',
-    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','wave-optics','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','quantum-mechanics','uncertainty-principle','dirac-equation','qed','standard-model','higgs'],
+    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','wave-optics','maxwell-em','special-relativity','general-relativity','lcdm','cmb','planck-quantum','nuclear-model','bohr-model','de-broglie','quantum-mechanics','uncertainty-principle','dirac-equation','qed','bcs-superconductivity','standard-model','higgs'],
   },
   {
     id: 'physics',
     name: '物理系学生',
     nameEn: 'Physics Major',
     desc: '近乎完整的理论主干，适合系统学习物理系核心脉络',
-    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','wave-optics','blackbody-radiation','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','photoelectric','bohr-model','quantum-mechanics','uncertainty-principle','dirac-equation','qed','yang-mills','electroweak','qcd','standard-model','higgs','string-theory','loop-quantum-gravity','dark-matter-energy','quantum-computing','ligo','quantum-gravity-test','grand-unification'],
+    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','wave-optics','blackbody-radiation','maxwell-em','special-relativity','general-relativity','lcdm','cmb','planck-quantum','nuclear-model','photoelectric','bohr-model','de-broglie','quantum-mechanics','uncertainty-principle','dirac-equation','qed','yang-mills','electroweak','qcd','standard-model','bcs-superconductivity','higgs','neutrino-oscillation','bell-entanglement','string-theory','loop-quantum-gravity','dark-matter-energy','quantum-computing','ligo','quantum-gravity-test','grand-unification'],
   },
 ];
 
