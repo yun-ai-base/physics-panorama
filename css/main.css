@@ -12,7 +12,8 @@
   --topbar-h:60px; --eranav-h:52px; --bottom-h:46px;
 }
 *,*::before,*::after{box-sizing:border-box;}
-html,body{height:100%;margin:0;}
+/* html/body 双重 overflow:hidden：主页是 100vh SPA，任何情况（含移动端 WebView 对 body overflow 遵守不一致）都不可滚动露出页脚/溢出内容 */
+html,body{height:100%;margin:0;overflow:hidden;}
 body{
   font-family:var(--font-sans); color:var(--ink); background:var(--bg);
   font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow:hidden;
@@ -321,10 +322,9 @@ body.view-people .hint{display:none;}
 .lang-toggle:hover { background: #FBF3E2; }
 .topbar__update{font-size:11px; color:var(--ink-3); text-align:center; padding:3px 0 1px; opacity:.72; letter-spacing:.2px;}
 
-.site-footer{margin-top:28px; padding:16px 20px; text-align:center; font-size:12px; color:var(--ink-3); border-top:1px solid rgba(42,38,32,.08);}
-.site-footer a{color:var(--gold); text-decoration:none; font-weight:600;}
-.site-footer a:hover{text-decoration:underline;}
-.site-footer__sep{margin:0 8px; opacity:.5;}
+/* 主页是 100vh SPA：site-footer 已移除（其「关于本项目」入口并入底栏 bottombar）。
+   根因：footer 在 #app 外占位使内容高过视口，移动端 WebView 滚动时页面底部露出
+   「物理学全景图 · Physics Panorama」文字，被误认为大标题跑到底部。 */
 
 /* A.5 统一之路「统一程度」阶梯面板 —— 左列固定，零遮挡 */
 .unif-panel{

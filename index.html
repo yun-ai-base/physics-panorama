@@ -25,15 +25,15 @@
   <!-- KaTeX（公式渲染，CDN 引入；加载失败时自动回退为原始 LaTeX 文本，不影响其余功能） -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="css/main.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/timeline.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/sidebar.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/responsive.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/tour.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/mindmap.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/honor.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/void-views.css?v=20260808eb" />
-  <link rel="stylesheet" href="css/glossary.css?v=20260808eb" />
+  <link rel="stylesheet" href="css/main.css?v=20260808f" />
+  <link rel="stylesheet" href="css/timeline.css?v=20260808f" />
+  <link rel="stylesheet" href="css/sidebar.css?v=20260808f" />
+  <link rel="stylesheet" href="css/responsive.css?v=20260808f" />
+  <link rel="stylesheet" href="css/tour.css?v=20260808f" />
+  <link rel="stylesheet" href="css/mindmap.css?v=20260808f" />
+  <link rel="stylesheet" href="css/honor.css?v=20260808f" />
+  <link rel="stylesheet" href="css/void-views.css?v=20260808f" />
+  <link rel="stylesheet" href="css/glossary.css?v=20260808f" />
 </head>
 <body>
   <!-- 首屏加载骨架屏（数据加载完成后由 app.js 移除；失败时切换为错误态+重试）
@@ -297,6 +297,8 @@
         <button class="linkbtn" id="shareBtn">分享当前视图</button>
         <button class="linkbtn" id="expandAllBtn">展开全部关联</button>
         <button class="linkbtn" id="resetBtn">回到全景</button>
+        <span class="dot" aria-hidden="true">·</span>
+        <a class="linkbtn" href="about.html">关于本项目</a>
         </div>
       <div class="bottombar__tour">
         <button class="tour-btn" id="tour3">3 分钟概览</button>
@@ -320,14 +322,8 @@
     </div>
   </div>
 
-  <footer class="site-footer">
-    <a href="about.html">关于本项目</a>
-    <span class="site-footer__sep">·</span>
-    <span>物理学全景图 · Physics Panorama</span>
-  </footer>
-
-  <script type="module" src="js/app.js?v=20260808eb"></script>
-  <script type="module" src="js/poem.js?v=20260808eb"></script>
-  <script defer src="js/changelog.js?v=20260808eb"></script>
+  <script type="module" src="js/app.js?v=20260808f"></script>
+  <script type="module" src="js/poem.js?v=20260808f"></script>
+  <script defer src="js/changelog.js?v=20260808f"></script>
 </body>
 </html>
