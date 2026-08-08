@@ -25,16 +25,16 @@
   <!-- KaTeX（公式渲染，CDN 引入；加载失败时自动回退为原始 LaTeX 文本，不影响其余功能） -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="css/main.css?v=20260808k" />
-  <link rel="stylesheet" href="css/timeline.css?v=20260808k" />
-  <link rel="stylesheet" href="css/sidebar.css?v=20260808k" />
-  <link rel="stylesheet" href="css/responsive.css?v=20260808k" />
-  <link rel="stylesheet" href="css/tour.css?v=20260808k" />
-  <link rel="stylesheet" href="css/mindmap.css?v=20260808k" />
-  <link rel="stylesheet" href="css/honor.css?v=20260808k" />
-  <link rel="stylesheet" href="css/void-views.css?v=20260808k" />
-  <link rel="stylesheet" href="css/glossary.css?v=20260808k" />
-  <link rel="stylesheet" href="css/experiments.css?v=20260808k" />
+  <link rel="stylesheet" href="css/main.css?v=20260808l" />
+  <link rel="stylesheet" href="css/timeline.css?v=20260808l" />
+  <link rel="stylesheet" href="css/sidebar.css?v=20260808l" />
+  <link rel="stylesheet" href="css/responsive.css?v=20260808l" />
+  <link rel="stylesheet" href="css/tour.css?v=20260808l" />
+  <link rel="stylesheet" href="css/mindmap.css?v=20260808l" />
+  <link rel="stylesheet" href="css/honor.css?v=20260808l" />
+  <link rel="stylesheet" href="css/void-views.css?v=20260808l" />
+  <link rel="stylesheet" href="css/glossary.css?v=20260808l" />
+  <link rel="stylesheet" href="css/experiments.css?v=20260808l" />
 </head>
 <body>
   <!-- 首屏加载骨架屏（数据加载完成后由 app.js 移除；失败时切换为错误态+重试）
@@ -51,6 +51,11 @@
       <p class="boot-skeleton__err" data-skel="err" hidden>数据加载失败，请检查网络后重试</p>
       <button type="button" class="boot-skeleton__retry" data-skel="retry" hidden>重试</button>
     </div>
+  </div>
+  <!-- 移动端首页提示框：为了更好的浏览效果，请移步到PC端（fixed 不占文档流，不撑高页面；仅移动端显示，可关闭并记住） -->
+  <div class="pc-tip" id="pcTip" hidden>
+    <span class="pc-tip__txt">为了更好的浏览效果，请移步到PC端</span>
+    <button class="pc-tip__close" id="pcTipClose" type="button" aria-label="知道了">✕</button>
   </div>
   <div id="app">
     <!-- 顶栏 -->
@@ -352,8 +357,8 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=20260808k"></script>
-  <script type="module" src="js/poem.js?v=20260808k"></script>
-  <script defer src="js/changelog.js?v=20260808k"></script>
+  <script type="module" src="js/app.js?v=20260808l"></script>
+  <script type="module" src="js/poem.js?v=20260808l"></script>
+  <script defer src="js/changelog.js?v=20260808l"></script>
 </body>
 </html>

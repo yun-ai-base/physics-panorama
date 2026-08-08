@@ -26,6 +26,19 @@ st.textContent = '.node.is-search .node__circle{stroke:var(--gold)!important;str
 document.head.appendChild(st);
 
 async function boot() {
+  // 移动端首页提示框：仅手机端显示、可关闭、关闭后记住不再打扰（fixed 浮层不占文档流）
+  const pcTip = document.getElementById('pcTip');
+  if (pcTip) {
+    const tipClosed = (() => { try { return localStorage.getItem('pp-pc-tip') === '1'; } catch (e) { return false; } })();
+    if (window.matchMedia('(max-width:768px)').matches && !tipClosed) {
+      pcTip.hidden = false;
+      const closeBtn = document.getElementById('pcTipClose');
+      if (closeBtn) closeBtn.addEventListener('click', () => {
+        pcTip.hidden = true;
+        try { localStorage.setItem('pp-pc-tip', '1'); } catch (e) { /* ignore */ }
+      });
+    }
+  }
   try {
     const [nodeRes, metaRes] = await Promise.all([
       fetch('nodes.json').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),

@@ -11,6 +11,22 @@
   --font-sans:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
   --eranav-h:52px; --bottom-h:46px;
 }
+/* ── 移动端首页提示框（仅 ≤768px 显示；fixed 不占文档流，不撑高 100vh SPA） ── */
+.pc-tip{
+  position:fixed; left:50%; bottom:64px; transform:translateX(-50%); z-index:60;
+  display:flex; align-items:center; gap:10px; max-width:calc(100% - 28px);
+  padding:9px 14px 9px 16px; border-radius:999px;
+  background:rgba(28,25,20,.92); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  border:1px solid rgba(212,167,92,.45); box-shadow:0 6px 20px rgba(0,0,0,.25);
+  animation:pcTipIn .25s ease both;
+}
+.pc-tip__txt{font-size:13px; color:#F3ECDC; letter-spacing:.02em; white-space:nowrap;}
+.pc-tip__close{
+  width:24px; height:24px; flex:0 0 auto; border:none; background:rgba(255,255,255,.08);
+  color:#D8CBA8; font-size:12px; cursor:pointer; line-height:1; border-radius:50%;
+}
+.pc-tip__close:hover{color:#fff; background:rgba(255,255,255,.16);}
+@keyframes pcTipIn{from{opacity:0; transform:translate(-50%,6px);} to{opacity:1; transform:translate(-50%,0);}}
 /* ── 深色主题（html[data-theme="dark"]）── */
 [data-theme="dark"]{
   --bg:#15130F; --bg-2:#1C1914; --card:#221E17;
