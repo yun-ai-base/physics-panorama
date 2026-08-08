@@ -83,6 +83,15 @@ function initPoemRotation() {
     else raf = 0;
   }
 
+  // 视图切换驱动：意境页从隐藏→可见时重启 rAF（tick 在不可见时已停止，
+  // 若没有这里的重启逻辑，切回意境页时轮播会永久停摆、所有诗文保持 hidden）
+  function ensureRunning() {
+    if (isActive() && raf === 0) raf = requestAnimationFrame(tick);
+  }
+  const mo = new MutationObserver(ensureRunning);
+  mo.observe(poemView, { attributes: true, attributeFilter: ['hidden'] });
+  mo.observe(voidView, { attributes: true, attributeFilter: ['hidden'] });
+
   if (reduceMotion) {
     // 尊重「减少动态效果」偏好：静态显示首组，不自动轮换
     showStep(false);
