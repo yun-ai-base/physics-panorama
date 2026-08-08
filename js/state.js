@@ -10,7 +10,7 @@ export const state = {
   filterEra: null,         // 纪元筛选（null = 全部）
   activeEra: null,         // 当前激活/选中的纪元（顶部导航或时间线标签点击，UI 高亮 + 综述）
   activeScale: null,       // 当前激活/选中的尺度维度（尺度视图标签点击，UI 高亮 + 概念解析面板）
-  onlyCore: true,          // 仅显示主干
+  onlyCore: false,           // 仅显示主干（2026-08-08 起默认不勾选：首屏展示全部节点）
   pathIds: null,           // 阅读路径（READER_PATHS id）筛选集合；非 null 时仅显示该集合节点并高亮
   view: 'timeline',        // 当前视图
   glossaryEra: 'classical', // 术语表当前选中的纪元（classical/relativity/quantum/standard-model/frontier）
