@@ -11,10 +11,17 @@ let onPick = null;          // 点击卡片回调（由 app.js 注入）
 
 export function initExperiments(cb) { onPick = cb; }
 
+// 实验年份 → 数值（'1970s' → 1970；用于网格按年代排序）
+function yearNum(s) {
+  const m = String(s || '').match(/\d{4}/);
+  return m ? parseInt(m[0], 10) : 9999;
+}
+
 // 实验 → 对应理论节点名（由 app.js 通过回调注入节点数据，避免模块耦合）
 export function renderExperiments(grid, nodeById) {
   if (!grid) return;
-  const list = EXPERIMENTS.filter(matchFilter);
+  // 按年代升序渲染，让网格呈现时间脉络
+  const list = EXPERIMENTS.filter(matchFilter).sort((a, b) => yearNum(a.year) - yearNum(b.year));
   grid.innerHTML = list.map(exp => {
     const era = ERAS[exp.era];
     const eraName = era ? era.name : exp.era;

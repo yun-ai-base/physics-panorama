@@ -259,9 +259,9 @@ function applyUILanguage() {
   // 理论·实验视图
   const expSearch = document.getElementById('expSearch');
   if (expSearch) expSearch.placeholder = t('expSearchPlaceholder');
-  // 实验计数副标题
+  // 实验计数副标题（随实验数量动态更新）
   const expSub = document.querySelector('.exp-view__sub');
-  if (expSub) expSub.textContent = t('expSubtitle');
+  if (expSub) expSub.textContent = t('expSubtitle', expCount());
   // 重建纪元筛选 chips（语言切换时文案随 ERAS 变化）
   const expTabsEl = document.getElementById('expTabs');
   if (expTabsEl && expTabsEl.children.length === 0) buildExpTabs();
@@ -932,6 +932,9 @@ function setView(v, push) {
     closeSidebar();
     if (!document.getElementById('expTabs').children.length) buildExpTabs();
     renderExperiments(document.getElementById('expGrid'), byId);
+    // 副标题动态计数（初始 boot 时 applyUILanguage 未跑，这里补一次）
+    const expSub = document.querySelector('.exp-view__sub');
+    if (expSub) expSub.textContent = t('expSubtitle', expCount());
   } else if (isPeople) {
     const pg = document.getElementById('peopleGrid');
     renderPeople(pg, [...PEOPLE_MAP.values()], onPickPerson);

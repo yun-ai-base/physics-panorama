@@ -57,6 +57,18 @@ export const PERSON_NAME_EN = {
   '阿兰·阿斯佩': 'Alain Aspect',
   '小柴昌俊': 'Masatoshi Koshiba',
   '弗雷德里克·莱因斯': 'Frederick Reines',
+  '奥勒·罗默': 'Ole Rømer',
+  '罗伯特·布朗': 'Robert Brown',
+  '詹姆斯·焦耳': 'James Prescott Joule',
+  '海因里希·赫兹': 'Heinrich Hertz',
+  '詹姆斯·弗兰克': 'James Franck',
+  '古斯塔夫·赫兹': 'Gustav Hertz',
+  '吴健雄': 'Chien-Shiung Wu',
+  '克劳斯·约恩孙': 'Claus Jönsson',
+  '拉塞尔·赫尔斯': 'Russell Hulse',
+  '约瑟夫·泰勒': 'Joseph Hooton Taylor',
+  '米尔顿·赫马森': 'Milton Humason',
+  '肯特·福特': 'Kent Ford',
 
   // === 相对论革命 ===
   '阿尔伯特·爱因斯坦': 'Albert Einstein',
