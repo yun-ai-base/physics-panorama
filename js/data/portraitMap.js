@@ -42,6 +42,9 @@ export const PERSON_NAME_EN = {
   '菲利普·莱纳德': 'Philipp Lenard',
   '安德烈-玛丽·安培': 'André-Marie Ampère',
   '安德烈·玛丽·安培': 'André-Marie Ampère',
+  '托马斯·杨': 'Thomas Young',
+  '奥古斯丁·菲涅尔': 'Augustin-Jean Fresnel',
+  '克里斯蒂安·惠更斯': 'Christiaan Huygens',
 
   // === 相对论革命 ===
   '阿尔伯特·爱因斯坦': 'Albert Einstein',
@@ -116,10 +119,11 @@ export function personNameEn(raw) {
 }
 
 // 返回 <img> 占位（onerror 链式回退到 png，再回退到首字占位）
+// loading=lazy + decoding=async：76+ 头像仅在进入可视区时加载，降低首屏带宽与主线程压力
 export function avatarImg(name) {
   const alias = portraitName(name);
   const ch = (name.replace(/（[^）]*）/g, '').replace(/\([^)]*\)/g, '').trim()[0] || '?');
-  return `<img class="avatar" alt="${esc(name)}" data-alias="${esc(alias)}" data-ch="${esc(ch)}" src="assets/portraits/${encodeURIComponent(alias)}.jpg">`;
+  return `<img class="avatar" alt="${esc(name)}" data-alias="${esc(alias)}" data-ch="${esc(ch)}" loading="lazy" decoding="async" src="assets/portraits/${encodeURIComponent(alias)}.jpg">`;
 }
 
 export function bindAvatars(root) {

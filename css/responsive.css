@@ -10,8 +10,6 @@
 
 @media (max-width:768px){
   .stage-wrap{flex-direction:column;}
-  /* 移动端裁掉「侧栏滑出 / 顶栏溢出」造成的整页横向滚动（根因：absolute 侧栏 translateX(100%) 被推到视口外 430px） */
-  #app{overflow-x:hidden;}
   .sidebar{position:absolute; right:0; top:0; bottom:0; width:100%; max-width:430px; z-index:40; border-left:none; box-shadow:-12px 0 40px rgba(0,0,0,.18);}
   .topbar{padding:8px 12px 6px; gap:6px;}
   .brand__title{font-size:19px;}

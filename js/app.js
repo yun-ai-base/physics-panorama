@@ -58,7 +58,7 @@ async function boot() {
     NODES.forEach(n => byId.set(n.id, n));
   } catch (err) {
     console.error('[boot] 数据加载失败：', err);
-    toast(t('dataLoadFailed'));
+    showBootError();
     return;
   }
 
@@ -104,6 +104,25 @@ async function boot() {
 
   // 若 URL 带 ?lang=en，启动即进入英文界面
   if (state.lang === 'en') applyLang();
+
+  // 首次渲染完成，移除骨架屏
+  const sk = document.getElementById('bootSkeleton');
+  if (sk) sk.remove();
+}
+
+// 数据加载失败：骨架屏切换为错误态 + 重试按钮（替代原先仅弹 toast 后白屏）
+function showBootError() {
+  const sk = document.getElementById('bootSkeleton');
+  if (!sk) { toast(t('dataLoadFailed')); return; }
+  const errEl = sk.querySelector('[data-skel="err"]');
+  const retryEl = sk.querySelector('[data-skel="retry"]');
+  const textEl = sk.querySelector('[data-skel="loading"]');
+  if (errEl) errEl.hidden = false;
+  if (retryEl) retryEl.hidden = false;
+  if (textEl) textEl.hidden = true;
+  if (retryEl) {
+    retryEl.onclick = () => location.reload();
+  }
 }
 
 function renderCurrent() {
@@ -364,7 +383,7 @@ function wireUI() {
     // 主动点顶栏导航进入虚无-图景时，回到默认意境引导页（poem），
     // 不被 URL 残留的 vtab 劫持（刷新页面仍由 readURL 保留上次子页）
     if (b.dataset.view === 'void') voidTab = 'poem';
-    setView(b.dataset.view);
+    setView(b.dataset.view, true);
   });
 
   // 虚无-图景子选项（意境 / 思维导图）切换
@@ -551,7 +570,8 @@ function wireUI() {
     const hits = NODES.map(n => ({ n, tags: searchNode(n, q) })).filter(x => x.tags.length);
     sr.hidden = false;
     sr.innerHTML = hits.slice(0, 40).map(({ n, tags }) => {
-      const extra = tags.filter(t => EXTRA_TAGS.has(t)).map(t => t('FIELD_LABEL'[t] || t));
+      // 注意：map 回调参数用 tag 而非 t，避免遮蔽外层翻译函数 t（此前 terms/formula 命中时抛 TypeError 致结果空白）
+      const extra = tags.filter(tag => EXTRA_TAGS.has(tag)).map(tag => t('FIELD_LABEL'[tag] || tag));
       return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(langName(n))} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">${t('searchHit')}${esc(extra.join('/'))}</span>` : ''}</button>`;
     }).join('') || `<div style="padding:10px;color:var(--ink-3)">${t('searchNoMatch')}</div>`;
     clearSearchGlow();
@@ -570,7 +590,7 @@ function wireUI() {
     selectNode(id);
     if (!window.matchMedia('(max-width:768px)').matches) focusNode(id);
     // 联动思维导图：自动切到思维导图、展开该学说维度、高亮其分支路径并缩放定位（按图索骥）
-    if (state.view !== 'void') setView('void');
+    if (state.view !== 'void') setView('void', true);
     voidTab = 'mindmap';
     activateVoidTab('mindmap');
     focusMindmapNode(id);
@@ -589,8 +609,17 @@ function wireUI() {
     }
   });
 
-  document.getElementById('shareBtn').addEventListener('click', () => {
-    updateURL(); navigator.clipboard?.writeText(location.href); toast(t('linkCopied'));
+  document.getElementById('shareBtn').addEventListener('click', async () => {
+    updateURL();
+    const url = location.href;
+    // 移动端优先调用系统分享面板；用户取消（AbortError）不算失败，静默返回
+    if (navigator.share) {
+      try { await navigator.share({ title: document.title, url }); return; }
+      catch (err) { if (err && err.name === 'AbortError') return; }
+    }
+    // 桌面端 / 分享不可用时回退：复制链接 + 提示
+    try { await navigator.clipboard.writeText(url); } catch (e) { /* 剪贴板不可用时静默 */ }
+    toast(t('linkCopied'));
   });
   const expandAllBtn = document.getElementById('expandAllBtn');
   if (expandAllBtn) expandAllBtn.textContent = state.expandAll ? t('collapseAll') : t('expandAll');
@@ -619,7 +648,7 @@ function wireUI() {
   });
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
-  window.addEventListener('pp:gotoNode', e => { setView('timeline'); selectNode(e.detail); });
+  window.addEventListener('pp:gotoNode', e => { setView('timeline', true); selectNode(e.detail); });
 
   // 术语链接：跳转到术语释义锚点，并记录回退位置
   window.addEventListener('pp:gotoTerm', e => {
@@ -635,23 +664,52 @@ function wireUI() {
     focusTerm(termName);
   });
 
-  // 浏览器回退：恢复跳转前的节点与标签（仅节点图视图才恢复侧栏）
+  // 浏览器回退：优先恢复术语跳转前的节点与标签；否则按 URL 参数还原完整视图状态（跨视图历史）
   window.addEventListener('popstate', e => {
     const back = e.state?.ppBack;
-    if (!back) return;
-    state.termFocus = null;
-    const nodeViews = new Set(['timeline', 'scale', 'unification']);
-    if (!back.node || !byId.has(back.node) || !nodeViews.has(state.view)) {
-      closeSidebar();
-      state.selected = null;
-      state.highlight = new Set();
-      applyState();
-      updateURL();
+    if (back) {
+      state.termFocus = null;
+      const nodeViews = new Set(['timeline', 'scale', 'unification']);
+      if (!back.node || !byId.has(back.node) || !nodeViews.has(state.view)) {
+        closeSidebar();
+        state.selected = null;
+        state.highlight = new Set();
+        applyState();
+        updateURL();
+        return;
+      }
+      selectNode(back.node);
+      if (back.tab) openSidebarTab(back.tab);
       return;
     }
-    selectNode(back.node);
-    if (back.tab) openSidebarTab(back.tab);
+    restoreStateFromURL();
   });
+
+  // 按 URL 查询参数还原视图/筛选/选中节点（popstate 触发，不产生新历史）
+  function restoreStateFromURL() {
+    const p = new URLSearchParams(location.search);
+    const v = p.get('view') || 'timeline';
+    state.filterEra = p.get('era') || null;
+    state.activeEra = state.filterEra;
+    state.onlyCore = p.get('core') !== '0';
+    document.getElementById('onlyCore').checked = state.onlyCore;
+    if (p.get('vtab')) voidTab = p.get('vtab');
+    reflectEraActive();
+    setView(v, false);
+    const node = p.get('node');
+    if (node && byId.has(node)) {
+      state.sidebarTab = p.get('tab') || null;
+      state.termFocus = p.get('term') || null;
+      selectNode(node);
+      if (state.sidebarTab) openSidebarTab(state.sidebarTab);
+      if (state.termFocus) focusTerm(state.termFocus);
+    } else {
+      state.selected = null;
+      state.highlight = new Set();
+      closeSidebar();
+      applyState();
+    }
+  }
 
   // 侧边栏内部状态变化时同步 URL
   window.addEventListener('pp:updateURL', updateURL);
@@ -778,7 +836,8 @@ document.addEventListener('keydown', e => {
 });
 
 // 统一视图切换（含人物索引与虚无-图景覆盖层）
-function setView(v) {
+// push=true 时产生浏览器历史条目（可后退还原）；boot 首次调用与 popstate 还原传 false
+function setView(v, push) {
   state.view = v;
   closeHonorPop();   // 切换任何视图时都清除残留的诺贝尔奖 popover（防止从荣誉殿堂切走后浮层残留在其他页）
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('is-active', t.dataset.view === v));
@@ -815,7 +874,7 @@ function setView(v) {
     renderCurrent(); fit();
     if (v === 'unification') renderUnifPanel();
   }
-  updateURL();
+  updateURL(push ? 'push' : undefined);
 }
 
 // A.5 统一之路「统一程度」阶梯面板渲染（仅 view-unification 左侧列，零遮挡）
@@ -847,7 +906,7 @@ function onPickPerson(name) {
   if (p) openPerson(name, p.nodeIds);
 }
 
-function updateURL() {
+function updateURL(mode) {
   const p = new URLSearchParams();
   if (state.view !== 'timeline') p.set('view', state.view);
   if (state.view === 'void' && voidTab !== 'poem') p.set('vtab', voidTab);
@@ -859,7 +918,9 @@ function updateURL() {
   const qs = p.toString();
   const targetQS = qs ? '?' + qs : '';
   if (location.search === targetQS) return;
-  history.replaceState(history.state, '', targetQS || location.pathname);
+  // mode='push' 用于跨视图切换（可后退）；默认 replace 用于节点/筛选等高频状态（避免历史堆栈膨胀）
+  if (mode === 'push') history.pushState(null, '', targetQS || location.pathname);
+  else history.replaceState(history.state, '', targetQS || location.pathname);
 }
 function readURL() {
   const p = new URLSearchParams(location.search);

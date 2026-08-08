@@ -17,7 +17,7 @@ body{
   font-family:var(--font-sans); color:var(--ink); background:var(--bg);
   font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow:hidden;
 }
-#app{display:flex; flex-direction:column; height:100vh;}
+#app{display:flex; flex-direction:column; height:100vh; overflow-x:hidden;} /* overflow-x 全局裁剪：防止 absolute 侧栏 translateX(100%) 滑出把 html 撑宽（根因：桌面 400px 横向溢出） */
 h1,h2,h3,h4{font-family:var(--font-serif); font-weight:600; color:var(--ink); margin:0;}
 a{color:var(--gold); text-decoration:none;}
 a:hover{text-decoration:underline;}
@@ -207,33 +207,6 @@ body.view-people .hint{display:none;}
 .people-count{font-size:12.5px; color:var(--ink-3); letter-spacing:.3px;}
 .person-card.is-hidden{display:none !important;}
 
-/* 移动端首页提醒（检测到移动设备后弹出，停留 2 秒自动淡出） */
-.mobile-notice{
-  position:fixed; top:0; right:0; bottom:0; left:0; z-index:9999;
-  display:flex; align-items:center; justify-content:center;
-  padding:24px; box-sizing:border-box;
-  background:rgba(20,16,8,.55);
-  -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
-  opacity:1; transition:opacity .55s ease;
-}
-.mobile-notice.is-hide{opacity:0; pointer-events:none;}
-.mobile-notice__box{
-  background:var(--card);
-  border:1px solid rgba(184,137,59,.35);
-  border-radius:18px;
-  padding:28px 30px 26px;
-  max-width:84vw; width:auto; max-height:88vh; overflow:auto;
-  box-sizing:border-box; text-align:center;
-  box-shadow:0 18px 50px rgba(20,16,8,.32);
-  animation:mnPop .4s ease;
-}
-@keyframes mnPop{from{transform:translateY(10px) scale(.96); opacity:0;} to{transform:none; opacity:1;}}
-.mobile-notice__icon{font-size:36px; line-height:1; margin-bottom:12px;}
-.mobile-notice__text{
-  font-family:var(--font-sans); font-size:15px; font-weight:600;
-  line-height:1.6; color:var(--ink); letter-spacing:.3px;
-}
-
 /* ── 更新日记（左下角低调入口） ── */
 .changelog{position:fixed; left:14px; bottom:64px; z-index:35;}
 .changelog__toggle{
@@ -401,3 +374,44 @@ body.view-unification .unif-panel{ display:flex; }
   .unif-panel{ flex-basis:260px; padding:14px 12px; }
   .unif-step{ margin-left:calc((var(--lvl) - 1) * 16px); padding:8px 10px; }
 }
+
+/* ── 首屏加载骨架屏（app.js 数据加载完成后移除；失败时显示错误态+重试） ── */
+.boot-skeleton{
+  position:fixed; inset:0; z-index:9998;
+  display:flex; flex-direction:column;
+  background:var(--bg); color:var(--ink-2);
+}
+.boot-skeleton__bar{
+  flex:0 0 auto; height:56px; margin:14px 22px 0;
+  border-radius:12px; background:linear-gradient(90deg, rgba(184,137,59,.08) 25%, rgba(184,137,59,.18) 50%, rgba(184,137,59,.08) 75%);
+  background-size:200% 100%; animation:skShimmer 1.3s ease-in-out infinite;
+}
+.boot-skeleton__body{
+  flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+}
+.boot-skeleton__ring{
+  width:42px; height:42px; border-radius:50%;
+  border:3px solid rgba(184,137,59,.22); border-top-color:var(--gold);
+  animation:skSpin .9s linear infinite;
+}
+.boot-skeleton__text{font-size:14px; color:var(--ink-3); letter-spacing:.14em; margin:0;}
+.boot-skeleton__err{font-size:14px; color:#8B3B24; margin:0;}
+.boot-skeleton__retry{
+  border:1px solid var(--gold); background:var(--gold); color:#fff;
+  padding:8px 26px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer; transition:.18s;
+}
+.boot-skeleton__retry:hover{filter:brightness(1.06); transform:translateY(-1px);}
+.boot-skeleton__retry:active{transform:none;}
+@keyframes skShimmer{from{background-position:200% 0;} to{background-position:-200% 0;}}
+@keyframes skSpin{to{transform:rotate(360deg);}}
+
+/* ── iOS 刘海屏安全区（viewport-fit=cover 时顶/底留出 home indicator） ── */
+.topbar{ padding-top:max(14px, env(safe-area-inset-top)); }
+.bottombar{ padding-bottom:max(0px, env(safe-area-inset-bottom)); height:calc(var(--bottom-h) + env(safe-area-inset-bottom)); }
+.hint{ bottom:calc(14px + env(safe-area-inset-bottom)); }
+
+/* ── 键盘可达性：统一 focus 焦点环（仅键盘操作显示，鼠标点击不出现） ── */
+button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--gold); outline-offset:2px; border-radius:4px;
+}
+.view-tab:focus-visible, .era-tab:focus-visible, .path-tab:focus-visible, .void-subtab:focus-visible{outline-offset:-2px;}

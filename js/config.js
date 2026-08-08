@@ -20,6 +20,7 @@ export const EDGE_CLASS = {
 export const REVOLUTION_SET = new Set([
   'newton-mechanics|special-relativity',
   'newton-mechanics|quantum-mechanics',
+  'newton-mechanics|wave-optics',   // 波动光学以干涉/衍射证据取代牛顿微粒说
   'maxwell-em|special-relativity',
 ]);
 // 统一关系边（这些节点的所有入边为「统一」发光环线）
@@ -63,7 +64,7 @@ export const READER_PATHS = [
     name: '高中生',
     nameEn: 'High School',
     desc: '从日常现象出发，建立对经典与近代物理的直观印象',
-    nodeIds: ['newton-mechanics','thermodynamics','maxwell-em','michelson-morley','special-relativity','blackbody-radiation','planck-quantum','photoelectric','bohr-model','ligo'],
+    nodeIds: ['newton-mechanics','thermodynamics','wave-optics','maxwell-em','michelson-morley','special-relativity','blackbody-radiation','planck-quantum','photoelectric','bohr-model','ligo'],
   },
   {
     id: 'popular',
@@ -77,14 +78,14 @@ export const READER_PATHS = [
     name: '大学生',
     nameEn: 'Undergrad',
     desc: '物理/相关专业的低年级路线，覆盖核心理论与数学框架',
-    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','quantum-mechanics','uncertainty-principle','dirac-equation','qed','standard-model','higgs'],
+    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','wave-optics','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','quantum-mechanics','uncertainty-principle','dirac-equation','qed','standard-model','higgs'],
   },
   {
     id: 'physics',
     name: '物理系学生',
     nameEn: 'Physics Major',
     desc: '近乎完整的理论主干，适合系统学习物理系核心脉络',
-    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','blackbody-radiation','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','photoelectric','bohr-model','quantum-mechanics','uncertainty-principle','dirac-equation','qed','yang-mills','electroweak','qcd','standard-model','higgs','string-theory','loop-quantum-gravity','dark-matter-energy','quantum-computing','ligo','quantum-gravity-test','grand-unification'],
+    nodeIds: ['newton-mechanics','lagrangian-mechanics','thermodynamics','stat-mechanics','wave-optics','blackbody-radiation','maxwell-em','special-relativity','general-relativity','lcdm','planck-quantum','photoelectric','bohr-model','quantum-mechanics','uncertainty-principle','dirac-equation','qed','yang-mills','electroweak','qcd','standard-model','higgs','string-theory','loop-quantum-gravity','dark-matter-energy','quantum-computing','ligo','quantum-gravity-test','grand-unification'],
   },
 ];
 

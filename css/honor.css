@@ -57,6 +57,12 @@
   border-color: var(--gold, #B8893B);
   box-shadow: 0 0 0 3px rgba(184, 137, 59, .15);
 }
+/* 搜索无结果：红框提示（honor.js 已 toggle .is-empty，这里补视觉样式） */
+.honor-search.is-empty {
+  border-color: #8B3B24;
+  box-shadow: 0 0 0 3px rgba(139, 59, 36, .12);
+}
+.honor-search.is-empty::placeholder { color: #8B3B24; }
 .honor-navbtn {
   padding: 5px 12px;
   font-size: 12.5px;
