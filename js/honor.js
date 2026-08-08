@@ -212,6 +212,7 @@ export function renderHonor() {
   const host = document.getElementById('honorTimeline');
   if (!host) return;
   const data = NOBEL_PHYSICS;
+  if (!data || !data.length) return;   // 防御：数据为空时直接返回，避免后续 n-1 索引崩溃
   const n = data.length;
 
   host.innerHTML = '';

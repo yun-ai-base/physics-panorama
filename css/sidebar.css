@@ -115,7 +115,7 @@
 .sb-fm__brief{
   display:flex; align-items:flex-start; gap:6px;
   margin-top:7px; padding:6px 10px;
-  font-size:12px; line-height:1.55; color:var(--ink-1);
+  font-size:12px; line-height:1.55; color:var(--ink-2);
   background:linear-gradient(180deg, rgba(184,137,59,.07), rgba(184,137,59,.04));
   border-left:3px solid var(--gold);
   border-radius:0 6px 6px 0;

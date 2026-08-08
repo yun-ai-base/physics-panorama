@@ -693,6 +693,7 @@ export function openNode(id) {
   const sb = document.getElementById('sidebar');
   const body = document.getElementById('sidebarBody');
   const era = ERAS[node.era];
+  const eraRaw = era ? era.raw : 'var(--gold)';   // 数据缺失时兜底，避免 .raw 访问崩溃
   const isDeep = node.depth === 'deep' && node.deepContent;
   const scaleLabel = state.lang === 'en' ? (SCALE_LABEL_EN[node.scale] || SCALE_LABEL[node.scale] || node.scale) : (SCALE_LABEL[node.scale] || node.scale);
   const maturitySet = MATURITY_LABEL[state.lang] || MATURITY_LABEL.zh;
@@ -740,9 +741,28 @@ export function openNode(id) {
 
   const titleName = state.lang === 'en' ? (node.nameEn || node.name) : node.name;
   const titleSmall = state.lang === 'en' ? node.name : (node.nameEn || '');
+  // 迷你时间线缩略导航：前驱 → 当前 → 后继（各取最近 4 个）
+  const miniMapHTML = () => {
+    const prevs = (node.prevIds || []).map(id => byId.get(id)).filter(Boolean);
+    const nexts = NODES.filter(n => (n.prevIds || []).includes(node.id));
+    const yNum = s => parseInt(String(s || '').match(/\d{4}/)?.[0] || '0', 10);
+    const ps = prevs.sort((a, b) => yNum(a.year) - yNum(b.year)).slice(-4);
+    const ns = nexts.sort((a, b) => yNum(a.year) - yNum(b.year)).slice(0, 4);
+    if (!ps.length && !ns.length) return '';
+    const total = ps.length + 1 + ns.length;
+    const pos = i => (total === 1 ? 50 : (i / (total - 1)) * 100);
+    const dot = (n, cls, i) => `<button type="button" class="sb-minimap__dot ${cls}" data-id="${n.id}" style="left:${pos(i)}%" title="${esc(n.name)} ${esc(String(n.year))}" aria-label="${esc(n.name)}"></button>`;
+    const dots = [
+      ...ps.map((n, i) => dot(n, 'is-prev', i)),
+      dot(node, 'is-current', ps.length),
+      ...ns.map((n, i) => dot(n, 'is-next', ps.length + 1 + i)),
+    ];
+    return `<div class="sb-minimap"><div class="sb-minimap__track"><div class="sb-minimap__line"></div>${dots.join('')}</div><span class="sb-minimap__count">${ps.length}→${ns.length}</span></div>`;
+  };
   body.innerHTML = `
     <div class="sb-head">
-      <div class="sb-head__era"><span class="sb-swatch" style="background:${era.raw}"></span>${state.lang === 'en' ? era.nameEn : era.name} · ${era.range}</div>
+      <button class="sb-fav" id="sbFavBtn" type="button" aria-label="收藏/取消收藏" title="收藏">☆</button>
+      <div class="sb-head__era"><span class="sb-swatch" style="background:${eraRaw}"></span>${era ? (state.lang === 'en' ? era.nameEn : era.name) : node.era} · ${era ? era.range : ''}</div>
       <div class="sb-head__title">${esc(titleName)}<small>${esc(titleSmall)}</small></div>
       <div class="sb-head__quote">${esc(node.aha || '')}</div>
       <div class="sb-head__meta">
@@ -752,18 +772,45 @@ export function openNode(id) {
       </div>
       ${figuresHTML(node)}
     </div>
+    ${miniMapHTML()}
     ${backBtn}
-    <div class="sb-tabs">${dims.map(d => `<button class="sb-tab" data-key="${d.key}">${state.lang === 'en' ? d.labelEn : d.label}</button>`).join('')}</div>
-    <div class="sb-mobile-tip">${t('mobileTip')}</div>
+    <div class="sb-tabs" role="tablist" aria-label="${esc(state.lang === 'en' ? 'Node sections' : '节点栏目')}">${dims.map(d => `<button class="sb-tab" data-key="${d.key}" role="tab" type="button">${state.lang === 'en' ? d.labelEn : d.label}</button>`).join('')}</div>
     <div class="sb-panel" id="tabBody"></div>
     ${pathCtxHTML(node)}
     ${exploreMoreHTML(node)}
   `;
 
   bindAvatars(body);
-  // 绑定人物头像/名字点击 → 打开人物索引视点
+  // 绑定人物头像/名字点击 → 打开人物索引视点（键盘可达：Enter/Space 同 click）
   body.querySelectorAll('.sb-fig--link').forEach(btn => {
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('tabindex', '0');
     btn.addEventListener('click', () => openPerson(btn.dataset.name, figureNodeIds(btn.dataset.name)));
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPerson(btn.dataset.name, figureNodeIds(btn.dataset.name)); }
+    });
+  });
+  // 绑定收藏星标（状态与切换）
+  const favBtnEl = body.querySelector('#sbFavBtn');
+  if (favBtnEl) {
+    const favNow = () => { try { return JSON.parse(localStorage.getItem('pp-favs') || '[]').includes(node.id); } catch (e) { return false; } };
+    favBtnEl.classList.toggle('is-faved', favNow());
+    favBtnEl.textContent = favNow() ? '★' : '☆';
+    favBtnEl.addEventListener('click', () => {
+      if (typeof window.__ppToggleFav === 'function') window.__ppToggleFav(node.id);
+      else { // 独立兜底（app.js 未初始化时）
+        const favs = (() => { try { return JSON.parse(localStorage.getItem('pp-favs') || '[]'); } catch (e) { return []; } })();
+        const i = favs.indexOf(node.id);
+        if (i >= 0) favs.splice(i, 1); else favs.unshift(node.id);
+        try { localStorage.setItem('pp-favs', JSON.stringify(favs)); } catch (e) { /* ignore */ }
+      }
+      favBtnEl.classList.toggle('is-faved', favNow());
+      favBtnEl.textContent = favNow() ? '★' : '☆';
+    });
+  }
+  // 绑定迷你时间线导航点 → 跳转相邻节点
+  body.querySelectorAll('.sb-minimap__dot').forEach(d => {
+    d.addEventListener('click', () => window.dispatchEvent(new CustomEvent('pp:gotoNode', { detail: d.dataset.id })));
   });
   // 绑定返回按钮
   body.querySelector('[data-action="back"]')?.addEventListener('click', () => history.back());
@@ -967,7 +1014,8 @@ export function openPerson(name, nodeIds) {
 
   const cards = nodes.map(n => {
     const era = ERAS[n.era];
-    const eraName = state.lang === 'en' ? era.nameEn : era.name;
+    const eraRaw = era ? era.raw : 'var(--gold)';
+    const eraName = state.lang === 'en' ? (era ? era.nameEn : n.era) : (era ? era.name : n.era);
     const nodeName = state.lang === 'en' ? (n.nameEn || n.name) : n.name;
     const snippet = personSnippet(n, name);
     const cleanSnippet = esc(stripInlineBold(snippet)).replace(/\n/g, ' ');
@@ -976,7 +1024,7 @@ export function openPerson(name, nodeIds) {
         <div class="sb-node-card__head">
           <span class="sb-node-card__name">${esc(nodeName)}</span>
           <span class="sb-node-card__meta">
-            <span class="sb-chip" style="background:${era.raw}18;color:${era.raw};border-color:${era.raw}40">${esc(eraName)}</span>
+            <span class="sb-chip" style="background:${eraRaw}18;color:${eraRaw};border-color:${eraRaw}40">${esc(eraName)}</span>
             <span class="sb-chip">${esc(String(n.year))}</span>
           </span>
         </div>
@@ -1019,7 +1067,7 @@ export function openExperiment(exp, nodeById) {
     : exp.theoryId;
   const eraName = state.lang === 'en' ? (era?.nameEn || era?.name || exp.era) : (era?.name || exp.era);
   const figs = (exp.figures || []).map(f => `
-    <span class="sb-fig sb-fig--link" data-name="${esc(f)}">${avatarImg(f)}<span class="sb-fig__name">${esc(state.lang === 'en' ? personNameEn(f) : f)}</span></span>`).join('');
+    <span class="sb-fig sb-fig--link" data-name="${esc(f)}" role="button" tabindex="0">${avatarImg(f)}<span class="sb-fig__name">${esc(state.lang === 'en' ? personNameEn(f) : f)}</span></span>`).join('');
 
   body.innerHTML = `
     <div class="sb-head sb-head--person">
@@ -1045,9 +1093,12 @@ export function openExperiment(exp, nodeById) {
       </div>` : ''}`;
 
   bindAvatars(body);
-  // 人物行 → 打开人物详情（复用 figureNodeIds 聚合）
+  // 人物行 → 打开人物详情（复用 figureNodeIds 聚合；键盘 Enter/Space 同 click）
   body.querySelectorAll('.sb-fig[data-name]').forEach(btn => {
     btn.addEventListener('click', () => openPerson(btn.dataset.name, figureNodeIds(btn.dataset.name)));
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPerson(btn.dataset.name, figureNodeIds(btn.dataset.name)); }
+    });
   });
   // 对应理论按钮 → 打开理论节点侧栏
   const thBtn = body.querySelector('.sb-exp-theory');

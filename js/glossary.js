@@ -121,7 +121,7 @@ function renderTabs() {
   tabs.querySelectorAll('.glossary-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       state.glossaryEra = btn.dataset.era;
-      renderTabs();
+      // renderGlossary 内部会重建 tabs，这里不重复调用
       renderGlossary();
     });
   });

@@ -51,8 +51,9 @@ function computeScaleLayout(nodes) {
 
     const yBase = START_Y + si * ROW_H;
 
-    // 按年份排序，让同 scale 内的理论演进从左到右
-    list.sort((a, b) => (a.year ?? 1900) - (b.year ?? 1900));
+    // 按年份排序，让同 scale 内的理论演进从左到右（year 可能为区间/字符串，取前 4 位数字）
+    const yearNum = s => { const m = String(s ?? '').match(/\d{4}/); return m ? parseInt(m[0], 10) : 1900; };
+    list.sort((a, b) => yearNum(a.year) - yearNum(b.year));
 
     const availW = W - PAD_X * 2;
     const count = list.length;

@@ -42,7 +42,7 @@ export function buildEdges(nodes, conflicts = []) {
 export function relatedSet(nodes, id, expandAll) {
   const parents = new Map(nodes.map(n => [n.id, n.prevIds || []]));
   const children = new Map(nodes.map(n => [n.id, []]));
-  for (const n of nodes) for (const p of n.prevIds || []) children.get(p).push(n.id);
+  for (const n of nodes) for (const p of n.prevIds || []) (children.get(p) || []).push(n.id);
   const set = new Set([id]);
   if (expandAll) {
     const up = x => { for (const p of parents.get(x) || []) if (!set.has(p)) { set.add(p); up(p); } };
@@ -59,7 +59,7 @@ export function relatedSet(nodes, id, expandAll) {
 export function chain(nodes, id) {
   const parents = new Map(nodes.map(n => [n.id, n.prevIds || []]));
   const children = new Map(nodes.map(n => [n.id, []]));
-  for (const n of nodes) for (const p of n.prevIds || []) children.get(p).push(n.id);
+  for (const n of nodes) for (const p of n.prevIds || []) (children.get(p) || []).push(n.id);
   return { parents: parents.get(id) || [], children: children.get(id) || [] };
 }
 

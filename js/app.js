@@ -1,15 +1,15 @@
 import { state } from './state.js';
 import { esc, buildEdges, relatedSet } from './utils.js';
 import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js';
-import { computeLayout } from './views.js?v=20260808c';
-import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808c';
+import { computeLayout } from './views.js?v=20260808d';
+import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808d';
 import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js';
 import { initInteraction, fitView, consumeDrag } from './interaction.js';
 import { startTour } from './tour.js';
 import { buildPeople, renderPeople, filterPeopleGrid } from './people.js';
 import { initExperiments, renderExperiments, setExpEraFilter, setExpQuery, expCount, getExp } from './experiments.js';
 import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js';
-import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, focusHonorYear, scrollHonorToOldest, scrollHonorToNewest } from './honor.js';
+import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, scrollHonorToOldest, scrollHonorToNewest } from './honor.js';
 import { initSky, renderSky, refreshSkyLang } from './sky.js';
 import { initMicro, renderMicro, refreshMicroLang } from './micro.js';
 import { initGlossary, renderGlossary } from './glossary.js';
@@ -25,28 +25,7 @@ const st = document.createElement('style');
 st.textContent = '.node.is-search .node__circle{stroke:var(--gold)!important;stroke-width:3.6!important;}';
 document.head.appendChild(st);
 
-// 移动端首页提醒：已随移动端适配完成而禁用（原逻辑保留供参考）
-function maybeShowMobileNotice() {
-  /* 移动端适配完成后不再显示此提示
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
-  if (!isMobile) return;
-  const box = document.createElement('div');
-  box.className = 'mobile-notice';
-  box.id = 'mobileNotice';
-  box.innerHTML = '<div class="mobile-notice__box">' +
-    '<div class="mobile-notice__icon">🖥️</div>' +
-    `<div class="mobile-notice__text">${t('mobileNotice')}</div>` +
-    '</div>';
-  document.body.appendChild(box);
-  setTimeout(() => {
-    box.classList.add('is-hide');
-    setTimeout(() => box.remove(), 600);
-  }, 2000);
-  */
-}
-
 async function boot() {
-  maybeShowMobileNotice(); // 移动端首页提醒（在任何 await 之前弹出，确保首屏即可见）
   try {
     const [nodeRes, metaRes] = await Promise.all([
       fetch('nodes.json').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),
@@ -141,6 +120,9 @@ function renderCurrent() {
   renderGraph(state.view, currentLayout);
 }
 function bounds() {
+  // 非时间线视图（experiments/people/void/glossary）时 currentLayout 为空，直接返回画布尺寸兜底，
+  // 避免 Math.min/max 空数组得 ±Infinity 把 state.scale/tx/ty 置成 NaN
+  if (!currentLayout.length) return { minX: 0, maxX: stage.clientWidth || 1200, minY: 0, maxY: stage.clientHeight || 800 };
   const xs = currentLayout.map(p => p.x), ys = currentLayout.map(p => p.y);
   let minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   // scale 视图左侧要容纳尺度标签（如“中观”“宇观”），需额外留白
@@ -164,16 +146,20 @@ function selectNode(id) {
   updateURL();
 }
 
-// 计算选中节点 + 关联节点的包围盒并 fit 到视口（移动端聚焦用）
+// 计算选中节点 + 关联节点的包围盒并 fit 到视口（移动端聚焦用；搜索结果点击定位用）
 function focusNode(id) {
   const ids = new Set([id, ...state.highlight]);
   const pts = currentLayout.filter(p => ids.has(p.id));
   if (!pts.length) return;
   const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  // 平滑聚焦：临时加 transition，动画结束后移除，避免拖拽/缩放被拖慢
+  const vp = document.getElementById('viewport');
+  if (vp) vp.classList.add('is-smoothing');
   fitView(
     { minX: Math.min(...xs), maxX: Math.max(...xs), minY: Math.min(...ys), maxY: Math.max(...ys) },
     stage.clientWidth, stage.clientHeight, 120
   );
+  if (vp) setTimeout(() => vp.classList.remove('is-smoothing'), 650);
 }
 function nodeEl(id) { return document.querySelector(`.node[data-id="${id}"]`); }
 function clearSearchGlow() { document.querySelectorAll('.node.is-search').forEach(n => n.classList.remove('is-search')); }
@@ -607,21 +593,48 @@ function wireUI() {
     }
     return tags;
   }
-  si.addEventListener('input', () => {
-    const q = si.value.trim().toLowerCase();
+  // ── 搜索增强：纪元 / 人物筛选 chips（不动 searchNode 匹配逻辑，仅对命中做后置过滤） ──
+  let searchFilter = null;   // { type:'era', value } | { type:'figures' } | null
+  function renderSearchChips() {
+    const chipData = [
+      { key: 'all', label: t('searchAll') || '全部', type: null },
+      ...ERA_ORDER.map(era => ({ key: era, label: state.lang === 'en' ? (ERAS[era].nameEn || ERAS[era].name) : ERAS[era].name, type: 'era' })),
+      { key: 'figures', label: t('searchFigures') || '人物', type: 'figures' },
+    ];
+    const isActive = c => (searchFilter == null && c.key === 'all') ||
+      (searchFilter && searchFilter.type === 'era' && searchFilter.value === c.key) ||
+      (searchFilter && searchFilter.type === 'figures' && c.key === 'figures');
+    return '<div class="search__chips">' + chipData.map(c =>
+      `<button type="button" class="search__chip${isActive(c) ? ' is-active' : ''}" data-sf="${c.key}">${esc(c.label)}</button>`
+    ).join('') + '</div>';
+  }
+  function renderSearch(q) {
     lastQ = q;
     if (!q) { sr.hidden = true; sr.innerHTML = ''; clearSearchGlow(); return; }
     const hits = NODES.map(n => ({ n, tags: searchNode(n, q) })).filter(x => x.tags.length);
+    const filtered = searchFilter ? hits.filter(({ n, tags }) => {
+      if (searchFilter.type === 'era') return n.era === searchFilter.value;
+      if (searchFilter.type === 'figures') return tags.includes('figures');
+      return true;
+    }) : hits;
     sr.hidden = false;
-    sr.innerHTML = hits.slice(0, 40).map(({ n, tags }) => {
+    sr.innerHTML = renderSearchChips() + (filtered.slice(0, 40).map(({ n, tags }) => {
       // 注意：map 回调参数用 tag 而非 t，避免遮蔽外层翻译函数 t（此前 terms/formula 命中时抛 TypeError 致结果空白）
-      const extra = tags.filter(tag => EXTRA_TAGS.has(tag)).map(tag => t('FIELD_LABEL'[tag] || tag));
+      const extra = tags.filter(tag => EXTRA_TAGS.has(tag)).map(tag => t(FIELD_LABEL[tag] || tag));
       return `<button data-id="${n.id}" data-tags="${esc(tags.join(','))}">${esc(langName(n))} <span style="color:var(--ink-3)">· ${esc(String(n.year))}</span>${extra.length ? ` <span style="color:var(--gold);font-size:11px">${t('searchHit')}${esc(extra.join('/'))}</span>` : ''}</button>`;
-    }).join('') || `<div style="padding:10px;color:var(--ink-3)">${t('searchNoMatch')}</div>`;
+    }).join('') || `<div style="padding:10px;color:var(--ink-3)">${t('searchNoMatch')}</div>`);
     clearSearchGlow();
-    hits.forEach(({ n }) => nodeEl(n.id)?.classList.add('is-search'));
-  });
+    filtered.forEach(({ n }) => nodeEl(n.id)?.classList.add('is-search'));
+  }
+  si.addEventListener('input', () => renderSearch(si.value.trim().toLowerCase()));
   sr.addEventListener('click', e => {
+    const chip = e.target.closest('.search__chip');
+    if (chip) {
+      const k = chip.dataset.sf;
+      searchFilter = k === 'all' ? null : (k === 'figures' ? { type: 'figures' } : { type: 'era', value: k });
+      renderSearch(lastQ);
+      return;
+    }
     const b = e.target.closest('button[data-id]'); if (!b) return;
     const id = b.dataset.id;
     const tags = (b.dataset.tags || '').split(',').filter(Boolean);
@@ -634,9 +647,10 @@ function wireUI() {
     selectNode(id);
     if (!window.matchMedia('(max-width:768px)').matches) focusNode(id);
     // 联动思维导图：自动切到思维导图、展开该学说维度、高亮其分支路径并缩放定位（按图索骥）
-    if (state.view !== 'void') setView('void', true);
+    // 先设 voidTab 再 setView，避免 setView 内部按旧 voidTab 先渲染一次旧子页
     voidTab = 'mindmap';
-    activateVoidTab('mindmap');
+    if (state.view !== 'void') setView('void', true);
+    else activateVoidTab('mindmap');
     focusMindmapNode(id);
     const dimZh = tags.find(t => DIM_KEY_MAP[t]);
     if (dimZh) openSidebarTab(DIM_KEY_MAP[dimZh]);
@@ -689,6 +703,125 @@ function wireUI() {
   if (langBtn) langBtn.addEventListener('click', () => {
     state.lang = state.lang === 'en' ? 'zh' : 'en';
     applyLang();
+  });
+
+  // ── 深色/浅色主题切换（localStorage 记忆） ──
+  const themeBtn = document.getElementById('themeBtn');
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (themeBtn) themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    try { localStorage.setItem('pp-theme', theme); } catch (e) { /* 隐私模式忽略 */ }
+  }
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem('pp-theme'); } catch (e) { /* ignore */ }
+  applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    applyTheme(cur === 'dark' ? 'light' : 'dark');
+    // 主题切换后重渲染，避免深色下残留浅色 SVG 文字/节点
+    if (state.view === 'timeline' || state.view === 'unification' || state.view === 'scale') { renderCurrent(); fit(); }
+    else if (state.view === 'void' && voidTab === 'mindmap') renderMindmap();
+  });
+
+  // ── 本地收藏（localStorage） ──
+  function loadFavs() { try { return JSON.parse(localStorage.getItem('pp-favs') || '[]'); } catch (e) { return []; } }
+  function saveFavs(favs) { try { localStorage.setItem('pp-favs', JSON.stringify(favs)); } catch (e) { /* ignore */ } }
+  function isFaved(id) { return loadFavs().includes(id); }
+  window.__ppToggleFav = id => {
+    const favs = loadFavs();
+    const i = favs.indexOf(id);
+    if (i >= 0) favs.splice(i, 1); else favs.unshift(id);
+    saveFavs(favs);
+    renderFavPanel();
+    const btn = document.getElementById('sbFavBtn');
+    if (btn) btn.classList.toggle('is-faved', isFaved(id));
+    toast(i >= 0 ? t('favRemoved') || '已取消收藏' : t('favAdded') || '已收藏');
+  };
+  const favWrap = document.getElementById('favWrap');
+  function renderFavPanel() {
+    if (!favWrap || !favWrap.hidden) return;
+    const list = document.getElementById('favList');
+    if (!list) return;
+    const favs = loadFavs();
+    const hint = document.getElementById('favHint');
+    if (hint) hint.hidden = favs.length > 0;
+    list.innerHTML = favs.map(id => {
+      const n = byId.get(id);
+      if (!n) return '';
+      return `<div class="fav-item" data-id="${esc(id)}">
+        <span class="fav-item__name">${esc(langName(n))}</span>
+        <span class="fav-item__year">${esc(String(n.year))}</span>
+        <button class="fav-item__del" type="button" aria-label="移除收藏">×</button>
+      </div>`;
+    }).join('') || '<div style="padding:8px;color:var(--ink-3);font-size:12.5px;text-align:center">暂无收藏</div>';
+    list.querySelectorAll('.fav-item').forEach(item => {
+      item.addEventListener('click', e => {
+        if (e.target.closest('.fav-item__del')) return;
+        const id = item.dataset.id;
+        favWrap.hidden = true;
+        setView('timeline', true);
+        selectNode(id);
+        if (!window.matchMedia('(max-width:768px)').matches) focusNode(id);
+      });
+      item.querySelector('.fav-item__del').addEventListener('click', e => {
+        e.stopPropagation();
+        window.__ppToggleFav(item.dataset.id);
+      });
+    });
+  }
+  const favBtn = document.getElementById('favBtn');
+  if (favBtn) favBtn.addEventListener('click', () => {
+    if (!favWrap) return;
+    favWrap.hidden = !favWrap.hidden;
+    if (!favWrap.hidden) renderFavPanel();
+  });
+  const favClose = document.getElementById('favClose');
+  if (favClose) favClose.addEventListener('click', () => { if (favWrap) favWrap.hidden = true; });
+  document.addEventListener('click', e => {
+    if (favWrap && !favWrap.hidden && !favWrap.contains(e.target) && !e.target.closest('#favBtn')) favWrap.hidden = true;
+  });
+
+  // ── 导出当前时间线视图为 PNG ──
+  const exportPngBtn = document.getElementById('exportPngBtn');
+  if (exportPngBtn) exportPngBtn.addEventListener('click', () => {
+    if (state.view !== 'timeline' && state.view !== 'unification' && state.view !== 'scale') {
+      toast(t('exportHint') || '请先切到时间线/统一/尺度视图');
+      setView('timeline', true);
+      return;
+    }
+    const svgEl = document.getElementById('panorama');
+    if (!svgEl) return;
+    try {
+      const clone = svgEl.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('width', svgEl.viewBox.baseVal.width);
+      clone.setAttribute('height', svgEl.viewBox.baseVal.height);
+      const xml = new XMLSerializer().serializeToString(clone);
+      const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const k = 2;
+        const cv = document.createElement('canvas');
+        cv.width = svgEl.viewBox.baseVal.width * k;
+        cv.height = svgEl.viewBox.baseVal.height * k;
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#F7F3EA';
+        ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        URL.revokeObjectURL(url);
+        const a = document.createElement('a');
+        a.download = 'physics-panorama.png';
+        a.href = cv.toDataURL('image/png');
+        a.click();
+        toast(t('exported') || '已导出 PNG');
+      };
+      img.onerror = () => toast('导出失败：SVG 渲染异常');
+      img.src = url;
+    } catch (err) {
+      console.error('PNG 导出失败', err);
+      toast('导出失败');
+    }
   });
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
@@ -758,10 +891,15 @@ function wireUI() {
   // 侧边栏内部状态变化时同步 URL
   window.addEventListener('pp:updateURL', updateURL);
 
+  // resize 防抖：窗口拖动时避免连续重建大型 SVG（思维导图/荣誉殿堂）
+  let resizeT = 0;
   window.addEventListener('resize', () => {
-    fit();
-    if (state.view === 'void' && voidTab === 'mindmap') renderMindmap();
-    if (state.view === 'void' && voidTab === 'honor') renderHonor();
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => {
+      fit();
+      if (state.view === 'void' && voidTab === 'mindmap') renderMindmap();
+      if (state.view === 'void' && voidTab === 'honor') renderHonor();
+    }, 200);
   });
 
   // ── 手机端 <480px：竖排卡片列表（设计 4.4，仅超小屏生效，桌面/平板不受影响） ──

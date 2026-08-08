@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 · 页面不存在 | 物理学全景图</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    :root{
+      --bg:#F7F3EA; --ink:#2A2620; --ink-2:#6B6358; --ink-3:#9A8F7E;
+      --gold:#B8893B; --gold-tint:#F3E9D6;
+      --font-serif:"Noto Serif SC","Songti SC","STSong",serif;
+      --font-sans:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%;margin:0;}
+    body{
+      font-family:var(--font-sans); color:var(--ink); background:var(--bg);
+      display:flex; align-items:center; justify-content:center; padding:24px;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:560px; text-align:center;}
+    .code{font-family:var(--font-serif); font-size:120px; font-weight:900; line-height:1;
+      color:transparent; -webkit-text-stroke:2px var(--gold); letter-spacing:8px; user-select:none;}
+    .title{font-family:var(--font-serif); font-size:26px; font-weight:700; margin:18px 0 10px;}
+    .desc{font-size:14.5px; color:var(--ink-2); line-height:1.8; margin:0 0 26px;}
+    .desc b{color:var(--ink);}
+    .btn{
+      display:inline-block; border:1px solid var(--gold); background:var(--gold); color:#fff;
+      padding:10px 30px; border-radius:999px; font-size:14px; font-weight:600;
+      text-decoration:none; transition:.18s;
+    }
+    .btn:hover{filter:brightness(1.06); transform:translateY(-1px);}
+    .quote{font-family:var(--font-serif); font-size:13px; color:var(--ink-3); margin-top:34px; line-height:1.7;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="code">404</div>
+    <div class="title">这条物理路径不存在</div>
+    <p class="desc">也许它从未被写进方程，也许它早已坍缩。<br/>点击下方按钮，回到<b>物理学全景图</b>的主页继续探索。</p>
+    <a class="btn" href="./">回到全景图</a>
+    <div class="quote">「宇宙最不可理解之处，在于它是可被理解的。」—— 爱因斯坦</div>
+  </div>
+</body>
+</html>

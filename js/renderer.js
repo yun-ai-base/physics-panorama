@@ -82,7 +82,9 @@ function drawEraBands(layer) {
       fill: `url(#eraGrad-${era})`, 'fill-opacity': active ? 0.14 : 0.08, rx: 18, class: 'era-band',
     }, layer);
     if (active) {
-      const hlW = ERAS[era].name.length * 20 + 22;
+      // 高亮条宽度按当前语言的名字计算（中文每字 20px，英文按字符计）
+      const eraName = state.lang === 'en' ? (ERAS[era].nameEn || ERAS[era].name) : ERAS[era].name;
+      const hlW = eraName.length * 20 + 22;
       el('rect', { class: 'era-band__hl', x: minX + 6, y: globalMinY + 4, width: hlW, height: 38, rx: 10,
         fill: ERAS[era].raw, 'fill-opacity': 0.20 }, layer);
     }
@@ -191,17 +193,17 @@ function drawScaleBands(layer, labelLayer) {
     }, layer);
 
     // 画标签背景（圆角矩形）
-    const labelW = relLabel.length * 13 + 24;
+    const gapLabelW = relLabel.length * 13 + 24;
     const labelX = globalMinX + 50;
     el('rect', {
       x: labelX, y: gapY - 11,
-      width: labelW, height: 22, rx: 11,
+      width: gapLabelW, height: 22, rx: 11,
       fill: '#FFF9F0', stroke: '#C4A96A', 'stroke-width': 0.8, 'stroke-opacity': 0.5,
     }, layer);
 
     // 画标签文字
     el('text', {
-      x: labelX + labelW / 2, y: gapY + 4,
+      x: labelX + gapLabelW / 2, y: gapY + 4,
       class: 'scale-gap__label',
       text: relLabel,
       fill: '#8B7340',

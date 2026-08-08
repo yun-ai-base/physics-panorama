@@ -60,7 +60,6 @@ function matchFilter(exp) {
   const q = expQuery.toLowerCase();
   const hay = [exp.name, exp.nameEn, (exp.figures || []).join(' '), exp.summary]
     .map(s => (s || '').toLowerCase()).join(' ');
-  // 同时匹配对应理论名（理论节点 name）
   return hay.includes(q);
 }
 

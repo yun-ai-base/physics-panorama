@@ -31,6 +31,7 @@ function initPoemRotation() {
   let stepStart = 0;
   let wasActive = false;
   let hotTimer = 0;
+  let raf = 0;
 
   function clearHot() {
     if (hotTimer) { clearTimeout(hotTimer); hotTimer = 0; }
@@ -77,7 +78,9 @@ function initPoemRotation() {
       rightLines.forEach(l => { l.hidden = true; });
     }
     wasActive = active;
-    requestAnimationFrame(tick);
+    // 仅在可见时续帧；离开意境页（或视图被隐藏）即停止 rAF，避免永久空转占用 CPU
+    if (active) raf = requestAnimationFrame(tick);
+    else raf = 0;
   }
 
   if (reduceMotion) {
@@ -85,7 +88,7 @@ function initPoemRotation() {
     showStep(false);
     return;
   }
-  requestAnimationFrame(tick);
+  raf = requestAnimationFrame(tick);
 }
 
 if (document.readyState === 'loading') {

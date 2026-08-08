@@ -108,6 +108,7 @@ export const PERSON_NAME_EN = {
   '乔治·茨威格': 'George Zweig',
   '弗兰克·维尔切克': 'Frank Wilczek',
   '大卫·格罗斯': 'David Gross',
+  '戴维·格罗斯': 'David Gross',
   '乔杰什·帕蒂': 'Jogesh Pati',
   '威廉·哈密顿': 'William Rowan Hamilton',
 
