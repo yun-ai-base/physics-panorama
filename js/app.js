@@ -1177,8 +1177,9 @@ function updateURL(mode) {
 function readURL() {
   const p = new URLSearchParams(location.search);
   if (p.get('lang') === 'en') state.lang = 'en';
-  if (p.get('view')) state.view = p.get('view');
-  if (p.get('vtab')) voidTab = p.get('vtab');
+  // 首页强制从时间线开始：不再从 URL 恢复 view/vtab（2026-08-10 用户确认）。
+  // 避免「打开带 ?view=void&vtab=sky 的历史链接/刷新」时直接跳到虚无图景子页。
+  // 代价：分享带视图参数的链接打开后落回时间线（用户已接受）；node/tab/term 等内容定位参数仍生效。
   if (p.get('era')) state.filterEra = p.get('era');
   if (p.get('core') === '0') state.onlyCore = false;
   if (p.get('tab')) state.sidebarTab = p.get('tab');
