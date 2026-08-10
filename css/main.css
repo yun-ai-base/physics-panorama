@@ -64,6 +64,13 @@
 [data-theme="dark"] .experiments-view,
 [data-theme="dark"] .void-view{background:var(--bg);}
 *,*::before,*::after{box-sizing:border-box;}
+/* ── 全站统一细金滚动条（与更新日记/术语表风格一致，替代浏览器原生；局部更具体规则优先） ── */
+*{scrollbar-width:thin; scrollbar-color:rgba(184,137,59,.45) transparent;}
+*::-webkit-scrollbar{width:5px; height:5px;}
+*::-webkit-scrollbar-track{background:transparent; border-radius:10px;}
+*::-webkit-scrollbar-thumb{background:rgba(184,137,59,.45); border-radius:10px; min-height:32px;}
+*::-webkit-scrollbar-thumb:hover{background:rgba(184,137,59,.75);}
+*::-webkit-scrollbar-corner{background:transparent;}
 /* html/body 双重 overflow:hidden：主页是 100vh SPA，任何情况（含移动端 WebView 对 body overflow 遵守不一致）都不可滚动露出页脚/溢出内容 */
 html,body{height:100%;margin:0;overflow:hidden;}
 body{
