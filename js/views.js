@@ -1,4 +1,4 @@
-import { ERA_RANK, SCALE_RANK, SCALE_ORDER } from './config.js?v=20260808t';
+import { ERA_RANK, SCALE_RANK, SCALE_ORDER } from './config.js?v=20260808u';
 
 const W = 2600; // 画布宽度
 const NODE_R = 38; // 节点碰撞半径（含标签；2026-08-08 随节点球调大 32→38 同步放大）
