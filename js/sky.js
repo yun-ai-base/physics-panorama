@@ -2,8 +2,8 @@
 // 竖向对数尺度轴（你在底、可观测宇宙在顶），滚轮缩放 / 拖拽平移，点击天体看简介。
 // 支持「类型筛选 + 尺度轴」：分类标签栏高亮某类天体并弹出清单，轴上节点随之淡化/高亮。
 
-import { createJourney } from './journey.js?v=20260808u';
-import { esc } from './utils.js?v=20260808u';
+import { createJourney } from './journey.js?v=20260808v';
+import { esc } from './utils.js?v=20260808v';
 
 // —— 天体节点（含尺度结构层级 + 各类天体）。category 驱动类型筛选 ——
 const SKY_NODES = [
@@ -176,7 +176,7 @@ const SKY_NODES = [
     formZh:'暴胀阶段以指数速率拉伸时空，同时解决平直性、视界与磁单极三大问题，并把量子涨落放大为 CMB 温度涨落（结构种子）；随后原初核合成产生轻元素，38 万年后光子退耦形成宇宙微波背景。',
     paramZh:'宇宙年龄 ≈138 亿年；CMB 温度 2.725 K；哈勃常数 ~70 km/s/Mpc；原初扰动谱指数 nₛ≈0.965。',
     obsZh:'1965 年彭齐亚斯与威尔逊发现 CMB；暴胀预言的原初扰动谱与 WMAP/Planck 观测高度一致（nₛ≈0.965）。',
-    theories:['宇宙学','暴涨理论','ΛCDM 模型'], phenomena:['宇宙微波背景','轻元素核合成','暴胀'] },
+    theories:['宇宙学','暴胀理论','ΛCDM 模型'], phenomena:['宇宙微波背景','轻元素核合成','暴胀'] },
 
   // ===== 理论假想天体 =====
   { id:'wormhole', logSize:13.4, zh:'虫洞', en:'Wormhole', subZh:'理论时空隧道', subEn:'theoretical tunnel',

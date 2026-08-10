@@ -5,9 +5,9 @@
 //   · 切换视图      → 点击顶部 .view-tab（与用户手动点击完全一致）
 // 因此本文件不会触碰 state 之外的任何已有渲染/交互逻辑。
 
-import { state } from './state.js?v=20260808u';
-import { closeSidebar, focusTerm } from './sidebar.js?v=20260808u';
-import { UI_LABELS } from './config.js?v=20260808u';
+import { state } from './state.js?v=20260808v';
+import { closeSidebar, focusTerm } from './sidebar.js?v=20260808v';
+import { UI_LABELS } from './config.js?v=20260808v';
 
 function t(key, ...args) {
   const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];

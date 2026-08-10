@@ -11,9 +11,9 @@
 //     高亮其分支路径（根 → 纪元 → 学说）并缩放定位，实现「按图索骥」。
 // ════════════════════════════════════════════════════════════════
 
-import { ERAS, ERA_ORDER, DIMENSIONS, UI_LABELS } from './config.js?v=20260808u';
-import { esc } from './utils.js?v=20260808u';
-import { state } from './state.js?v=20260808u';
+import { ERAS, ERA_ORDER, DIMENSIONS, UI_LABELS } from './config.js?v=20260808v';
+import { esc } from './utils.js?v=20260808v';
+import { state } from './state.js?v=20260808v';
 
 function t(key) {
   return UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key] ?? key;

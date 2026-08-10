@@ -1,10 +1,10 @@
 // 理论·实验视图：著名实验卡片网格 + 纪元筛选 + 搜索
 // 卡片点击 → dispatch 'pp:gotoExp' → app.js 调用 sidebar.openExperiment(id) 打开实验详情
-import { EXPERIMENTS } from './data/experiments.js?v=20260808u';
-import { ERAS, ERA_ORDER, UI_LABELS } from './config.js?v=20260808u';
-import { state } from './state.js?v=20260808u';
-import { esc } from './utils.js?v=20260808u';
-import { portraitName, personNameEn } from './data/portraitMap.js?v=20260808u';
+import { EXPERIMENTS } from './data/experiments.js?v=20260808v';
+import { ERAS, ERA_ORDER, UI_LABELS } from './config.js?v=20260808v';
+import { state } from './state.js?v=20260808v';
+import { esc } from './utils.js?v=20260808v';
+import { portraitName, personNameEn } from './data/portraitMap.js?v=20260808v';
 
 let expEraFilter = 'all';   // 当前纪元筛选
 let expQuery = '';          // 当前搜索词

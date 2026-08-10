@@ -18,7 +18,7 @@ const eras = new Set(['classical', 'relativity', 'quantum', 'standard-model', 'f
 
 test('nodes.json：id 唯一且 38 个节点', () => {
   assert.equal(ids.size, nodes.length);
-  assert.equal(nodes.length, 38);
+  assert.equal(nodes.length, 39);
 });
 
 test('nodes.json：必填字段齐全（19 字段，unifyLevel 可选）', () => {

@@ -1,7 +1,7 @@
-import { state } from './state.js?v=20260808u';
-import { esc, chain } from './utils.js?v=20260808u';
-import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC, UI_LABELS } from './config.js?v=20260808u';
-import { avatarImg, bindAvatars, personNameEn } from './data/portraitMap.js?v=20260808u';
+import { state } from './state.js?v=20260808v';
+import { esc, chain } from './utils.js?v=20260808v';
+import { ERAS, DIMENSIONS, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC, UI_LABELS } from './config.js?v=20260808v';
+import { avatarImg, bindAvatars, personNameEn } from './data/portraitMap.js?v=20260808v';
 
 let NODES = [], SUMMARIES = {};
 const byId = new Map();

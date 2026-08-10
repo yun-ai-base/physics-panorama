@@ -1,18 +1,18 @@
-import { state } from './state.js?v=20260808u';
-import { esc, buildEdges, relatedSet } from './utils.js?v=20260808u';
-import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js?v=20260808u';
-import { computeLayout } from './views.js?v=20260808u';
-import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808u';
-import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js?v=20260808u';
-import { initInteraction, fitView, consumeDrag } from './interaction.js?v=20260808u';
-import { startTour } from './tour.js?v=20260808u';
-import { buildPeople, renderPeople, filterPeopleGrid } from './people.js?v=20260808u';
-import { initExperiments, renderExperiments, setExpEraFilter, setExpQuery, expCount, getExp } from './experiments.js?v=20260808u';
-import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js?v=20260808u';
-import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, scrollHonorToOldest, scrollHonorToNewest } from './honor.js?v=20260808u';
-import { initSky, renderSky, refreshSkyLang } from './sky.js?v=20260808u';
-import { initMicro, renderMicro, refreshMicroLang } from './micro.js?v=20260808u';
-import { initGlossary, renderGlossary } from './glossary.js?v=20260808u';
+import { state } from './state.js?v=20260808v';
+import { esc, buildEdges, relatedSet } from './utils.js?v=20260808v';
+import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js?v=20260808v';
+import { computeLayout } from './views.js?v=20260808v';
+import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808v';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js?v=20260808v';
+import { initInteraction, fitView, consumeDrag } from './interaction.js?v=20260808v';
+import { startTour } from './tour.js?v=20260808v';
+import { buildPeople, renderPeople, filterPeopleGrid } from './people.js?v=20260808v';
+import { initExperiments, renderExperiments, setExpEraFilter, setExpQuery, expCount, getExp } from './experiments.js?v=20260808v';
+import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js?v=20260808v';
+import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, scrollHonorToOldest, scrollHonorToNewest } from './honor.js?v=20260808v';
+import { initSky, renderSky, refreshSkyLang } from './sky.js?v=20260808v';
+import { initMicro, renderMicro, refreshMicroLang } from './micro.js?v=20260808v';
+import { initGlossary, renderGlossary } from './glossary.js?v=20260808v';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -41,8 +41,8 @@ async function boot() {
   }
   try {
     const [nodeRes, metaRes] = await Promise.all([
-      fetch('nodes.json').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),
-      fetch('physics-data.json').then(r => { if (!r.ok) throw new Error('physics-data.json → ' + r.status); return r.json(); }),
+      fetch('nodes.json?v=20260808v').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),
+      fetch('physics-data.json?v=20260808v').then(r => { if (!r.ok) throw new Error('physics-data.json → ' + r.status); return r.json(); }),
     ]);
     NODES = nodeRes;
     EDGES = buildEdges(NODES, metaRes.conflicts || []);

@@ -1,6 +1,6 @@
 // A.9 全局术语表：聚合全站 nodes.json 的 terms，按纪元分组（顶部五选项 + 横向图片式展示框），支持搜索
-import { state } from './state.js?v=20260808u';
-import { esc } from './utils.js?v=20260808u';
+import { state } from './state.js?v=20260808v';
+import { esc } from './utils.js?v=20260808v';
 
 let ALL_TERMS = [];
 let glossaryReady = false;
