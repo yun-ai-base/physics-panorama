@@ -1,8 +1,8 @@
 // 人物索引视图：从节点列表提取唯一人物，渲染为卡片网格
-import { esc } from './utils.js';
-import { ERAS, UI_LABELS } from './config.js';
-import { state } from './state.js';
-import { avatarImg, bindAvatars, portraitName, personNameEn } from './data/portraitMap.js';
+import { esc } from './utils.js?v=20260808t';
+import { ERAS, UI_LABELS } from './config.js?v=20260808t';
+import { state } from './state.js?v=20260808t';
+import { avatarImg, bindAvatars, portraitName, personNameEn } from './data/portraitMap.js?v=20260808t';
 
 function t(key, ...args) {
   const v = UI_LABELS[state.lang]?.[key] ?? UI_LABELS.zh[key];

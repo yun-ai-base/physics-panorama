@@ -5,8 +5,8 @@
 // 拖拽平移、+/- 按钮、全览复位、左侧对数刻度标尺、当前视角尺度读数、通用简介卡片。
 // 返回 controller：{ render, reset, focusNode, zoomTo, showCard, hideCard, refreshLang }
 
-import { el, esc } from './utils.js';
-import { state } from './state.js';
+import { el, esc } from './utils.js?v=20260808t';
+import { state } from './state.js?v=20260808t';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻' };
@@ -95,19 +95,26 @@ export function createJourney(opts){
       el('text', { class:'journey-node__label', x:r+10, y:5, text: name }, g);
       if (node.subZh){ const sub = state.lang==='en' ? (node.subEn||node.subZh) : node.subZh; el('text', { class:'journey-node__sub', x:r+10, y:22, text: sub }, g); }
       g.style.cursor = 'pointer';
-      g.addEventListener('click', () => { if (moved) return; onNodeClick(node, api); });
-      // 悬停迷你预览：显示名称 + 特征尺度，减少「点开才知道是什么」的认知负担
-      g.addEventListener('mouseenter', e => {
-        const nm = state.lang==='en' ? (node.en||node.zh) : node.zh;
-        const sub = state.lang==='en' ? (node.subEn||node.subZh) : node.subZh;
-        preview.innerHTML = `<div class="journey-preview__name">${esc(nm)}</div>${sub ? `<div class="journey-preview__sub">${esc(sub)}</div>` : ''}`;
-        preview.hidden = false;
+      g.addEventListener('click', () => {
+        if (moved) return;
+        preview.hidden = true;   // 防御：任何点击后隐藏预览，防止触摸设备上残留
+        onNodeClick(node, api);
       });
-      g.addEventListener('mousemove', e => {
-        preview.style.left = (e.clientX + 14) + 'px';
-        preview.style.top  = (e.clientY + 14) + 'px';
-      });
-      g.addEventListener('mouseleave', () => { preview.hidden = true; });
+      // 悬停迷你预览：显示名称 + 特征尺度，减少「点开才知道是什么」的认知负担。
+      // 触摸设备（hover:none）不绑定——避免合成 mouseenter 后无 mouseleave 导致的预览残留。
+      if (!(window.matchMedia && window.matchMedia('(hover: none)').matches)) {
+        g.addEventListener('mouseenter', e => {
+          const nm = state.lang==='en' ? (node.en||node.zh) : node.zh;
+          const sub = state.lang==='en' ? (node.subEn||node.subZh) : node.subZh;
+          preview.innerHTML = `<div class="journey-preview__name">${esc(nm)}</div>${sub ? `<div class="journey-preview__sub">${esc(sub)}</div>` : ''}`;
+          preview.hidden = false;
+        });
+        g.addEventListener('mousemove', e => {
+          preview.style.left = (e.clientX + 14) + 'px';
+          preview.style.top  = (e.clientY + 14) + 'px';
+        });
+        g.addEventListener('mouseleave', () => { preview.hidden = true; });
+      }
     }
   }
   function apply(){
