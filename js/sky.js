@@ -209,8 +209,11 @@ const CATEGORIES = [
   { id:'hypothetical',zh:'理论假想天体', en:'Hypothetical',             color:'#C0A0FF' },
 ];
 
-function chips(arr){
-  return (arr||[]).map(x => `<span class="jc-chip">${esc(x)}</span>`).join('');
+function chips(arr, linkable){
+  // linkable=true 时渲染为可跳转按钮（点击跳时间线对应理论节点，journey.js showCard 统一绑定）
+  return (arr||[]).map(x => linkable
+    ? `<button type="button" class="jc-chip jc-chip--link" data-theory="${esc(x)}">${esc(x)}</button>`
+    : `<span class="jc-chip">${esc(x)}</span>`).join('');
 }
 
 // 仰望星空 · 随尺度淡入淡出的背景图（各阶段中心对应一个天体节点）
@@ -311,7 +314,7 @@ function cardHTML(node){
       ${sec('形成机制', node.formZh)}
       ${sec('典型参数', node.paramZh)}
       ${sec('关键观测证据', node.obsZh)}
-      ${node.theories ? `<div class="journey-card__sec">相关理论</div><div class="jc-chips">${chips(node.theories)}</div>` : ''}
+      ${node.theories ? `<div class="journey-card__sec">相关理论</div><div class="jc-chips">${chips(node.theories, true)}</div>` : ''}
       ${node.phenomena ? `<div class="journey-card__sec">典型现象</div><div class="jc-chips">${chips(node.phenomena)}</div>` : ''}
     </div>`;
 }

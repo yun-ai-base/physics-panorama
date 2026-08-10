@@ -158,13 +158,13 @@ function updateMicroBg(c){
 
 function chips(arr){ return (arr||[]).map(x => `<span class="jc-chip">${esc(x)}</span>`).join(''); }
 
-function cardHTML(node){
+function cardHTML(node, idx, total){
   const title = node.zh, en = node.en || '', scale = node.subZh || '', desc = node.descZh || '', enDesc = node.descEn || '';
   return `
     <div class="journey-card__inner">
       <button class="journey-card__close" aria-label="关闭">×</button>
       <div class="journey-card__title">${esc(title)} <span class="journey-card__en">${esc(en)}</span></div>
-      <div class="journey-card__scale">特征尺度 · ${esc(scale)}</div>
+      <div class="journey-card__scale">特征尺度 · ${esc(scale)}${total ? ` <span class="jc-layer">层级 ${idx} / ${total}</span>` : ''}</div>
       <p class="journey-card__desc">${esc(desc)}</p>
       <p class="journey-card__desc journey-card__desc--en">${esc(enDesc)}</p>
     </div>`;
@@ -229,7 +229,7 @@ function onNodeClick(node, api){
     return;
   }
   api.focusNode(node);
-  api.showCard(cardHTML(node));
+  api.showCard(cardHTML(node, MICRO_NODES.indexOf(node) + 1, MICRO_NODES.length));
 }
 
 export function initMicro(mount){
@@ -280,7 +280,7 @@ export function renderMicro(){
 export function refreshMicroLang(){
   if (!controller) return;
   controller.refreshLang();
-  if (lastNode && !lastNode.family) controller.showCard(cardHTML(lastNode));
+  if (lastNode && !lastNode.family) controller.showCard(cardHTML(lastNode, MICRO_NODES.indexOf(lastNode) + 1, MICRO_NODES.length));
   if (overlay && !overlay.hidden){
     overlay.innerHTML = buildOverlayHTML();
     // 重建后重新绑定返回按钮（innerHTML 会销毁旧按钮及其监听器）

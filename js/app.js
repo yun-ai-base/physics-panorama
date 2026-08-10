@@ -848,6 +848,16 @@ function wireUI() {
   document.getElementById('tour3').addEventListener('click', () => startTour('3min'));
   document.getElementById('tour10').addEventListener('click', () => startTour('10min'));
   window.addEventListener('pp:gotoNode', e => { setView('timeline', true); selectNode(e.detail); });
+  // 仰望星空/探幽识微卡片「相关理论」chips 跳转：按理论名匹配时间线节点（尽力匹配，找不到静默）
+  window.addEventListener('pp:gotoTheory', e => {
+    const name = e.detail;
+    if (!name) return;
+    const n = NODES.find(x => x.name === name || (x.nameEn && x.nameEn.toLowerCase() === String(name).toLowerCase()));
+    if (!n) return;
+    setView('timeline', true);
+    selectNode(n.id);
+    if (!window.matchMedia('(max-width:768px)').matches) focusNode(n.id);
+  });
 
   // 术语链接：跳转到术语释义锚点，并记录回退位置
   window.addEventListener('pp:gotoTerm', e => {

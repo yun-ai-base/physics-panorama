@@ -121,6 +121,11 @@
 .journey-card__scale {
   font-size: 12px; color: var(--gold, #c9a24e); letter-spacing: .03em; margin-bottom: 10px;
 }
+/* 层级进度徽标（探幽识微：第 x / n 层） */
+.jc-layer{
+  display:inline-block; margin-left:8px; padding:1px 8px; border-radius:999px;
+  font-size:11px; color:#d8cba8; background:rgba(200,180,140,.12); border:1px solid rgba(200,180,140,.22); letter-spacing:.02em;
+}
 .journey-card__desc { font-size: 13.5px; line-height: 1.7; color: #e3dccb; margin: 0 0 8px; }
 .journey-card__desc--en { font-size: 12px; line-height: 1.6; color: #9d937c; margin: 0 0 4px; }
 .journey-card__sec {
@@ -132,6 +137,12 @@
   font-size: 12px; color: #e8dcc0; background: rgba(201,162,78,0.14);
   border: 1px solid rgba(201,162,78,0.35); border-radius: 999px; padding: 3px 10px;
 }
+/* 可跳转理论 chips：hover 提亮 + 手型，明确可点 */
+.jc-chip--link{
+  cursor:pointer; transition:background .15s, border-color .15s, color .15s;
+}
+.jc-chip--link:hover{ background:rgba(201,162,78,.32); border-color:var(--gold, #c9a24e); color:#fff; }
+.jc-chip--link:focus-visible{ outline:2px solid var(--gold, #c9a24e); outline-offset:1px; }
 
 /* 标准模型粒子家族 overlay */
 .particle-overlay {

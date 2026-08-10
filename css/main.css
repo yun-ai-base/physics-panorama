@@ -367,6 +367,12 @@ body.view-people .hint{display:none;}
 .node-preview__sum{font-size:12.5px; line-height:1.6; color:var(--ink-2); margin-top:7px;}
 @keyframes npIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
 
+/* ── 仰望星空/探幽识微：节点悬停迷你预览（深色 journey 主题适配） ── */
+.journey-preview{position:fixed; z-index:60; max-width:240px; padding:7px 12px; background:rgba(14,12,18,.94); border:1px solid rgba(200,180,140,.35); border-radius:10px; box-shadow:0 8px 22px rgba(0,0,0,.4); pointer-events:none; animation:npIn .12s ease both;}
+.journey-preview[hidden]{display:none;}
+.journey-preview__name{font-family:var(--font-serif); font-size:13.5px; font-weight:700; color:#f3ecdc; line-height:1.4;}
+.journey-preview__sub{font-size:11px; color:#b6a986; margin-top:1px;}
+
 /* ── 侧栏「探索更多」拓展阅读块（纯新增，复用 --gold/--gold-tint） ── */
 .sb-explore{margin-top:18px; padding:14px 16px 16px; border:1px solid rgba(184,137,59,.26); border-radius:12px; background:linear-gradient(180deg, rgba(243,233,214,.42), rgba(243,233,214,.16));}
 .sb-explore__title{font-family:var(--font-serif); font-size:15px; font-weight:700; color:var(--gold-dark,#8B6914); letter-spacing:.12em; margin-bottom:10px;}

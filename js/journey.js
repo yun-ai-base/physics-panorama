@@ -5,7 +5,7 @@
 // 拖拽平移、+/- 按钮、全览复位、左侧对数刻度标尺、当前视角尺度读数、通用简介卡片。
 // 返回 controller：{ render, reset, focusNode, zoomTo, showCard, hideCard, refreshLang }
 
-import { el } from './utils.js';
+import { el, esc } from './utils.js';
 import { state } from './state.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -25,6 +25,10 @@ export function createJourney(opts){
   // 简介卡片
   const card = document.createElement('div'); card.className = 'journey-card'; card.hidden = true;
   mount.appendChild(card);
+  // 悬停迷你预览（跟随鼠标，fixed 于 body 级避免被容器裁剪）
+  const preview = document.createElement('div');
+  preview.className = 'journey-preview'; preview.hidden = true;
+  document.body.appendChild(preview);
   // 控制条
   const ctrl = document.createElement('div'); ctrl.className = 'journey-ctrl';
   const mk = (label, title) => { const b = document.createElement('button'); b.type='button'; b.className='journey-btn'; b.textContent=label; if(title) b.title=title; return b; };
@@ -92,6 +96,18 @@ export function createJourney(opts){
       if (node.subZh){ const sub = state.lang==='en' ? (node.subEn||node.subZh) : node.subZh; el('text', { class:'journey-node__sub', x:r+10, y:22, text: sub }, g); }
       g.style.cursor = 'pointer';
       g.addEventListener('click', () => { if (moved) return; onNodeClick(node, api); });
+      // 悬停迷你预览：显示名称 + 特征尺度，减少「点开才知道是什么」的认知负担
+      g.addEventListener('mouseenter', e => {
+        const nm = state.lang==='en' ? (node.en||node.zh) : node.zh;
+        const sub = state.lang==='en' ? (node.subEn||node.subZh) : node.subZh;
+        preview.innerHTML = `<div class="journey-preview__name">${esc(nm)}</div>${sub ? `<div class="journey-preview__sub">${esc(sub)}</div>` : ''}`;
+        preview.hidden = false;
+      });
+      g.addEventListener('mousemove', e => {
+        preview.style.left = (e.clientX + 14) + 'px';
+        preview.style.top  = (e.clientY + 14) + 'px';
+      });
+      g.addEventListener('mouseleave', () => { preview.hidden = true; });
     }
   }
   function apply(){
@@ -149,7 +165,14 @@ export function createJourney(opts){
     reset,
     focusNode(node){ computeFit(); k = clamp(2.4, fitK, 9); tx = W()/2; ty = H()/2 - yOf(node.logSize)*k; apply(); },
     zoomTo(logSize){ computeFit(); k = clamp(2.4, fitK, 9); tx = W()/2; ty = H()/2 - yOf(logSize)*k; apply(); },
-    showCard(html){ card.innerHTML = html; card.hidden = false; },
+    showCard(html){ card.innerHTML = html; card.hidden = false;
+      // 卡片内「可跳转理论」chips（.jc-chip--link[data-theory]）：点击跳到时间线对应理论节点（跨视图知识闭环）
+      card.querySelectorAll('.jc-chip--link[data-theory]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.dispatchEvent(new CustomEvent('pp:gotoTheory', { detail: btn.dataset.theory }));
+        });
+      });
+    },
     hideCard(){ card.hidden = true; },
     refreshLang(){ drawNodes(); },
   };
