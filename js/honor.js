@@ -1,11 +1,11 @@
 // 荣誉殿堂：诺贝尔物理学奖蛇形时间线
 // 数据来源 js/data/nobel-physics.js（1901–2025 英文官方原文）
 // 中文补充：js/data/nobel-physics-zh.js（中文字段，按年份索引）
-import { NOBEL_PHYSICS } from './data/nobel-physics.js?v=20260808v';
-import { NOBEL_PHYSICS_ZH } from './data/nobel-physics-zh.js?v=20260808v';
-import { NOBEL_PHYSICS_NAT } from './data/nobel-physics-nationality.js?v=20260808v';
-import { NOBEL_PHYSICS_IMPACT } from './data/nobel-physics-impact.js?v=20260808v';
-import { state } from './state.js?v=20260808v';
+import { NOBEL_PHYSICS } from './data/nobel-physics.js?v=20260808w';
+import { NOBEL_PHYSICS_ZH } from './data/nobel-physics-zh.js?v=20260808w';
+import { NOBEL_PHYSICS_NAT } from './data/nobel-physics-nationality.js?v=20260808w';
+import { NOBEL_PHYSICS_IMPACT } from './data/nobel-physics-impact.js?v=20260808w';
+import { state } from './state.js?v=20260808w';
 
 const NS = 'http://www.w3.org/2000/svg';
 

@@ -43,9 +43,9 @@
 .edge__label-bg{fill:rgba(247,243,234,.88); pointer-events:none;}
 
 /* 节点 —— 实心浅色填充 + 纪元色描边加粗 */
-.node{cursor:pointer; transition:opacity .3s, transform .2s;}
-.node__circle{fill:#F0EBE0; stroke:var(--ink-3); stroke-width:2.2; transition:transform .2s, fill .2s, stroke .2s, stroke-width .2s;}
-.node:hover .node__circle{transform:scale(1.10); transform-origin:center; transform-box:fill-box;}
+.node{cursor:pointer; transition:opacity .3s var(--ease), transform .2s var(--ease);}
+.node__circle{fill:#F0EBE0; stroke:var(--ink-3); stroke-width:2.2; filter:drop-shadow(0 1px 2px rgba(42,38,32,.12)); transition:transform .2s var(--ease-spring), fill .2s var(--ease), stroke .2s var(--ease), stroke-width .2s var(--ease), filter .2s var(--ease);}
+.node:hover .node__circle{transform:scale(1.10); transform-origin:center; transform-box:fill-box; filter:drop-shadow(0 3px 6px rgba(42,38,32,.22));}
 .node.is-selected .node__circle{filter:url(#goldGlow);}
 /* 关联节点（选中节点的直系父子）：金色描边 + 光晕，让其在画布上明确"显出来" */
 .node.is-related .node__circle{stroke:var(--gold); stroke-width:3.4px; filter:url(#goldGlow);}
