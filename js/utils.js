@@ -1,4 +1,4 @@
-import { REVOLUTION_SET, UNIFY_NODES, EDGE_CLASS } from './config.js?v=20260808w';
+import { REVOLUTION_SET, UNIFY_NODES, EDGE_CLASS } from './config.js?v=20260808x';
 
 export const SVGNS = 'http://www.w3.org/2000/svg';
 

@@ -2,9 +2,9 @@
 // 竖向对数尺度轴（你在顶、普朗克尺度在底），滚轮缩放 / 拖拽平移，点击层级看简介；
 // 点击「夸克」节点展开标准模型粒子家族网格（夸克×3代 / 轻子×3代 / 规范玻色子 + 希格斯）。
 
-import { createJourney } from './journey.js?v=20260808w';
-import { esc } from './utils.js?v=20260808w';
-import { state } from './state.js?v=20260808w';
+import { createJourney } from './journey.js?v=20260808x';
+import { esc } from './utils.js?v=20260808x';
+import { state } from './state.js?v=20260808x';
 
 const MICRO_NODES = [
   { id:'you', logSize:0, zh:'你（观察者）', en:'You (Observer)', subZh:'1 m', subEn:'1 m',

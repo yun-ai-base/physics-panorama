@@ -2,8 +2,8 @@
 // 竖向对数尺度轴（你在底、可观测宇宙在顶），滚轮缩放 / 拖拽平移，点击天体看简介。
 // 支持「类型筛选 + 尺度轴」：分类标签栏高亮某类天体并弹出清单，轴上节点随之淡化/高亮。
 
-import { createJourney } from './journey.js?v=20260808w';
-import { esc } from './utils.js?v=20260808w';
+import { createJourney } from './journey.js?v=20260808x';
+import { esc } from './utils.js?v=20260808x';
 
 // —— 天体节点（含尺度结构层级 + 各类天体）。category 驱动类型筛选 ——
 const SKY_NODES = [

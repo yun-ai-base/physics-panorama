@@ -5,8 +5,8 @@
 // 拖拽平移、+/- 按钮、全览复位、左侧对数刻度标尺、当前视角尺度读数、通用简介卡片。
 // 返回 controller：{ render, reset, focusNode, zoomTo, showCard, hideCard, refreshLang }
 
-import { el, esc } from './utils.js?v=20260808w';
-import { state } from './state.js?v=20260808w';
+import { el, esc } from './utils.js?v=20260808x';
+import { state } from './state.js?v=20260808x';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻' };

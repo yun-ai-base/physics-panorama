@@ -1,6 +1,6 @@
-import { state } from './state.js?v=20260808w';
-import { el, esc, edgePath, bezierMidpoint } from './utils.js?v=20260808w';
-import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC } from './config.js?v=20260808w';
+import { state } from './state.js?v=20260808x';
+import { el, esc, edgePath, bezierMidpoint } from './utils.js?v=20260808x';
+import { ERAS, ERA_ORDER, EDGE_CLASS, SCALE_ORDER, SCALE_LABEL, SCALE_LABEL_EN, SCALE_COLORS, SCALE_DESC } from './config.js?v=20260808x';
 
 const EDGE_LABELS = {
   inherit: '继承',
