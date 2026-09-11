@@ -22,19 +22,20 @@
   {"@context":"https://schema.org","@type":"WebSite","name":"物理学全景图 Physics Panorama","url":"https://yun-ai-base.github.io/physics-panorama/","description":"将物理学300+年的演化路径可视化为可交互、可探索的全景图谱。","inLanguage":"zh-CN","about":{"@type":"Thing","name":"Physics History"}}
   </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='none' stroke='%23B8893B' stroke-width='3'/></svg>" />
-  <!-- KaTeX（公式渲染，CDN 引入；加载失败时自动回退为原始 LaTeX 文本，不影响其余功能） -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="css/main.css?v=20260808x" />
-  <link rel="stylesheet" href="css/timeline.css?v=20260808x" />
-  <link rel="stylesheet" href="css/sidebar.css?v=20260808x" />
-  <link rel="stylesheet" href="css/responsive.css?v=20260808x" />
-  <link rel="stylesheet" href="css/tour.css?v=20260808x" />
-  <link rel="stylesheet" href="css/mindmap.css?v=20260808x" />
-  <link rel="stylesheet" href="css/honor.css?v=20260808x" />
-  <link rel="stylesheet" href="css/void-views.css?v=20260808x" />
-  <link rel="stylesheet" href="css/glossary.css?v=20260808x" />
-  <link rel="stylesheet" href="css/experiments.css?v=20260808x" />
+  <!-- KaTeX（公式渲染）自托管于 vendor/katex/：jsdelivr 在中国大陆常不可达，不再依赖外链 CDN；
+       若脚本加载失败，代码会自动回退为原始 LaTeX 文本，不影响其余功能 -->
+  <link rel="stylesheet" href="vendor/katex/katex.min.css?v=20260911-9d1f4e" />
+  <script defer src="vendor/katex/katex.min.js?v=20260911-9d1f4e"></script>
+  <link rel="stylesheet" href="css/main.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/timeline.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/sidebar.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/responsive.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/tour.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/mindmap.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/honor.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/void-views.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/glossary.css?v=20260911-9d1f4e" />
+  <link rel="stylesheet" href="css/experiments.css?v=20260911-9d1f4e" />
 </head>
 <body>
   <!-- 首屏加载骨架屏（数据加载完成后由 app.js 移除；失败时切换为错误态+重试）
@@ -357,8 +358,8 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=20260808x"></script>
-  <script type="module" src="js/poem.js?v=20260808x"></script>
-  <script defer src="js/changelog.js?v=20260808x"></script>
+  <script type="module" src="js/app.js?v=20260911-9d1f4e"></script>
+  <script type="module" src="js/poem.js?v=20260911-9d1f4e"></script>
+  <script defer src="js/changelog.js?v=20260911-9d1f4e"></script>
 </body>
 </html>

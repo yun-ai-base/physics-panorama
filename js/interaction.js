@@ -1,4 +1,4 @@
-import { state } from './state.js?v=20260808x';
+import { state } from './state.js?v=20260911-9d1f4e';
 
 let svg, vp;
 let dragged = false;

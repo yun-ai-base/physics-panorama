@@ -1,18 +1,18 @@
-import { state } from './state.js?v=20260808x';
-import { esc, buildEdges, relatedSet } from './utils.js?v=20260808x';
-import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js?v=20260808x';
-import { computeLayout } from './views.js?v=20260808x';
-import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260808x';
-import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js?v=20260808x';
-import { initInteraction, fitView, consumeDrag } from './interaction.js?v=20260808x';
-import { startTour } from './tour.js?v=20260808x';
-import { buildPeople, renderPeople, filterPeopleGrid } from './people.js?v=20260808x';
-import { initExperiments, renderExperiments, setExpEraFilter, setExpQuery, expCount, getExp } from './experiments.js?v=20260808x';
-import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js?v=20260808x';
-import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, scrollHonorToOldest, scrollHonorToNewest } from './honor.js?v=20260808x';
-import { initSky, renderSky, refreshSkyLang } from './sky.js?v=20260808x';
-import { initMicro, renderMicro, refreshMicroLang } from './micro.js?v=20260808x';
-import { initGlossary, renderGlossary } from './glossary.js?v=20260808x';
+import { state } from './state.js?v=20260911-9d1f4e';
+import { esc, buildEdges, relatedSet } from './utils.js?v=20260911-9d1f4e';
+import { ERAS, ERA_ORDER, UI_LABELS, READER_PATHS } from './config.js?v=20260911-9d1f4e';
+import { computeLayout } from './views.js?v=20260911-9d1f4e';
+import { initRenderer, renderGraph, applyState } from './renderer.js?v=20260911-9d1f4e';
+import { initSidebar, openNode, openEra, openScale, closeSidebar, openPerson, openSidebarTab, focusTerm, openExperiment } from './sidebar.js?v=20260911-9d1f4e';
+import { initInteraction, fitView, consumeDrag } from './interaction.js?v=20260911-9d1f4e';
+import { startTour } from './tour.js?v=20260911-9d1f4e';
+import { buildPeople, renderPeople, filterPeopleGrid } from './people.js?v=20260911-9d1f4e';
+import { initExperiments, renderExperiments, setExpEraFilter, setExpQuery, expCount, getExp } from './experiments.js?v=20260911-9d1f4e';
+import { initMindmap, renderMindmap, resetMindmap, setExpandAll, focusMindmapNode, exportMindmap } from './mindmap.js?v=20260911-9d1f4e';
+import { renderHonor, refreshHonorLang, closeHonorPop, searchHonor, scrollHonorToOldest, scrollHonorToNewest } from './honor.js?v=20260911-9d1f4e';
+import { initSky, renderSky, refreshSkyLang } from './sky.js?v=20260911-9d1f4e';
+import { initMicro, renderMicro, refreshMicroLang } from './micro.js?v=20260911-9d1f4e';
+import { initGlossary, renderGlossary } from './glossary.js?v=20260911-9d1f4e';
 
 let NODES = [], EDGES = [], SUMMARIES = {}, byId = new Map(), PREFACES = {};
 let currentLayout = [];
@@ -41,8 +41,8 @@ async function boot() {
   }
   try {
     const [nodeRes, metaRes] = await Promise.all([
-      fetch('nodes.json?v=20260808x').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),
-      fetch('physics-data.json?v=20260808x').then(r => { if (!r.ok) throw new Error('physics-data.json → ' + r.status); return r.json(); }),
+      fetch('nodes.json?v=20260911-9d1f4e').then(r => { if (!r.ok) throw new Error('nodes.json → ' + r.status); return r.json(); }),
+      fetch('physics-data.json?v=20260911-9d1f4e').then(r => { if (!r.ok) throw new Error('physics-data.json → ' + r.status); return r.json(); }),
     ]);
     NODES = nodeRes;
     EDGES = buildEdges(NODES, metaRes.conflicts || []);
@@ -92,6 +92,8 @@ async function boot() {
   const restoreTab = state.sidebarTab;
   const restoreTerm = state.termFocus;
   setView(state.view); // 统一走视图切换逻辑（激活 tab、body class、尺度关联条显隐等）
+  // 分享链接（go=1）指定的虚无-图景子视图：等 setView 完成后再激活对应子页
+  if (state.restoreVtab && state.view === 'void') activateVoidTab(state.restoreVtab);
   // 仅在有节点图的视图下才根据 URL hash 自动选中节点并打开侧栏
   const nodeViews = new Set(['timeline', 'scale', 'unification']);
   if (node && byId.has(node) && nodeViews.has(state.view)) {
@@ -691,7 +693,11 @@ function wireUI() {
 
   document.getElementById('shareBtn').addEventListener('click', async () => {
     updateURL();
-    const url = location.href;
+    // 分享链接显式带 go=1：打开时直达当前视图（含虚无-图景子视图）。
+    // 普通刷新/历史进入不带该参数，仍从时间线开始 —— 两者兼顾。
+    const shareUrl = new URL(location.href);
+    shareUrl.searchParams.set('go', '1');
+    const url = shareUrl.toString();
     // 移动端优先调用系统分享面板；用户取消（AbortError）不算失败，静默返回
     if (navigator.share) {
       try { await navigator.share({ title: document.title, url }); return; }
@@ -1177,9 +1183,16 @@ function updateURL(mode) {
 function readURL() {
   const p = new URLSearchParams(location.search);
   if (p.get('lang') === 'en') state.lang = 'en';
-  // 首页强制从时间线开始：不再从 URL 恢复 view/vtab（2026-08-10 用户确认）。
+  // 首页默认从时间线开始，不从 URL 恢复 view/vtab（2026-08-10 用户确认），
   // 避免「打开带 ?view=void&vtab=sky 的历史链接/刷新」时直接跳到虚无图景子页。
-  // 代价：分享带视图参数的链接打开后落回时间线（用户已接受）；node/tab/term 等内容定位参数仍生效。
+  // 例外：链接带 go=1（由「分享当前视图」按钮生成）→ 恢复视图与子视图，让分享/收藏链接真正直达。
+  //       node/tab/term 等内容定位参数始终生效。
+  if (p.get('go') === '1') {
+    const v = p.get('view');
+    if (v && document.querySelector(`.view-tab[data-view="${v}"]`)) state.view = v;
+    const vt = p.get('vtab');
+    if (vt) state.restoreVtab = vt;
+  }
   if (p.get('era')) state.filterEra = p.get('era');
   if (p.get('core') === '0') state.onlyCore = false;
   if (p.get('tab')) state.sidebarTab = p.get('tab');

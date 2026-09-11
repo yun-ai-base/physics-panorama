@@ -2,8 +2,8 @@
 // 竖向对数尺度轴（你在底、可观测宇宙在顶），滚轮缩放 / 拖拽平移，点击天体看简介。
 // 支持「类型筛选 + 尺度轴」：分类标签栏高亮某类天体并弹出清单，轴上节点随之淡化/高亮。
 
-import { createJourney } from './journey.js?v=20260808x';
-import { esc } from './utils.js?v=20260808x';
+import { createJourney } from './journey.js?v=20260911-9d1f4e';
+import { esc } from './utils.js?v=20260911-9d1f4e';
 
 // —— 天体节点（含尺度结构层级 + 各类天体）。category 驱动类型筛选 ——
 const SKY_NODES = [
@@ -73,7 +73,7 @@ const SKY_NODES = [
 
   // ===== 恒星演化 =====
   { id:'whiteDwarf', logSize:7.2, zh:'白矮星', en:'White Dwarf', subZh:'~地球尺度', subEn:'~Earth-sized',
-    category:'stellar', color:'#CFE0FF', r:11, image:'assets/sky/obj_whitedwarf.jpg',
+    category:'stellar', color:'#CFE0FF', r:11, image:'assets/sky/obj_whitedwarf.webp',
     imgCredit:'NASA, ESA, STScI（哈勃·天狼星 B 系统）',
     descZh:'中小质量恒星（如太阳）演化到末期的残骸：核心坍缩后靠电子简并压支撑，体积与地球相仿却拥有太阳量级的质量。',
     descEn:'The remnant of a low-to-intermediate mass star’s evolution, supported by electron degeneracy pressure.',
@@ -82,7 +82,7 @@ const SKY_NODES = [
     obsZh:'天狼星 B 是最易观测的白矮星；Ia 型超新星作为"标准烛光"印证了钱德拉塞卡极限。',
     theories:['恒星演化','简并压'], phenomena:['行星状星云'] },
   { id:'redGiant', logSize:10.8, zh:'红巨星 / 红超巨星', en:'Red Giant', subZh:'~0.5–10 AU', subEn:'~0.5–10 AU',
-    category:'stellar', color:'#E8763C', r:15, image:'assets/sky/obj_redgiant.jpg',
+    category:'stellar', color:'#E8763C', r:15, image:'assets/sky/obj_redgiant.webp',
     imgCredit:'NASA, ESA, E. Wheatley (STScI)（哈勃·参宿四）',
     descZh:'恒星耗尽核心氢后膨胀、冷却、变红的晚年阶段；参宿四等红超巨星可膨胀到木星轨道之外。',
     descEn:'A late evolutionary phase where a star expands, cools and reddens after exhausting core hydrogen.',
@@ -93,7 +93,7 @@ const SKY_NODES = [
 
   // ===== 致密天体 =====
   { id:'neutronStar', logSize:4.0, zh:'中子星', en:'Neutron Star', subZh:'~10 km', subEn:'~10 km',
-    category:'compact', color:'#9FE0FF', r:10, image:'assets/sky/obj_neutronstar.jpg',
+    category:'compact', color:'#9FE0FF', r:10, image:'assets/sky/obj_neutronstar.webp',
     imgCredit:'NASA, ESA, STScI（哈勃·双中子星并合示意图）',
     descZh:'大质量恒星超新星爆发后核心坍缩成的极致密天体，几乎全由中子构成，一茶匙物质重达数亿吨。',
     descEn:'An ultra-dense remnant of a core-collapse supernova, made almost entirely of neutrons.',
@@ -102,7 +102,7 @@ const SKY_NODES = [
     obsZh:'1967 年发现脉冲星（旋转中子星）；2017 GW170817 双中子星并合被 LIGO/Virgo 与电磁波联合探测。',
     theories:['中子星物理','简并压','引力波'], phenomena:['脉冲星','磁星'] },
   { id:'stellarBH', logSize:4.6, zh:'恒星级黑洞', en:'Stellar-mass Black Hole', subZh:'数–数十 M☉', subEn:'few–tens M☉',
-    category:'compact', color:'#7FD0FF', r:11, image:'assets/sky/obj_stellarbh.jpg',
+    category:'compact', color:'#7FD0FF', r:11, image:'assets/sky/obj_stellarbh.webp',
     imgCredit:'ESA, NASA, F. Mirabel（恒星级黑洞艺术印象）',
     descZh:'大质量恒星（>20–25 M☉）燃料耗尽、核心坍缩越过中子星极限后形成的黑洞，质量通常数至数十太阳质量。',
     descEn:'A black hole formed when a massive star’s core collapses past the neutron-star limit.',
@@ -111,7 +111,7 @@ const SKY_NODES = [
     obsZh:'恒星级黑洞与伴星组成 X 射线双星（如 Cygnus X-1）；LIGO 探测到双黑洞并合引力波。',
     theories:['广义相对论','黑洞物理','引力波'], phenomena:['X 射线双星','事件视界'] },
   { id:'pulsar', logSize:4.3, zh:'脉冲星', en:'Pulsar', subZh:'~10 km · 快速自转', subEn:'~10 km, spinning',
-    category:'compact', color:'#B8F0FF', r:10, image:'assets/sky/obj_pulsar.jpg',
+    category:'compact', color:'#B8F0FF', r:10, image:'assets/sky/obj_pulsar.webp',
     imgCredit:'NASA/CXC/ASU/J. Hester et al.（钱德拉 X 射线 + 哈勃光学 · 蟹状脉冲星）',
     descZh:'快速自转、磁场极强的中子星，两极射出的辐射束像宇宙灯塔一样周期性扫过地球，形成精准的脉冲信号。',
     descEn:'A rapidly rotating, highly magnetized neutron star whose radiation beams sweep past Earth like a cosmic lighthouse.',
@@ -120,7 +120,7 @@ const SKY_NODES = [
     obsZh:'1967 年贝尔与休伊什用射电望远镜首次发现（PSR B1919+21）；毫秒脉冲星被用作引力波探测的"脉冲星计时阵列"。',
     theories:['中子星物理','电动力学','引力波'], phenomena:['灯塔效应','脉冲星风云'] },
   { id:'magnetar', logSize:3.7, zh:'磁星', en:'Magnetar', subZh:'~10 km · 极端磁场', subEn:'~10 km, extreme B-field',
-    category:'compact', color:'#8FD8E8', r:10, image:'assets/sky/obj_magnetar.jpg',
+    category:'compact', color:'#8FD8E8', r:10, image:'assets/sky/obj_magnetar.webp',
     imgCredit:'ESO/L. Calçada（Westerlund 1 磁星艺术印象）',
     descZh:'磁场强度冠绝宇宙的中子星——比普通中子星强千倍，磁场衰减驱动的星震可释放出银河系可见的伽马射线巨耀发。',
     descEn:'A neutron star with the strongest magnetic fields in the universe, powering giant gamma-ray flares.',
@@ -129,7 +129,7 @@ const SKY_NODES = [
     obsZh:'1979 年 SGR 0526-66 巨耀发首次记录；2004 年 SGR 1806-20 耀发亮度超满月（距 5 万光年）；部分快速射电暴（FRB）已被证认源自磁星。',
     theories:['中子星物理','磁流体力学'], phenomena:['软伽马重复暴','快速射电暴'] },
   { id:'smbh', logSize:13.0, zh:'超大质量黑洞', en:'Supermassive Black Hole', subZh:'10⁶–10¹⁰ M☉', subEn:'10⁶–10¹⁰ M☉',
-    category:'compact', color:'#5FB8FF', r:14, image:'assets/sky/obj_smbh.jpg',
+    category:'compact', color:'#5FB8FF', r:14, image:'assets/sky/obj_smbh.webp',
     imgCredit:'Event Horizon Telescope Collaboration（M87* 首张黑洞照片）',
     descZh:'栖居星系中心的巨型黑洞，质量达百万至数百亿太阳质量，通过吸积与喷流深刻塑造星系演化。',
     descEn:'Giant black holes at galactic centers, shaping galaxy evolution via accretion and jets.',
@@ -138,7 +138,7 @@ const SKY_NODES = [
     obsZh:'2019 年事件视界望远镜（EHT）发布 M87* 首张黑洞阴影照片；银心人马座 A* 亦被成像。',
     theories:['广义相对论','黑洞物理','星系演化'], phenomena:['吸积盘','相对论喷流'] },
   { id:'quasar', logSize:15.0, zh:'类星体', en:'Quasar', subZh:'中央引擎 ~0.1 ly', subEn:'central engine ~0.1 ly',
-    category:'compact', color:'#7FC8FF', r:13, image:'assets/sky/obj_quasar.jpg',
+    category:'compact', color:'#7FC8FF', r:13, image:'assets/sky/obj_quasar.webp',
     imgCredit:'ESA/Hubble & NASA（3C 273——首个被证认的类星体，右下可见喷流）',
     descZh:'宇宙中最明亮的持续光源——超大质量黑洞疯狂吸积气体，中央引擎不足一光年却能亮过整个千亿恒星的星系。',
     descEn:'The most luminous persistent objects in the universe—supermassive black holes devouring gas at galactic centers.',
@@ -149,7 +149,7 @@ const SKY_NODES = [
 
   // ===== 爆发与高能 =====
   { id:'supernova', logSize:11.6, zh:'超新星遗迹', en:'Supernova Remnant', subZh:'~数–数十 ly', subEn:'~few–tens ly',
-    category:'explosive', color:'#FF6A3D', r:13, image:'assets/sky/obj_supernova.jpg',
+    category:'explosive', color:'#FF6A3D', r:13, image:'assets/sky/obj_supernova.webp',
     imgCredit:'NASA, ESA, J. Hester (ASU)（哈勃·蟹状星云）',
     descZh:'大质量恒星生命终点的剧烈爆炸，瞬间亮度堪比整个星系，向星际空间抛洒重元素。',
     descEn:'The violent explosion ending a massive star’s life, briefly outshining its whole galaxy.',
@@ -158,7 +158,7 @@ const SKY_NODES = [
     obsZh:'1054 年中国天文官记录超新星（催生蟹状星云）；SN 1987A 是近代最近邻超新星；Ia 作宇宙距离标准烛光。',
     theories:['恒星演化','核物理'], phenomena:['激波','重元素核合成'] },
   { id:'grb', logSize:11.9, zh:'伽马射线暴', en:'Gamma-ray Burst', subZh:'数秒–数分钟', subEn:'seconds–minutes',
-    category:'explosive', color:'#FF9A3D', r:12, image:'assets/sky/obj_grb.jpg',
+    category:'explosive', color:'#FF9A3D', r:12, image:'assets/sky/obj_grb.webp',
     imgCredit:'NASA, ESA, CSA, STScI, L. Hustak（韦布·GRB 250314A 艺术概念）',
     descZh:'宇宙中最猛烈的高能爆发，数秒至数分钟的伽马射线闪光，源于大质量恒星坍缩或致密天体并合。',
     descEn:'The most violent high-energy flashes in the cosmos, lasting seconds to minutes.',
@@ -169,7 +169,7 @@ const SKY_NODES = [
 
   // ===== 宇宙学与起源 =====
   { id:'bigBang', logSize:0, zh:'大爆炸与暴胀', en:'Big Bang & Inflation', subZh:'宇宙开端 ~138 亿年前', subEn:'~13.8 Gyr ago',
-    category:'cosmology', color:'#FFE9B0', r:14, noAxis:true, image:'assets/sky/sky_cmb.jpg',
+    category:'cosmology', color:'#FFE9B0', r:14, noAxis:true, image:'assets/sky/sky_cmb.webp',
     imgCredit:'ESA Planck（宇宙微波背景全天图，CC BY-SA 3.0 IGO）',
     descZh:'宇宙的开端——约 138 亿年前，时空与物质从极高温高密度状态膨胀而来（大爆炸）；其极早期（约 10⁻³⁶ 秒量级）还经历了暴胀：以指数速率急速膨胀，把微观量子涨落拉伸为今天宇宙大尺度结构的种子。',
     descEn:'The origin of the universe ~13.8 Gyr ago: spacetime and matter expanding from an extremely hot, dense state (the Big Bang), preceded by cosmic inflation—an exponential expansion within the first ~10⁻³⁶ s that stretched quantum fluctuations into the seeds of cosmic structure.',
@@ -220,15 +220,15 @@ function chips(arr, linkable){
 // 真实科学图：NASA 公共领域（银河 / 黑色弹珠·城市灯火 / 蓝色弹珠 / 太阳系）· ESA Planck CMB（CC BY-SA 3.0 IGO）
 // 程序化科学可视化（无实拍照，与微观侧同原则）：本星系群 / 室女座超星系团 / 拉尼亚凯亚超星系团
 const SKY_BG = [
-  { id:'observer',  log:0,    img:'assets/sky/sky_observer.jpg' },     // 你仰望的银河（NASA-JPL）
-  { id:'city',      log:3,    img:'assets/sky/sky_city.jpg' },          // 城市灯火·地球之夜（NASA Black Marble）
-  { id:'earth',     log:6.8,  img:'assets/sky/sky_earth.jpg' },         // 蓝色弹珠（NASA Blue Marble）
-  { id:'solar',     log:16,   img:'assets/sky/sky_solarsystem.jpg' },   // 太阳系（NASA）
-  { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.png' },        // 银河系·NGC 6744（ESA/Hubble 银河系"双胞胎"正面旋涡真照）
-  { id:'group',     log:23,   img:'assets/sky/sky_group.jpg' },         // 本星系群（ESA/Hubble M81/M82 星系群真实照）
-  { id:'virgo',     log:24,   img:'assets/sky/sky_virgo.jpg' },         // 室女座超星系团·NGC 4414 旋涡星系（ESA/Hubble potw2444a 无水印真照）
-  { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.jpg' },      // 拉尼亚凯亚超星系团·宇宙纤维网（ESA/Hubble opo0820b 无水印真图）
-  { id:'cmb',       log:26.9, img:'assets/sky/sky_cmb.jpg' },           // 普朗克 CMB 全天图（ESA）
+  { id:'observer',  log:0,    img:'assets/sky/sky_observer.webp' },     // 你仰望的银河（NASA-JPL）
+  { id:'city',      log:3,    img:'assets/sky/sky_city.webp' },          // 城市灯火·地球之夜（NASA Black Marble）
+  { id:'earth',     log:6.8,  img:'assets/sky/sky_earth.webp' },         // 蓝色弹珠（NASA Blue Marble）
+  { id:'solar',     log:16,   img:'assets/sky/sky_solarsystem.webp' },   // 太阳系（NASA）
+  { id:'galaxy',    log:21,   img:'assets/sky/sky_galaxy.webp' },        // 银河系·NGC 6744（ESA/Hubble 银河系"双胞胎"正面旋涡真照）
+  { id:'group',     log:23,   img:'assets/sky/sky_group.webp' },         // 本星系群（ESA/Hubble M81/M82 星系群真实照）
+  { id:'virgo',     log:24,   img:'assets/sky/sky_virgo.webp' },         // 室女座超星系团·NGC 4414 旋涡星系（ESA/Hubble potw2444a 无水印真照）
+  { id:'laniakea',  log:24.7, img:'assets/sky/sky_laniakea.webp' },      // 拉尼亚凯亚超星系团·宇宙纤维网（ESA/Hubble opo0820b 无水印真图）
+  { id:'cmb',       log:26.9, img:'assets/sky/sky_cmb.webp' },           // 普朗克 CMB 全天图（ESA）
 ];
 
 let bgLayers = [];
@@ -238,10 +238,14 @@ let bgCredit = null;
 function buildSkyBg(mount){
   bgEl = document.createElement('div');
   bgEl.className = 'sky-bg';
-  bgLayers = SKY_BG.map(stage => {
+  bgLayers = SKY_BG.map((stage, i) => {
     const layer = document.createElement('div');
     layer.className = 'sky-bg__layer';
-    layer.style.backgroundImage = `url("${stage.img}")`;
+    // 背景图按需加载（见 updateSkyBg）：仅第 0 层先加载作兜底，避免进入视图即拉取全部 9 层
+    if (i === 0){
+      layer.style.backgroundImage = `url("${stage.img}")`;
+      layer.dataset.loaded = '1';
+    }
     layer.dataset.id = stage.id;
     bgEl.appendChild(layer);
     return layer;
@@ -285,9 +289,28 @@ function bgOpacities(c){
   return ops;
 }
 
+// 背景图按需加载：只加载「当前中心层 ±1」中尚未加载的层。
+// 初始视角（最小尺度）因此只拉 sky_observer + sky_city（约 0.25 MB），而非全部 9 层（约 4 MB）；
+// 向外缩放时相邻层已进入加载路径，交叉淡入不会出现空档（过渡只发生在相邻层之间）。
+function ensureBgLoaded(i){
+  const layer = bgLayers[i];
+  if (!layer || layer.dataset.loaded) return;
+  layer.dataset.loaded = '1';                       // 先标记，避免同帧重复触发
+  layer.style.backgroundImage = `url("${SKY_BG[i].img}")`;
+}
+
 function updateSkyBg(c){
   if (!bgLayers.length) return;
   const ops = bgOpacities(c);
+  // 中心层 = 与当前尺度最接近的一层
+  let center = 0;
+  for (let i = 1; i < SKY_BG.length; i++)
+    if (Math.abs(c - SKY_BG[i].log) < Math.abs(c - SKY_BG[center].log)) center = i;
+  for (let i = center - 1; i <= center + 1; i++)
+    if (i >= 0 && i < bgLayers.length) ensureBgLoaded(i);
+  // 兜底：任何已参与显示的层都必须已加载（交叉淡入期间同样成立）
+  for (let i = 0; i < bgLayers.length; i++)
+    if (ops[i] > 0.001) ensureBgLoaded(i);
   for (let i = 0; i < bgLayers.length; i++) bgLayers[i].style.opacity = ops[i].toFixed(3);
 }
 
